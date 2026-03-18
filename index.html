@@ -64,10 +64,11 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  letter-spacing: -0.5px;
+  letter-spacing: -1px;
+  word-spacing: -4px;
 }
 
-.logo-dot { color: var(--accent); letter-spacing: -0.5px; }
+.logo-dot { color: var(--accent); letter-spacing: -1px; }
 
 .profile-btn {
   width: 36px; height: 36px;
@@ -705,7 +706,7 @@ textarea::placeholder { color: var(--muted); }
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="logo">🏷️ Eti<span class="logo-dot">Qu</span>ette</div>
+  <div class="logo">🏷️ <span style="letter-spacing:-1px">Eti<span class="logo-dot">Qu</span>ette</span></div>
   <button class="profile-btn" onclick="goToProfile()">
     👤
     <span class="profile-badge" id="profile-badge">0</span>
@@ -1324,7 +1325,7 @@ async function handlePhoto(event) {
               },
               {
                 type: "text",
-                text: "Extrage DOAR lista de ingrediente din această imagine de pe ambalajul unui produs. Returnează DOAR textul ingredientelor, exact cum apare, fără niciun alt text, explicație sau formatare. Dacă nu găsești ingrediente, returnează: NU_AM_GASIT"
+                text: "Ești expert în citirea etichetelor de produse. Uită-te cu atenție la această imagine și găsește lista de ingrediente. Lista de ingrediente apare de obicei după cuvintele: 'Ingredients:', 'Ingrediente:', 'Ingrediënten:', 'Inhaltsstoffe:', 'Ingrédients:', 'INCI:' sau similar. Extrage DOAR ingredientele — lista separată prin virgule. Ignoră orice alt text (instrucțiuni de utilizare, avertismente, descrieri). Returnează DOAR ingredientele, fără niciun alt cuvânt. Dacă absolut nu găsești nicio listă de ingrediente, returnează: NU_AM_GASIT"
               }
             ]
           }]
