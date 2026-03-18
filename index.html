@@ -735,14 +735,14 @@ textarea::placeholder { color: var(--muted); }
   <!-- Product type -->
   <div class="section-title">Tip produs</div>
   <div class="type-grid">
-    <div class="type-card active" id="type-food" onclick="setType('food')">
+    <button class="type-card active" id="type-food" onclick="setType('food')">
       <div class="emoji">🍎</div>
       <div class="label">Alimentar</div>
-    </div>
-    <div class="type-card" id="type-cosm" onclick="setType('cosmetic')">
+    </button>
+    <button class="type-card" id="type-cosm" onclick="setType('cosmetic')">
       <div class="emoji">💄</div>
       <div class="label">Cosmetic</div>
-    </div>
+    </button>
   </div>
 
   <!-- Ingredients input -->
@@ -817,6 +817,9 @@ textarea::placeholder { color: var(--muted); }
 
   <div style="margin-top:20px;">
     <button class="btn-primary" onclick="saveProfile()">💾 SALVEAZĂ PROFILUL</button>
+  </div>
+  <div style="margin-top:10px;">
+    <button class="btn-secondary" style="width:100%;text-align:center;" onclick="resetApiKey()">🔑 Schimbă cheia API</button>
   </div>
 
 </div>
@@ -1362,4 +1365,11 @@ async function handlePhoto(event) {
 // ===================== UTILS =====================
 function showError(msg) {
   const el = document.getElementById('error-card');
-  el.textContent = '⚠️ ' + msg
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('show');
+}
+
+init();
+</script>
+</body>
+</html>
