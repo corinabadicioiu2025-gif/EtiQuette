@@ -64,9 +64,10 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  letter-spacing: -0.5px;
 }
 
-.logo-dot { color: var(--accent); }
+.logo-dot { color: var(--accent); letter-spacing: -0.5px; }
 
 .profile-btn {
   width: 36px; height: 36px;
@@ -847,6 +848,19 @@ textarea::placeholder { color: var(--muted); }
 <!-- FAB: Quick add condition -->
 <button class="fab" id="fab" onclick="openModal()" title="Adaugă afecțiune rapid">+</button>
 
+<!-- API KEY MODAL -->
+<div class="modal-overlay" id="apikey-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔑 Cheie API</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6;">Introdu cheia ta API Anthropic ca să activezi analiza AI. O găsești pe <strong>console.anthropic.com</strong></p>
+    <input type="password" id="apikey-input" placeholder="sk-ant-api03-..." style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);outline:none;margin-bottom:8px;">
+    <div id="apikey-error" style="display:none;color:var(--danger);font-size:12px;margin-bottom:8px;">⚠️ Cheie invalidă. Trebuie să înceapă cu sk-ant</div>
+    <button class="btn-primary" onclick="submitApiKey()" style="margin-bottom:8px;">✓ Salvează cheia</button>
+    <p style="font-size:11px;color:var(--muted);text-align:center;">Cheia se salvează doar pe dispozitivul tău</p>
+  </div>
+</div>
+
 <!-- QUICK ADD MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
   <div class="modal">
@@ -907,6 +921,7 @@ function init() {
   updateProfileBadge();
   updateConditionsBar();
   renderHistory();
+  if (!getApiKey()) showApiKeyModal();
 }
 
 // ===================== NAVIGATION =====================
@@ -1045,7 +1060,7 @@ function handleOverlayClick(e) {
 
 // ===================== ANALYZE =====================
 async function analyze() {
-  const input = document.getElementById('ing-input').value.trim();
+  if (!getApiKey()) { showApiKeyModal(); return; }
   if (input.length < 5) { showError('Te rog introdu o listă de ingrediente.'); return; }
 
   const activeList = CONDITIONS.filter(c => activeConditions.has(c.id));
@@ -1234,22 +1249,34 @@ function renderHistory() {
 
 // ===================== API KEY MANAGEMENT =====================
 function getApiKey() {
-  let key = localStorage.getItem('etiquette_api_key');
-  if (!key) {
-    key = prompt('🔑 Introdu cheia ta API Anthropic:\n(o găsești pe console.anthropic.com)');
-    if (key && key.startsWith('sk-ant')) {
-      localStorage.setItem('etiquette_api_key', key);
-    } else {
-      alert('Cheie invalidă. Încearcă din nou.');
-      return null;
-    }
-  }
-  return key;
+  return localStorage.getItem('etiquette_api_key') || null;
+}
+
+function saveApiKey(key) {
+  localStorage.setItem('etiquette_api_key', key);
 }
 
 function resetApiKey() {
   localStorage.removeItem('etiquette_api_key');
-  alert('Cheie resetată. La următoarea analiză vei fi rugat să introduci cheia din nou.');
+  showApiKeyModal();
+}
+
+function showApiKeyModal() {
+  document.getElementById('apikey-modal').classList.add('show');
+}
+
+function closeApiKeyModal() {
+  document.getElementById('apikey-modal').classList.remove('show');
+}
+
+function submitApiKey() {
+  const key = document.getElementById('apikey-input').value.trim();
+  if (!key.startsWith('sk-ant')) {
+    document.getElementById('apikey-error').style.display = 'block';
+    return;
+  }
+  saveApiKey(key);
+  closeApiKeyModal();
 }
 
 
@@ -1264,6 +1291,7 @@ function clearPhoto() {
 }
 
 async function handlePhoto(event) {
+  if (!getApiKey()) { showApiKeyModal(); return; }
   const file = event.target.files[0];
   if (!file) return;
 
