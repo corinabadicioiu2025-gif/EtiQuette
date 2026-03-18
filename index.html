@@ -590,7 +590,11 @@ function doAnalyze() {
       var end = clean.lastIndexOf('}');
       if (start !== -1 && end !== -1) clean = clean.substring(start, end+1);
       parsed = JSON.parse(clean);
-    } catch(e) { throw new Error('Răspuns invalid. Încearcă din nou.'); }
+    } catch(e) {
+      // Show what we actually got for debugging
+      var preview = text ? text.substring(0,200) : JSON.stringify(data).substring(0,200);
+      throw new Error('Debug: ' + preview);
+    }
     renderResults(parsed, ing);
   })
   .catch(function(err) {
