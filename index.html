@@ -2,1374 +2,701 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>EtiQuette — Analizor de Ingrediente</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EtiQuette</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 :root {
-  --bg: #f7f5f0;
-  --surface: #ffffff;
-  --surface2: #f0ede6;
-  --border: #e0dbd0;
-  --accent: #1a5276;
-  --accent-light: #2e86c1;
-  --accent-pale: #d6eaf8;
-  --warn: #e76f51;
-  --warn-pale: #fde8e2;
-  --danger: #c1121f;
-  --danger-pale: #ffe0e0;
-  --gold: #d4a017;
-  --gold-pale: #fef9e7;
-  --text: #1a1a1a;
-  --text2: #555;
-  --muted: #999;
-  --good: #1e8449;
-  --medium: #d4a017;
-  --bad: #c1121f;
-  --radius: 16px;
-  --shadow: 0 2px 20px rgba(0,0,0,0.08);
+  --bg:#f8f6f1; --surface:#fff; --surface2:#f0ede6; --border:#e2ddd4;
+  --accent:#1a5276; --accent2:#2e86c1; --accent-pale:#d6eaf8;
+  --warn:#e67e22; --warn-pale:#fdebd0; --danger:#c0392b; --danger-pale:#fadbd8;
+  --good:#1e8449; --good-pale:#d5f5e3; --medium:#d4ac0d; --medium-pale:#fef9e7;
+  --text:#1a1a2e; --text2:#5d6d7e; --muted:#aab7c4;
+  --radius:14px; --shadow:0 2px 16px rgba(26,82,118,0.08);
 }
+body { background:var(--bg); color:var(--text); font-family:'DM Mono',monospace; min-height:100vh; max-width:430px; margin:0 auto; overflow-x:hidden; }
 
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Mono', monospace;
-  min-height: 100vh;
-  max-width: 430px;
-  margin: 0 auto;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* TOP BAR */
-.topbar {
-  background: var(--surface);
-  border-bottom: 1.5px solid var(--border);
-  padding: 16px 20px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logo {
-  font-family: 'Syne', sans-serif;
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  letter-spacing: -1px;
-  word-spacing: -4px;
-}
-
-.logo-dot { color: var(--accent); letter-spacing: -1px; }
-
-.profile-btn {
-  width: 36px; height: 36px;
-  background: var(--accent);
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-  position: relative;
-}
-
-.profile-badge {
-  position: absolute;
-  top: -3px; right: -3px;
-  width: 14px; height: 14px;
-  background: var(--warn);
-  border-radius: 50%;
-  border: 2px solid var(--bg);
-  font-size: 8px;
-  color: white;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-}
+/* TOPBAR */
+.topbar { background:var(--surface); border-bottom:1.5px solid var(--border); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; box-shadow:var(--shadow); }
+.logo { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; letter-spacing:-1.5px; display:flex; align-items:center; gap:8px; }
+.logo-qu { color:var(--accent2); }
+.avatar-btn { width:38px; height:38px; background:var(--accent); border-radius:50%; border:none; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; position:relative; }
+.badge { position:absolute; top:-2px; right:-2px; width:16px; height:16px; background:var(--danger); border-radius:50%; border:2px solid var(--bg); font-family:'Syne',sans-serif; font-size:9px; font-weight:700; color:white; display:none; align-items:center; justify-content:center; }
+.badge.show { display:flex; }
 
 /* PAGES */
-.page { display: none; padding: 20px 20px 100px; animation: fadeIn 0.25s ease; }
-.page.active { display: block; }
-
-@keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+.page { display:none; padding:20px 20px 90px; }
+.page.active { display:block; animation:fadeUp 0.25s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
 /* BOTTOM NAV */
-.bottom-nav {
-  position: fixed;
-  bottom: 0; left: 50%;
-  transform: translateX(-50%);
-  width: 100%; max-width: 430px;
-  background: var(--surface);
-  border-top: 1.5px solid var(--border);
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  padding: 8px 0 16px;
-  z-index: 100;
-}
-
-.nav-item {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 4px;
-  cursor: pointer;
-  padding: 6px;
-  border: none; background: none;
-  font-family: 'DM Mono', monospace;
-}
-
-.nav-icon { font-size: 22px; }
-.nav-label { font-size: 10px; color: var(--muted); letter-spacing: 0.05em; transition: color 0.2s; }
-.nav-item.active .nav-label { color: var(--accent); font-weight: 500; }
-.nav-item.active .nav-icon { filter: none; }
-
-/* SECTION TITLES */
-.section-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* CARDS */
-.card {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow);
-}
-
-/* ===================== HOME PAGE ===================== */
-.greeting {
-  margin-bottom: 24px;
-}
-
-.greeting h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 6px;
-}
-
-.greeting p { color: var(--text2); font-size: 13px; }
-
-/* Active conditions bar */
-.conditions-bar {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: var(--shadow);
-}
-
-.conditions-bar .icon { font-size: 18px; }
-.conditions-bar .info { flex: 1; }
-.conditions-bar .info .label { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
-.conditions-bar .info .value { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); }
-
-.conditions-pills {
-  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
-}
-
-.pill {
-  background: var(--accent-pale);
-  color: var(--accent);
-  border-radius: 20px;
-  padding: 3px 10px;
-  font-size: 11px;
-  font-weight: 500;
-  display: flex; align-items: center; gap: 4px;
-}
-
-.pill.warn { background: var(--warn-pale); color: var(--warn); }
-
-/* Product type selector */
-.type-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.type-card {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
-  box-shadow: var(--shadow);
-}
-
-.type-card:hover, .type-card.active {
-  border-color: var(--accent);
-  background: var(--accent-pale);
-}
-
-.type-card .emoji { font-size: 28px; margin-bottom: 8px; }
-.type-card .label { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); }
-.type-card.active .label { color: var(--accent); }
-
-/* Textarea */
-.input-wrap { position: relative; margin-bottom: 12px; }
-
-textarea {
-  width: 100%;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  font-family: 'DM Mono', monospace;
-  font-size: 12.5px;
-  line-height: 1.7;
-  padding: 16px;
-  resize: none;
-  height: 120px;
-  outline: none;
-  transition: border-color 0.2s;
-  box-shadow: var(--shadow);
-}
-
-textarea:focus { border-color: var(--accent); }
-textarea::placeholder { color: var(--muted); }
-
-/* Analyze btn */
-.btn-primary {
-  width: 100%;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: var(--radius);
-  padding: 17px;
-  font-family: 'Syne', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  cursor: pointer;
-  letter-spacing: 0.05em;
-  transition: all 0.2s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-
-.btn-primary:hover { background: #1e4d38; transform: translateY(-1px); }
-.btn-primary:active { transform: translateY(0); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-.btn-secondary {
-  background: var(--surface2);
-  color: var(--text);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 12px 18px;
-  font-family: 'Syne', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-
-/* Loading */
-.loading-wrap {
-  display: none;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.loading-wrap.show { display: block; }
-
-.loader {
-  width: 44px; height: 44px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 14px;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-wrap p { color: var(--muted); font-size: 12px; }
-
-/* ===================== RESULTS ===================== */
-.results-wrap { display: none; margin-top: 20px; }
-.results-wrap.show { display: block; animation: fadeIn 0.3s ease; }
-
-/* Alert banner */
-.alert-banner {
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  border: 1.5px solid;
-}
-
-.alert-banner.danger { background: var(--danger-pale); border-color: var(--danger); }
-.alert-banner.warn { background: var(--warn-pale); border-color: var(--warn); }
-.alert-banner .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-.alert-banner .alert-body .alert-title {
-  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800;
-  color: var(--danger); margin-bottom: 4px;
-}
-.alert-banner.warn .alert-body .alert-title { color: var(--warn); }
-.alert-banner .alert-body .alert-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
-
-/* Score */
-.score-row {
-  display: flex; align-items: center; gap: 20px;
-  padding: 20px;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  margin-bottom: 12px;
-  box-shadow: var(--shadow);
-}
-
-.score-circle {
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  border: 3px solid;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-
-.score-num { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; line-height: 1; }
-.score-den { font-size: 10px; color: var(--muted); }
-.score-info .verdict { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
-.score-info .summary { font-size: 12px; color: var(--text2); line-height: 1.6; }
-
-.color-good { color: var(--good); border-color: var(--good); }
-.color-medium { color: var(--medium); border-color: var(--medium); }
-.color-bad { color: var(--bad); border-color: var(--bad); }
-
-/* Bar */
-.bar-card {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 20px;
-  margin-bottom: 12px;
-}
-
-.bar-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.08em; }
-.bar-track { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 4px; transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1); width: 0; }
-.fill-good { background: var(--good); }
-.fill-medium { background: var(--medium); }
-.fill-bad { background: var(--bad); }
-
-/* Ingredient items */
-.section-card {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow);
-}
-
-.ing-item {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 12.5px;
-}
-
-.ing-item:last-child { border-bottom: none; }
-
-.ing-dot {
-  width: 18px; height: 18px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 700;
-  flex-shrink: 0; margin-top: 2px;
-}
-
-.dot-good { background: var(--accent-pale); color: var(--good); }
-.dot-medium { background: var(--gold-pale); color: var(--gold); }
-.dot-bad { background: var(--danger-pale); color: var(--bad); }
-
-.ing-name { font-weight: 500; color: var(--text); margin-bottom: 2px; }
-.ing-desc { font-size: 11.5px; color: var(--text2); line-height: 1.5; }
-.ing-alert { font-size: 11px; color: var(--danger); font-weight: 500; margin-top: 3px; }
-
-.point-row {
-  display: flex; gap: 10px; padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 12.5px; color: var(--text2); line-height: 1.5;
-}
-.point-row:last-child { border-bottom: none; }
-.point-icon { flex-shrink: 0; }
-
-.reco-box {
-  background: var(--accent-pale);
-  border: 1.5px solid var(--accent-light);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 12px;
-  font-size: 12.5px;
-  color: var(--accent);
-  line-height: 1.6;
-}
-
-.disclaimer {
-  font-size: 10.5px; color: var(--muted); text-align: center;
-  padding: 12px; line-height: 1.5;
-  border-top: 1px solid var(--border); margin-top: 8px;
-}
-
-/* ===================== PROFILE PAGE ===================== */
-.profile-header {
-  display: flex; align-items: center; gap: 14px;
-  margin-bottom: 24px;
-}
-
-.avatar {
-  width: 56px; height: 56px;
-  background: var(--accent);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px;
-}
-
-.profile-header .name {
-  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
-}
-
-.profile-header .sub { font-size: 12px; color: var(--muted); }
-
-/* Condition toggle list */
-.condition-list { display: flex; flex-direction: column; gap: 8px; }
-
-.condition-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 16px;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.condition-item.active {
-  border-color: var(--accent);
-  background: var(--accent-pale);
-}
-
-.condition-item .cond-info { display: flex; align-items: center; gap: 10px; }
-.condition-item .cond-icon { font-size: 20px; }
-.condition-item .cond-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; }
-.condition-item .cond-cat { font-size: 11px; color: var(--muted); }
-
-/* Toggle switch */
-.toggle {
-  width: 40px; height: 22px;
-  background: var(--border);
-  border-radius: 11px;
-  position: relative;
-  transition: background 0.2s;
-  flex-shrink: 0;
-}
-
-.toggle::after {
-  content: '';
-  position: absolute;
-  width: 16px; height: 16px;
-  background: white;
-  border-radius: 50%;
-  top: 3px; left: 3px;
-  transition: transform 0.2s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-
-.condition-item.active .toggle { background: var(--accent); }
-.condition-item.active .toggle::after { transform: translateX(18px); }
-
-/* Custom condition input */
-.add-custom {
-  display: flex; gap: 8px; margin-top: 12px;
-}
-
-.add-custom input {
-  flex: 1;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  padding: 11px 14px;
-  font-family: 'DM Mono', monospace;
-  font-size: 13px;
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.add-custom input:focus { border-color: var(--accent); }
-.add-custom input::placeholder { color: var(--muted); }
-
-.btn-add {
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 0 16px;
-  font-size: 20px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-add:hover { background: #1e4d38; }
-
-/* ===================== HISTORY PAGE ===================== */
-.history-item {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 10px;
-  display: flex; align-items: center; gap: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: var(--shadow);
-}
-
-.history-item:hover { border-color: var(--accent); }
-
-.hist-score {
-  width: 46px; height: 46px;
-  border-radius: 50%;
-  border: 2.5px solid;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-
-.hist-score .hs-num { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; line-height: 1; }
-.hist-score .hs-den { font-size: 8px; color: var(--muted); }
-
-.hist-info { flex: 1; }
-.hist-type { font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
-.hist-excerpt { font-size: 12px; color: var(--text2); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
-.hist-date { font-size: 10px; color: var(--muted); }
-.hist-alerts { display: flex; gap: 4px; margin-top: 5px; }
-.hist-alert-pill { background: var(--danger-pale); color: var(--danger); font-size: 10px; padding: 2px 7px; border-radius: 10px; }
-
-.empty-state {
-  text-align: center; padding: 60px 20px; color: var(--muted);
-}
-.empty-state .es-icon { font-size: 48px; margin-bottom: 12px; }
-.empty-state .es-text { font-size: 13px; line-height: 1.6; }
-
-/* QUICK ADD modal */
-.modal-overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 200;
-  align-items: flex-end;
-  justify-content: center;
-}
-.modal-overlay.show { display: flex; }
-
-.modal {
-  background: var(--surface);
-  border-radius: 20px 20px 0 0;
-  padding: 24px 20px 40px;
-  width: 100%; max-width: 430px;
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-.modal-handle {
-  width: 36px; height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin: 0 auto 20px;
-}
-
-.modal-title {
-  font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800;
-  margin-bottom: 16px;
-}
-
-.modal-conditions { display: flex; flex-direction: column; gap: 8px; max-height: 55vh; overflow-y: auto; }
-
-.modal-cond-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.modal-cond-item.active { border-color: var(--accent); background: var(--accent-pale); }
-.modal-cond-item .mc-icon { font-size: 18px; }
-.modal-cond-item .mc-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; flex: 1; }
-.modal-cond-item .mc-check { font-size: 16px; color: var(--accent); opacity: 0; transition: opacity 0.15s; }
-.modal-cond-item.active .mc-check { opacity: 1; }
+.bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; background:var(--surface); border-top:1.5px solid var(--border); display:grid; grid-template-columns:repeat(3,1fr); padding:8px 0 20px; z-index:50; }
+.nav-btn { display:flex; flex-direction:column; align-items:center; gap:3px; background:none; border:none; cursor:pointer; padding:4px; }
+.nav-icon { font-size:22px; }
+.nav-label { font-size:9px; letter-spacing:0.1em; color:var(--muted); font-family:'Syne',sans-serif; font-weight:700; }
+.nav-btn.active .nav-label { color:var(--accent); }
+
+/* COMMON */
+.section-label { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+.card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:12px; box-shadow:var(--shadow); }
+
+/* TYPE BUTTONS */
+.type-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.type-btn { background:var(--surface); border:2px solid var(--border); border-radius:var(--radius); padding:16px 10px; cursor:pointer; text-align:center; transition:all 0.15s; font-family:'Syne',sans-serif; }
+.type-btn:hover { border-color:var(--accent2); }
+.type-btn.active { background:var(--accent-pale); border-color:var(--accent); }
+.t-emoji { font-size:26px; margin-bottom:6px; display:block; }
+.t-label { font-size:13px; font-weight:700; color:var(--text2); }
+.type-btn.active .t-label { color:var(--accent); }
+
+/* CAMERA */
+.camera-btn { width:100%; background:var(--surface); border:2px dashed var(--accent2); border-radius:var(--radius); padding:15px; font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--accent); cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:10px; }
+.camera-btn:hover { background:var(--accent-pale); border-style:solid; }
+.photo-wrap { display:none; margin-bottom:10px; position:relative; }
+.photo-wrap img { width:100%; border-radius:10px; border:1.5px solid var(--border); max-height:160px; object-fit:cover; display:block; }
+.photo-close { position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:26px; height:26px; cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center; }
+.ocr-loading { display:none; align-items:center; gap:8px; background:var(--accent-pale); border-radius:8px; padding:10px 12px; font-size:12px; color:var(--accent); margin-top:6px; }
+.ocr-loading.show { display:flex; }
+.divider { text-align:center; position:relative; margin:10px 0; color:var(--muted); font-size:11px; }
+.divider::before,.divider::after { content:''; position:absolute; top:50%; width:40%; height:1px; background:var(--border); }
+.divider::before { left:0; } .divider::after { right:0; }
+
+/* TEXTAREA */
+textarea { width:100%; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; padding:14px; color:var(--text); font-family:'DM Mono',monospace; font-size:12.5px; line-height:1.7; resize:none; height:110px; outline:none; transition:border-color 0.15s; }
+textarea:focus { border-color:var(--accent); }
+textarea::placeholder { color:var(--muted); }
+
+/* BUTTONS */
+.btn-primary { width:100%; background:var(--accent); color:white; border:none; border-radius:var(--radius); padding:16px; font-family:'Syne',sans-serif; font-size:15px; font-weight:800; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; letter-spacing:0.05em; }
+.btn-primary:hover { background:#154360; transform:translateY(-1px); }
+.btn-primary:active { transform:translateY(0); }
+.btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+.btn-secondary { width:100%; background:var(--surface2); color:var(--text2); border:1.5px solid var(--border); border-radius:var(--radius); padding:13px; font-family:'Syne',sans-serif; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px; }
+.btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+
+/* ERROR / LOADING */
+.error-msg { background:var(--danger-pale); border:1.5px solid var(--danger); border-radius:10px; padding:12px 14px; font-size:12px; color:var(--danger); margin-top:10px; display:none; }
+.error-msg.show { display:block; }
+.loading-wrap { display:none; text-align:center; padding:40px; }
+.loading-wrap.show { display:block; }
+.spinner { width:40px; height:40px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 12px; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.loading-wrap p { font-size:12px; color:var(--muted); }
+
+/* CONDITIONS BAR */
+.conditions-bar { display:flex; align-items:center; gap:12px; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:12px 14px; margin-bottom:14px; box-shadow:var(--shadow); }
+.cond-bar-info { flex:1; }
+.cond-bar-label { font-size:10px; color:var(--muted); letter-spacing:0.08em; font-family:'Syne',sans-serif; font-weight:700; }
+.cond-bar-value { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--text); margin-top:2px; }
+.pills { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+.pill { background:var(--accent-pale); color:var(--accent); border-radius:20px; padding:2px 9px; font-size:11px; }
+
+/* RESULTS */
+.results-wrap { display:none; margin-top:16px; }
+.results-wrap.show { display:block; animation:fadeUp 0.3s ease; }
+.alert-card { border-radius:var(--radius); padding:14px; margin-bottom:10px; border:1.5px solid; display:flex; gap:10px; }
+.alert-card.danger { background:var(--danger-pale); border-color:var(--danger); }
+.alert-card.warn { background:var(--warn-pale); border-color:var(--warn); }
+.alert-icon { font-size:20px; flex-shrink:0; }
+.alert-title { font-family:'Syne',sans-serif; font-size:12px; font-weight:800; margin-bottom:3px; }
+.alert-card.danger .alert-title { color:var(--danger); }
+.alert-card.warn .alert-title { color:var(--warn); }
+.alert-text { font-size:12px; color:var(--text2); line-height:1.5; }
+.score-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:20px; display:flex; align-items:center; gap:18px; margin-bottom:10px; box-shadow:var(--shadow); }
+.score-circle { width:78px; height:78px; border-radius:50%; border:3px solid; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.score-num { font-family:'Syne',sans-serif; font-size:30px; font-weight:800; line-height:1; }
+.score-den { font-size:9px; color:var(--muted); }
+.score-verdict { font-family:'Syne',sans-serif; font-size:17px; font-weight:800; margin-bottom:5px; }
+.score-summary { font-size:12px; color:var(--text2); line-height:1.5; }
+.c-good { color:var(--good); border-color:var(--good); }
+.c-medium { color:var(--medium); border-color:var(--medium); }
+.c-bad { color:var(--danger); border-color:var(--danger); }
+.fill-good { background:var(--good); }
+.fill-medium { background:var(--medium); }
+.fill-bad { background:var(--danger); }
+.bar-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:14px 18px; margin-bottom:10px; }
+.bar-labels { display:flex; justify-content:space-between; font-size:9px; color:var(--muted); margin-bottom:7px; letter-spacing:0.08em; }
+.bar-track { height:7px; background:var(--surface2); border-radius:4px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:4px; width:0; transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1); }
+.section-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:16px 18px; margin-bottom:10px; }
+.ing-row { display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); font-size:12px; }
+.ing-row:last-child { border-bottom:none; }
+.ing-dot { width:18px; height:18px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; margin-top:1px; }
+.d-good { background:var(--good-pale); color:var(--good); }
+.d-medium { background:var(--medium-pale); color:var(--medium); }
+.d-bad { background:var(--danger-pale); color:var(--danger); }
+.ing-name { font-weight:500; margin-bottom:2px; }
+.ing-desc { font-size:11px; color:var(--text2); line-height:1.5; }
+.ing-risk { font-size:11px; color:var(--danger); font-weight:500; margin-top:2px; }
+.point-row { display:flex; gap:8px; padding:8px 0; border-bottom:1px solid var(--border); font-size:12px; color:var(--text2); line-height:1.5; }
+.point-row:last-child { border-bottom:none; }
+.reco-box { background:var(--accent-pale); border:1.5px solid var(--accent2); border-radius:var(--radius); padding:14px; font-size:12px; color:var(--accent); line-height:1.6; margin-bottom:10px; }
+.disclaimer { text-align:center; font-size:10px; color:var(--muted); line-height:1.5; padding:12px; border-top:1px solid var(--border); }
+
+/* PROFILE */
+.profile-hero { display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+.profile-avatar { width:54px; height:54px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; }
+.profile-name { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; }
+.profile-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+.cond-item { display:flex; align-items:center; justify-content:space-between; padding:13px 15px; background:var(--surface); border:1.5px solid var(--border); border-radius:12px; cursor:pointer; transition:all 0.15s; margin-bottom:8px; }
+.cond-item.on { border-color:var(--accent); background:var(--accent-pale); }
+.cond-left { display:flex; align-items:center; gap:10px; }
+.cond-emoji { font-size:20px; }
+.cond-name { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; }
+.cond-cat { font-size:10px; color:var(--muted); }
+.toggle { width:38px; height:20px; background:var(--border); border-radius:10px; position:relative; transition:background 0.2s; flex-shrink:0; }
+.toggle::after { content:''; position:absolute; width:14px; height:14px; background:white; border-radius:50%; top:3px; left:3px; transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+.cond-item.on .toggle { background:var(--accent); }
+.cond-item.on .toggle::after { transform:translateX(18px); }
+.custom-row { display:flex; gap:8px; margin:12px 0; }
+.custom-input { flex:1; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; padding:11px 13px; font-family:'DM Mono',monospace; font-size:12px; color:var(--text); outline:none; }
+.custom-input:focus { border-color:var(--accent); }
+.custom-input::placeholder { color:var(--muted); }
+.add-btn { background:var(--accent); color:white; border:none; border-radius:10px; padding:0 16px; font-size:22px; cursor:pointer; }
+.count-badge { background:var(--accent-pale); color:var(--accent); padding:2px 8px; border-radius:10px; font-size:11px; font-family:'Syne',sans-serif; font-weight:700; }
+
+/* HISTORY */
+.hist-item { display:flex; align-items:center; gap:12px; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:14px; margin-bottom:10px; box-shadow:var(--shadow); }
+.hist-score { width:46px; height:46px; border-radius:50%; border:2.5px solid; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.h-num { font-family:'Syne',sans-serif; font-size:17px; font-weight:800; line-height:1; }
+.h-den { font-size:8px; color:var(--muted); }
+.hist-info { flex:1; min-width:0; }
+.hist-type { font-size:10px; color:var(--muted); letter-spacing:0.08em; font-family:'Syne',sans-serif; font-weight:700; }
+.hist-excerpt { font-size:12px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+.hist-meta { display:flex; align-items:center; gap:6px; margin-top:4px; }
+.hist-date { font-size:10px; color:var(--muted); }
+.hist-alert-pill { background:var(--danger-pale); color:var(--danger); font-size:10px; padding:1px 7px; border-radius:10px; }
+.empty-state { text-align:center; padding:50px 20px; }
+.empty-icon { font-size:48px; margin-bottom:12px; }
+.empty-text { font-size:13px; color:var(--muted); line-height:1.6; }
+
+/* MODALS */
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:200; align-items:flex-end; justify-content:center; }
+.overlay.show { display:flex; }
+.modal { background:var(--surface); border-radius:20px 20px 0 0; padding:24px 20px 40px; width:100%; max-width:430px; animation:slideUp 0.3s ease; }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 20px; }
+.modal-title { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; margin-bottom:8px; }
+.modal-desc { font-size:12px; color:var(--text2); line-height:1.6; margin-bottom:16px; }
+.api-input { width:100%; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; padding:13px; font-family:'DM Mono',monospace; font-size:12px; color:var(--text); outline:none; margin-bottom:8px; transition:border-color 0.15s; }
+.api-input:focus { border-color:var(--accent); }
+.api-input::placeholder { color:var(--muted); }
+.api-error { color:var(--danger); font-size:11px; margin-bottom:8px; display:none; }
+.api-error.show { display:block; }
+.api-note { font-size:10px; color:var(--muted); text-align:center; margin-top:8px; }
+.qmodal-list { display:flex; flex-direction:column; gap:7px; max-height:55vh; overflow-y:auto; }
+.qmodal-item { display:flex; align-items:center; gap:10px; padding:11px 13px; border:1.5px solid var(--border); border-radius:11px; cursor:pointer; transition:all 0.15s; }
+.qmodal-item.on { border-color:var(--accent); background:var(--accent-pale); }
+.qmodal-emoji { font-size:18px; }
+.qmodal-name { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; flex:1; }
+.qmodal-check { font-size:15px; color:var(--accent); opacity:0; }
+.qmodal-item.on .qmodal-check { opacity:1; }
 
 /* FAB */
-.fab {
-  position: fixed;
-  bottom: 80px; right: 20px;
-  width: 52px; height: 52px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  font-size: 26px;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(45,106,79,0.4);
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
-  z-index: 99;
-}
-
-.fab:hover { transform: scale(1.1); }
-
-/* Error */
-.error-card {
-  background: var(--danger-pale);
-  border: 1.5px solid var(--danger);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  font-size: 13px;
-  color: var(--danger);
-  margin-top: 12px;
-  display: none;
-}
-.error-card.show { display: block; }
-
-/* Save btn */
-.save-row { display: flex; gap: 8px; margin-top: 8px; }
-
-/* Camera */
-.btn-camera {
-  width: 100%;
-  background: var(--surface);
-  border: 2px dashed var(--accent-light);
-  border-radius: var(--radius);
-  padding: 16px;
-  font-family: 'Syne', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--accent);
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  margin-bottom: 10px;
-}
-.btn-camera:hover { background: var(--accent-pale); border-style: solid; }
-
-.or-divider {
-  text-align: center; position: relative;
-  margin: 12px 0; color: var(--muted);
-  font-size: 11px; letter-spacing: 0.1em;
-}
-.or-divider::before, .or-divider::after {
-  content: ''; position: absolute;
-  top: 50%; width: 38%; height: 1px; background: var(--border);
-}
-.or-divider::before { left: 0; }
-.or-divider::after { right: 0; }
-
-.ocr-status {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--accent-pale); border-radius: 10px;
-  padding: 10px 14px; font-size: 12px; color: var(--accent); margin-top: 8px;
-}
+.fab { position:fixed; bottom:76px; right:18px; width:50px; height:50px; background:var(--accent); color:white; border:none; border-radius:50%; font-size:26px; cursor:pointer; box-shadow:0 4px 18px rgba(26,82,118,0.35); display:flex; align-items:center; justify-content:center; transition:transform 0.15s; z-index:49; }
+.fab:hover { transform:scale(1.1); }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="topbar">
-  <div class="logo">🏷️ <span style="letter-spacing:-1px">Eti<span class="logo-dot">Qu</span>ette</span></div>
-  <button class="profile-btn" onclick="goToProfile()">
-    👤
-    <span class="profile-badge" id="profile-badge">0</span>
-  </button>
+  <div class="logo">🏷️ Eti<span class="logo-qu">Qu</span>ette</div>
+  <button class="avatar-btn" onclick="goTo('profile')">👤<span class="badge" id="badge"></span></button>
 </div>
 
-<!-- =================== PAGE: HOME =================== -->
+<!-- HOME -->
 <div class="page active" id="page-home">
-
-  <div class="greeting">
-    <h1>Analizează<br>produsul tău</h1>
-    <p>Ingrediente + profilul tău = scor personalizat</p>
+  <div style="margin-bottom:18px;">
+    <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1.2;margin-bottom:5px;">Analizează<br>produsul tău</div>
+    <div style="font-size:12px;color:var(--text2);">Ingrediente + profilul tău = scor personalizat</div>
   </div>
 
-  <!-- Active conditions summary -->
-  <div class="conditions-bar" id="conditions-bar">
-    <div class="icon">🛡️</div>
-    <div class="info">
-      <div class="label">PROFIL ACTIV</div>
-      <div class="value" id="conditions-summary">Nicio afecțiune selectată</div>
-      <div class="conditions-pills" id="conditions-pills"></div>
+  <div class="conditions-bar">
+    <div style="font-size:20px;">🛡️</div>
+    <div class="cond-bar-info">
+      <div class="cond-bar-label">PROFIL ACTIV</div>
+      <div class="cond-bar-value" id="cond-summary">Nicio afecțiune selectată</div>
+      <div class="pills" id="cond-pills"></div>
     </div>
-    <button class="btn-secondary" style="padding:8px 12px; font-size:11px;" onclick="goToProfile()">Editează</button>
+    <button class="btn-secondary" style="width:auto;padding:7px 12px;font-size:11px;" onclick="goTo('profile')">Editează</button>
   </div>
 
-  <!-- Product type -->
-  <div class="section-title">Tip produs</div>
+  <div class="section-label">Tip produs</div>
   <div class="type-grid">
-    <button class="type-card active" id="type-food" onclick="setType('food')">
-      <div class="emoji">🍎</div>
-      <div class="label">Alimentar</div>
+    <button class="type-btn active" id="btn-food" onclick="selectType('food')">
+      <span class="t-emoji">🍎</span><span class="t-label">Alimentar</span>
     </button>
-    <button class="type-card" id="type-cosm" onclick="setType('cosmetic')">
-      <div class="emoji">💄</div>
-      <div class="label">Cosmetic</div>
+    <button class="type-btn" id="btn-cosm" onclick="selectType('cosmetic')">
+      <span class="t-emoji">💄</span><span class="t-label">Cosmetic</span>
     </button>
   </div>
 
-  <!-- Ingredients input -->
-  <div class="section-title">Lista de ingrediente</div>
+  <div class="section-label">Lista de ingrediente</div>
+  <button class="camera-btn" onclick="openCamera()">📷 Fotografiază ingredientele</button>
+  <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
 
-  <!-- Camera button -->
-  <div class="camera-row">
-    <button class="btn-camera" onclick="triggerCamera()">
-      📷 Fotografiază ingredientele
-    </button>
-    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
-  </div>
-
-  <!-- Photo preview -->
-  <div id="photo-preview-wrap" style="display:none; margin-bottom:12px;">
-    <div style="position:relative; display:inline-block; width:100%;">
-      <img id="photo-preview" style="width:100%; border-radius:12px; border:1.5px solid var(--border); max-height:180px; object-fit:cover;">
-      <button onclick="clearPhoto()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:14px;">✕</button>
-    </div>
-    <div id="ocr-status" class="ocr-status">
-      <div class="loader" style="width:20px;height:20px;border-width:2px;margin:0;"></div>
+  <div class="photo-wrap" id="photo-wrap">
+    <img id="photo-img" src="" alt="">
+    <button class="photo-close" onclick="clearPhoto()">✕</button>
+    <div class="ocr-loading" id="ocr-loading">
+      <div class="spinner" style="width:18px;height:18px;border-width:2px;margin:0;"></div>
       <span>Citesc ingredientele din poză...</span>
     </div>
   </div>
 
-  <div class="or-divider"><span>sau scrie manual</span></div>
+  <div class="divider"><span>sau scrie manual</span></div>
+  <textarea id="ing-textarea" placeholder="Ingredientele apar automat după foto, sau le poți scrie manual...&#10;&#10;Ex: Apă, zahăr, acid citric (E330)..."></textarea>
 
-  <div class="input-wrap">
-    <textarea id="ing-input" placeholder="Ingredientele apar automat după foto, sau le poți scrie manual...&#10;&#10;Ex: Apă, zahăr, acid citric (E330), aromă..."></textarea>
-  </div>
-
-  <button class="btn-primary" id="analyze-btn" onclick="analyze()">
-    ⚡ ANALIZEAZĂ
-  </button>
-
-  <div class="error-card" id="error-card"></div>
-
-  <!-- Loading -->
-  <div class="loading-wrap" id="loading">
-    <div class="loader"></div>
-    <p>analizând ingredientele...</p>
-  </div>
-
-  <!-- Results -->
-  <div class="results-wrap" id="results"></div>
-
-</div>
-
-<!-- =================== PAGE: PROFILE =================== -->
-<div class="page" id="page-profile">
-
-  <div class="profile-header">
-    <div class="avatar">👤</div>
-    <div>
-      <div class="name">Profilul meu</div>
-      <div class="sub">Afecțiunile tale • Personalizare analiză</div>
-    </div>
-  </div>
-
-  <div class="section-title" style="margin-bottom:14px;">
-    Afecțiunile mele
-    <span id="active-count" style="background:var(--accent-pale);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:11px;">0 active</span>
-  </div>
-
-  <div class="condition-list" id="condition-list"></div>
-
-  <div class="section-title" style="margin-top:20px; margin-bottom:10px;">Adaugă afecțiune proprie</div>
-  <div class="add-custom">
-    <input type="text" id="custom-input" placeholder="ex: Alergie la latex..." maxlength="40">
-    <button class="btn-add" onclick="addCustomCondition()">+</button>
-  </div>
-
-  <div style="margin-top:20px;">
-    <button class="btn-primary" onclick="saveProfile()">💾 SALVEAZĂ PROFILUL</button>
-  </div>
   <div style="margin-top:10px;">
-    <button class="btn-secondary" style="width:100%;text-align:center;" onclick="resetApiKey()">🔑 Schimbă cheia API</button>
+    <button class="btn-primary" id="analyze-btn" onclick="doAnalyze()">⚡ ANALIZEAZĂ</button>
   </div>
 
+  <div class="error-msg" id="error-msg"></div>
+  <div class="loading-wrap" id="loading"><div class="spinner"></div><p>analizând ingredientele...</p></div>
+  <div class="results-wrap" id="results"></div>
 </div>
 
-<!-- =================== PAGE: HISTORY =================== -->
+<!-- ISTORIC -->
 <div class="page" id="page-history">
-  <div class="greeting">
-    <h1>Istoricul<br>scanărilor</h1>
-    <p>Toate produsele analizate de tine</p>
-  </div>
+  <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:5px;">Istoricul<br>scanărilor</div>
+  <div style="font-size:12px;color:var(--text2);margin-bottom:20px;">Toate produsele analizate</div>
   <div id="history-list"></div>
 </div>
 
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <button class="nav-item active" id="nav-home" onclick="goTo('home')">
-    <span class="nav-icon">🔬</span>
-    <span class="nav-label">ANALIZĂ</span>
-  </button>
-  <button class="nav-item" id="nav-history" onclick="goTo('history')">
-    <span class="nav-icon">📋</span>
-    <span class="nav-label">ISTORIC</span>
-  </button>
-  <button class="nav-item" id="nav-profile" onclick="goTo('profile')">
-    <span class="nav-icon">👤</span>
-    <span class="nav-label">PROFIL</span>
-  </button>
+<!-- PROFIL -->
+<div class="page" id="page-profile">
+  <div class="profile-hero">
+    <div class="profile-avatar">👤</div>
+    <div>
+      <div class="profile-name">Profilul meu</div>
+      <div class="profile-sub">Afecțiunile tale • Analiză personalizată</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <div class="section-label" style="margin:0;">Afecțiunile mele</div>
+    <span class="count-badge" id="count-badge">0 active</span>
+  </div>
+  <div id="cond-list"></div>
+  <div class="section-label" style="margin-top:18px;margin-bottom:8px;">Adaugă afecțiune proprie</div>
+  <div class="custom-row">
+    <input class="custom-input" id="custom-input" type="text" placeholder="ex: Alergie la latex..." maxlength="40">
+    <button class="add-btn" onclick="addCustom()">+</button>
+  </div>
+  <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+    <button class="btn-primary" onclick="saveProfile()">💾 SALVEAZĂ PROFILUL</button>
+    <button class="btn-secondary" onclick="showApiModal()">🔑 Schimbă cheia API</button>
+  </div>
 </div>
 
-<!-- FAB: Quick add condition -->
-<button class="fab" id="fab" onclick="openModal()" title="Adaugă afecțiune rapid">+</button>
+<!-- FAB -->
+<button class="fab" id="fab" onclick="showQuickAdd()">+</button>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-home" onclick="goTo('home')"><span class="nav-icon">🔬</span><span class="nav-label">ANALIZĂ</span></button>
+  <button class="nav-btn" id="nav-history" onclick="goTo('history')"><span class="nav-icon">📋</span><span class="nav-label">ISTORIC</span></button>
+  <button class="nav-btn" id="nav-profile" onclick="goTo('profile')"><span class="nav-icon">👤</span><span class="nav-label">PROFIL</span></button>
+</div>
 
 <!-- API KEY MODAL -->
-<div class="modal-overlay" id="apikey-modal">
+<div class="overlay" id="api-overlay">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">🔑 Cheie API</div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6;">Introdu cheia ta API Anthropic ca să activezi analiza AI. O găsești pe <strong>console.anthropic.com</strong></p>
-    <input type="password" id="apikey-input" placeholder="sk-ant-api03-..." style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);outline:none;margin-bottom:8px;">
-    <div id="apikey-error" style="display:none;color:var(--danger);font-size:12px;margin-bottom:8px;">⚠️ Cheie invalidă. Trebuie să înceapă cu sk-ant</div>
-    <button class="btn-primary" onclick="submitApiKey()" style="margin-bottom:8px;">✓ Salvează cheia</button>
-    <p style="font-size:11px;color:var(--muted);text-align:center;">Cheia se salvează doar pe dispozitivul tău</p>
+    <div class="modal-desc">Introdu cheia ta API Anthropic pentru a activa analiza AI. O găsești pe <strong>console.anthropic.com</strong> → API Keys.</div>
+    <input class="api-input" type="password" id="api-input" placeholder="sk-ant-api03-...">
+    <div class="api-error" id="api-error">⚠️ Cheie invalidă. Trebuie să înceapă cu sk-ant</div>
+    <button class="btn-primary" onclick="saveApiKey()">✓ Salvează cheia</button>
+    <div class="api-note">Cheia se salvează doar pe acest dispozitiv.</div>
   </div>
 </div>
 
 <!-- QUICK ADD MODAL -->
-<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+<div class="overlay" id="quick-overlay" onclick="handleQuickOverlay(event)">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">⚡ Adaugă rapid o afecțiune</div>
-    <div class="modal-conditions" id="modal-conditions"></div>
-    <div style="margin-top:16px;">
-      <button class="btn-primary" onclick="closeModal()">✓ Gata</button>
-    </div>
+    <div class="modal-title">⚡ Adaugă rapid afecțiune</div>
+    <div class="qmodal-list" id="qmodal-list"></div>
+    <div style="margin-top:14px;"><button class="btn-primary" onclick="closeQuickAdd()">✓ Gata</button></div>
   </div>
 </div>
 
 <script>
-// ===================== STATE =====================
 const CONDITIONS = [
-  { id:'gluten', icon:'🌾', name:'Intoleranță la Gluten', cat:'Alimentar', type:'food',
-    keywords:['wheat','gluten','triticum','barley','rye','spelt','kamut','malt','semolina','farina','orz','secara','grau','secară','grâu','hordeum','triticale','einkorn','emmer','bulgur','couscous','durum'] },
-  { id:'lactoza', icon:'🥛', name:'Intoleranță la Lactoză', cat:'Alimentar', type:'food',
-    keywords:['lactose','milk','lactosum','whey','casein','lactis','lactalbumin','lactoglobulin','cream','butter','cheese','lapte','zer','cazeina','cazéină','lactoza','lactoză'] },
-  { id:'diabet', icon:'🩸', name:'Diabet (Tip 1 & 2)', cat:'Alimentar', type:'food',
-    keywords:['sugar','sucrose','glucose','fructose','dextrose','maltose','syrup','corn syrup','high-fructose','maltodextrin','zahăr','zahar','glucoza','fructoza','sirop','honey','miere','molasses','treacle','dextrin','turbinado','caramel'] },
-  { id:'hipertensiune', icon:'🫀', name:'Hipertensiune Arterială', cat:'Alimentar', type:'food',
-    keywords:['sodium','salt','sare','msg','monosodium glutamate','sodium chloride','sodium nitrite','sodium benzoate','sodium phosphate','disodium','natriu','bicarbonate of soda','baking soda','soy sauce'] },
-  { id:'arahide', icon:'🥜', name:'Alergie la Arahide', cat:'Alimentar', type:'food',
-    keywords:['peanut','arachide','arachis','groundnut','monkey nut','arahida','arahide'] },
-  { id:'soia', icon:'🫘', name:'Alergie la Soia', cat:'Alimentar', type:'food',
-    keywords:['soy','soya','soia','tofu','miso','tempeh','edamame','glycine max','textured vegetable protein','tvp','hydrolyzed soy'] },
-  { id:'dermatita', icon:'🌸', name:'Dermatită Atopică', cat:'Cosmetic', type:'cosmetic',
-    keywords:['sodium lauryl sulfate','sodium laureth sulfate','sls','sles','alcohol denat','denatured alcohol','parfum','fragrance','methylparaben','ethylparaben','propylparaben','butylparaben','quaternium-15','dmdm hydantoin','imidazolidinyl urea','diazolidinyl urea','propylene glycol','formaldehyde','lanolin','urea','retinol','benzalkonium'] },
-  { id:'acnee', icon:'🫧', name:'Acnee / Ten Acneic', cat:'Cosmetic', type:'cosmetic',
-    keywords:['isopropyl myristate','isopropyl palmitate','butyl stearate','laureth-4','cocoa butter','coconut oil','cocos nucifera','mineral oil','paraffinum liquidum','lanolin','sodium chloride','dimethicone','cyclopentasiloxane','cetearyl alcohol','stearic acid','hydrogenated vegetable oil'] },
-  { id:'piele-sensibila', icon:'🌿', name:'Piele Sensibilă', cat:'Cosmetic', type:'cosmetic',
-    keywords:['fragrance','parfum','alcohol denat','witch hazel','hamamelis','menthol','eucalyptus','peppermint','citrus','limonene','linalool','geraniol','cinnamal','parabens','methylparaben','sodium lauryl sulfate','benzoic acid'] },
-  { id:'sarcina', icon:'🤰', name:'Sarcină / Alăptare', cat:'Cosmetic', type:'cosmetic',
-    keywords:['retinol','retinyl','tretinoin','retinoic acid','salicylic acid','oxybenzone','benzophenone','hydroquinone','formaldehyde','parabens','methylparaben','propylparaben','dihydroxyacetone','benzoyl peroxide','essential oils','ulei esential'] },
-  { id:'vegan', icon:'🌱', name:'Vegan / Vegetarian', cat:'General', type:'both',
-    keywords:['gelatine','gelatin','gelatina','carmine','cochineal','e120','casein','whey','lactose','albumin','isinglass','lanolin','beeswax','cera alba','keratin','collagen','squalane','silk','sericin','honey','miere','lactis','tallow','lard'] },
-  { id:'colesterol', icon:'🫁', name:'Colesterol Mărit', cat:'Alimentar', type:'food',
-    keywords:['hydrogenated','partially hydrogenated','trans fat','palm oil','palmier','ulei de palmier','lard','tallow','shortening','butter','ghee','coconut oil','cocoa butter'] },
+  {id:'gluten',icon:'🌾',name:'Intoleranță Gluten',cat:'Alimentar',keys:['wheat','gluten','triticum','barley','rye','spelt','kamut','malt','semolina','orz','secara','grau','hordeum','triticale','bulgur','durum']},
+  {id:'lactoza',icon:'🥛',name:'Intoleranță Lactoză',cat:'Alimentar',keys:['lactose','milk','lactis','whey','casein','lactalbumin','cream','butter','lapte','zer','cazeina','lactoza']},
+  {id:'diabet',icon:'🩸',name:'Diabet Tip 1 & 2',cat:'Alimentar',keys:['sugar','sucrose','glucose','fructose','dextrose','maltose','syrup','corn syrup','high-fructose','maltodextrin','zahar','glucoza','sirop','honey','miere','dextrin','caramel','sorbitol','xylitol']},
+  {id:'hipertensiune',icon:'🫀',name:'Hipertensiune',cat:'Alimentar',keys:['sodium','salt','sare','msg','monosodium glutamate','sodium chloride','sodium nitrite','sodium benzoate','disodium','natriu','bicarbonate']},
+  {id:'arahide',icon:'🥜',name:'Alergie Arahide',cat:'Alimentar',keys:['peanut','arachide','arachis','groundnut','arahida']},
+  {id:'soia',icon:'🫘',name:'Alergie Soia',cat:'Alimentar',keys:['soy','soya','soia','tofu','miso','edamame','glycine max']},
+  {id:'dermatita',icon:'🌸',name:'Dermatită Atopică',cat:'Cosmetic',keys:['sodium lauryl sulfate','sodium laureth sulfate','sls','sles','alcohol denat','denatured alcohol','parfum','fragrance','methylparaben','ethylparaben','propylparaben','butylparaben','quaternium-15','dmdm hydantoin','imidazolidinyl urea','propylene glycol','formaldehyde','lanolin','retinol']},
+  {id:'acnee',icon:'🫧',name:'Acnee / Ten Acneic',cat:'Cosmetic',keys:['isopropyl myristate','isopropyl palmitate','cocoa butter','coconut oil','cocos nucifera','mineral oil','paraffinum liquidum','lanolin','dimethicone','cyclopentasiloxane','laureth-4']},
+  {id:'piele-sens',icon:'🌿',name:'Piele Sensibilă',cat:'Cosmetic',keys:['fragrance','parfum','alcohol denat','witch hazel','menthol','eucalyptus','limonene','linalool','geraniol','methylparaben','sodium lauryl sulfate']},
+  {id:'sarcina',icon:'🤰',name:'Sarcină / Alăptare',cat:'Cosmetic',keys:['retinol','retinyl','tretinoin','retinoic acid','salicylic acid','oxybenzone','benzophenone','hydroquinone','formaldehyde','methylparaben','propylparaben']},
+  {id:'vegan',icon:'🌱',name:'Vegan / Vegetarian',cat:'General',keys:['gelatine','gelatin','gelatina','carmine','cochineal','e120','casein','whey','albumin','isinglass','lanolin','beeswax','cera alba','keratin','collagen','silk','honey','miere','tallow','lard']},
+  {id:'colesterol',icon:'🫁',name:'Colesterol Mărit',cat:'Alimentar',keys:['hydrogenated','partially hydrogenated','trans fat','palm oil','palmier','ulei de palmier','lard','tallow','shortening','coconut oil','cocoa butter']},
 ];
 
-let activeConditions = new Set();
 let productType = 'food';
+let activeConditions = new Set();
 let scanHistory = [];
 
-// Load from localStorage
-try {
-  const saved = localStorage.getItem('etiqette_conditions');
-  if (saved) activeConditions = new Set(JSON.parse(saved));
-  const hist = localStorage.getItem('etiqette_history');
-  if (hist) scanHistory = JSON.parse(hist);
-} catch(e) {}
-
-// ===================== INIT =====================
-function init() {
-  renderConditionList();
-  renderModalConditions();
-  updateProfileBadge();
-  updateConditionsBar();
-  renderHistory();
-  if (!getApiKey()) showApiKeyModal();
-}
-
-// ===================== NAVIGATION =====================
-function goTo(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  document.getElementById('nav-' + page).classList.add('active');
-  const fab = document.getElementById('fab');
-  fab.style.display = (page === 'home') ? 'flex' : 'none';
-  if (page === 'profile') renderConditionList();
-  if (page === 'history') renderHistory();
-}
-
-function goToProfile() { goTo('profile'); }
-
-// ===================== TYPE =====================
-function setType(t) {
-  productType = t;
-  document.getElementById('type-food').classList.toggle('active', t === 'food');
-  document.getElementById('type-cosm').classList.toggle('active', t === 'cosmetic');
-}
-
-// ===================== CONDITIONS =====================
-function renderConditionList() {
-  const list = document.getElementById('condition-list');
-  list.innerHTML = CONDITIONS.map(c => `
-    <div class="condition-item ${activeConditions.has(c.id) ? 'active' : ''}" onclick="toggleCondition('${c.id}')">
-      <div class="cond-info">
-        <span class="cond-icon">${c.icon}</span>
-        <div>
-          <div class="cond-name">${c.name}</div>
-          <div class="cond-cat">${c.cat}</div>
-        </div>
-      </div>
-      <div class="toggle"></div>
-    </div>
-  `).join('');
-  updateActiveCount();
-}
-
-function renderModalConditions() {
-  const el = document.getElementById('modal-conditions');
-  el.innerHTML = CONDITIONS.map(c => `
-    <div class="modal-cond-item ${activeConditions.has(c.id) ? 'active' : ''}" onclick="toggleModalCondition('${c.id}')">
-      <span class="mc-icon">${c.icon}</span>
-      <span class="mc-name">${c.name}</span>
-      <span class="mc-check">✓</span>
-    </div>
-  `).join('');
-}
-
-function toggleCondition(id) {
-  if (activeConditions.has(id)) activeConditions.delete(id);
-  else activeConditions.add(id);
-  renderConditionList();
-  renderModalConditions();
-  updateProfileBadge();
-  updateConditionsBar();
-}
-
-function toggleModalCondition(id) {
-  if (activeConditions.has(id)) activeConditions.delete(id);
-  else activeConditions.add(id);
-  renderModalConditions();
-  updateProfileBadge();
-  updateConditionsBar();
-  saveToStorage();
-}
-
-function addCustomCondition() {
-  const input = document.getElementById('custom-input');
-  const val = input.value.trim();
-  if (!val) return;
-  const id = 'custom_' + Date.now();
-  CONDITIONS.push({ id, icon:'⚕️', name: val, cat:'Personalizat', type:'both', keywords:[] });
-  activeConditions.add(id);
-  input.value = '';
-  renderConditionList();
-  renderModalConditions();
-  updateProfileBadge();
-  updateConditionsBar();
-}
-
-function saveProfile() {
-  saveToStorage();
-  updateConditionsBar();
-  goTo('home');
-}
-
-function saveToStorage() {
+// LOAD
+function loadState() {
   try {
-    localStorage.setItem('etiqette_conditions', JSON.stringify([...activeConditions]));
+    const c = localStorage.getItem('eq_conds');
+    if (c) activeConditions = new Set(JSON.parse(c));
+    const h = localStorage.getItem('eq_hist');
+    if (h) scanHistory = JSON.parse(h);
   } catch(e) {}
 }
 
-function updateActiveCount() {
-  const count = activeConditions.size;
-  document.getElementById('active-count').textContent = count + ' active';
+function saveConditions() {
+  try { localStorage.setItem('eq_conds', JSON.stringify([...activeConditions])); } catch(e) {}
 }
 
-function updateProfileBadge() {
-  const badge = document.getElementById('profile-badge');
-  badge.textContent = activeConditions.size;
-  badge.style.display = activeConditions.size > 0 ? 'flex' : 'none';
+function getKey() { return localStorage.getItem('eq_key') || null; }
+function storeKey(k) { localStorage.setItem('eq_key', k); }
+
+// NAVIGATION
+function goTo(page) {
+  ['home','history','profile'].forEach(function(p) {
+    document.getElementById('page-'+p).classList.toggle('active', p===page);
+    document.getElementById('nav-'+p).classList.toggle('active', p===page);
+  });
+  document.getElementById('fab').style.display = page==='home' ? 'flex' : 'none';
+  if (page==='profile') renderCondList();
+  if (page==='history') renderHistory();
 }
 
-function updateConditionsBar() {
-  const pills = document.getElementById('conditions-pills');
-  const summary = document.getElementById('conditions-summary');
-  const active = CONDITIONS.filter(c => activeConditions.has(c.id));
-  if (active.length === 0) {
-    summary.textContent = 'Nicio afecțiune selectată';
-    pills.innerHTML = '';
-  } else {
-    summary.textContent = active.length + ' afecțiune' + (active.length > 1 ? 'i active' : ' activă');
-    pills.innerHTML = active.slice(0,4).map(c =>
-      `<div class="pill">${c.icon} ${c.name.split(' ')[0]}</div>`
-    ).join('') + (active.length > 4 ? `<div class="pill">+${active.length-4}</div>` : '');
+// TYPE
+function selectType(t) {
+  productType = t;
+  document.getElementById('btn-food').classList.toggle('active', t==='food');
+  document.getElementById('btn-cosm').classList.toggle('active', t==='cosmetic');
+}
+
+// CONDITIONS
+function renderCondList() {
+  var html = '';
+  CONDITIONS.forEach(function(c) {
+    html += '<div class="cond-item '+(activeConditions.has(c.id)?'on':'')+'" onclick="toggleCond(\''+c.id+'\')">'
+      +'<div class="cond-left"><span class="cond-emoji">'+c.icon+'</span>'
+      +'<div><div class="cond-name">'+c.name+'</div><div class="cond-cat">'+c.cat+'</div></div></div>'
+      +'<div class="toggle"></div></div>';
+  });
+  document.getElementById('cond-list').innerHTML = html;
+  document.getElementById('count-badge').textContent = activeConditions.size + ' active';
+}
+
+function toggleCond(id) {
+  if (activeConditions.has(id)) activeConditions.delete(id);
+  else activeConditions.add(id);
+  renderCondList();
+  updateCondBar();
+  updateBadge();
+  saveConditions();
+}
+
+function addCustom() {
+  var inp = document.getElementById('custom-input');
+  var val = inp.value.trim();
+  if (!val) return;
+  var id = 'c_'+Date.now();
+  CONDITIONS.push({id:id, icon:'⚕️', name:val, cat:'Personalizat', keys:[]});
+  activeConditions.add(id);
+  inp.value = '';
+  renderCondList();
+  updateCondBar();
+  updateBadge();
+  saveConditions();
+}
+
+function saveProfile() {
+  saveConditions();
+  updateCondBar();
+  goTo('home');
+}
+
+function updateBadge() {
+  var b = document.getElementById('badge');
+  b.textContent = activeConditions.size;
+  b.classList.toggle('show', activeConditions.size > 0);
+}
+
+function updateCondBar() {
+  var active = CONDITIONS.filter(function(c) { return activeConditions.has(c.id); });
+  document.getElementById('cond-summary').textContent =
+    active.length === 0 ? 'Nicio afecțiune selectată' :
+    active.length + (active.length===1 ? ' afecțiune activă' : ' afecțiuni active');
+  document.getElementById('cond-pills').innerHTML =
+    active.slice(0,4).map(function(c) { return '<div class="pill">'+c.icon+' '+c.name.split(' ')[0]+'</div>'; }).join('') +
+    (active.length>4 ? '<div class="pill">+' +(active.length-4)+'</div>' : '');
+}
+
+// API KEY MODAL
+function showApiModal() {
+  document.getElementById('api-input').value = '';
+  document.getElementById('api-error').classList.remove('show');
+  document.getElementById('api-overlay').classList.add('show');
+}
+
+function saveApiKey() {
+  var val = document.getElementById('api-input').value.trim();
+  if (!val.startsWith('sk-ant')) {
+    document.getElementById('api-error').classList.add('show');
+    return;
   }
+  storeKey(val);
+  document.getElementById('api-overlay').classList.remove('show');
 }
 
-// ===================== MODAL =====================
-function openModal() {
-  renderModalConditions();
-  document.getElementById('modal-overlay').classList.add('show');
-}
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('show');
-  saveToStorage();
-  updateConditionsBar();
-}
-function handleOverlayClick(e) {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
+// QUICK ADD
+function showQuickAdd() {
+  var html = '';
+  CONDITIONS.forEach(function(c) {
+    html += '<div class="qmodal-item '+(activeConditions.has(c.id)?'on':'')+'" onclick="toggleQuick(\''+c.id+'\')">'
+      +'<span class="qmodal-emoji">'+c.icon+'</span>'
+      +'<span class="qmodal-name">'+c.name+'</span>'
+      +'<span class="qmodal-check">✓</span></div>';
+  });
+  document.getElementById('qmodal-list').innerHTML = html;
+  document.getElementById('quick-overlay').classList.add('show');
 }
 
-// ===================== ANALYZE =====================
-async function analyze() {
-  if (!getApiKey()) { showApiKeyModal(); return; }
-  const input = document.getElementById('ing-input').value.trim();
-  if (input.length < 5) { showError('Te rog introdu o listă de ingrediente.'); return; }
+function toggleQuick(id) {
+  if (activeConditions.has(id)) activeConditions.delete(id);
+  else activeConditions.add(id);
+  showQuickAdd();
+  updateCondBar();
+  updateBadge();
+  saveConditions();
+}
 
-  const activeList = CONDITIONS.filter(c => activeConditions.has(c.id));
-  const conditionsText = activeList.length > 0
-    ? 'Utilizatorul are aceste afecțiuni: ' + activeList.map(c => c.name).join(', ')
+function closeQuickAdd() {
+  document.getElementById('quick-overlay').classList.remove('show');
+}
+
+function handleQuickOverlay(e) {
+  if (e.target === document.getElementById('quick-overlay')) closeQuickAdd();
+}
+
+// CAMERA
+function openCamera() {
+  if (!getKey()) { showApiModal(); return; }
+  document.getElementById('file-input').click();
+}
+
+function clearPhoto() {
+  document.getElementById('photo-wrap').style.display = 'none';
+  document.getElementById('file-input').value = '';
+  document.getElementById('photo-img').src = '';
+  document.getElementById('ing-textarea').value = '';
+}
+
+function handlePhoto(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var full = ev.target.result;
+    var b64 = full.split(',')[1];
+    var mime = file.type || 'image/jpeg';
+    document.getElementById('photo-img').src = full;
+    document.getElementById('photo-wrap').style.display = 'block';
+    document.getElementById('ocr-loading').classList.add('show');
+    document.getElementById('ing-textarea').value = '';
+
+    fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': getKey(),
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        messages: [{
+          role: 'user',
+          content: [
+            {type:'image', source:{type:'base64', media_type:mime, data:b64}},
+            {type:'text', text:'Caută în această imagine lista de ingrediente — apare după: Ingredients, Ingrediente, Inhaltsstoffe, Ingrédients sau INCI. Returnează DOAR ingredientele separate prin virgule, fără alt text. Dacă nu găsești, returnează exact: NU_AM_GASIT'}
+          ]
+        }]
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var text = (data.content||[]).map(function(i){return i.text||'';}).join('').trim();
+      document.getElementById('ocr-loading').classList.remove('show');
+      if (!text || text==='NU_AM_GASIT') {
+        showError('Nu am putut citi ingredientele. Încearcă o poză mai apropiată sau scrie manual.');
+      } else {
+        document.getElementById('ing-textarea').value = text;
+      }
+    })
+    .catch(function() {
+      document.getElementById('ocr-loading').classList.remove('show');
+      showError('Eroare la procesarea pozei. Scrie ingredientele manual.');
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+// ANALYZE
+function doAnalyze() {
+  if (!getKey()) { showApiModal(); return; }
+  var ing = document.getElementById('ing-textarea').value.trim();
+  if (ing.length < 5) { showError('Te rog introdu o listă de ingrediente.'); return; }
+
+  var active = CONDITIONS.filter(function(c){return activeConditions.has(c.id);});
+  var condsText = active.length > 0
+    ? 'Utilizatorul are aceste afecțiuni: ' + active.map(function(c){return c.name;}).join(', ')
     : 'Utilizatorul nu are afecțiuni declarate.';
+  var typeLabel = productType==='food' ? 'alimentare' : 'cosmetice';
 
-  const typeLabel = productType === 'food' ? 'alimentar' : 'cosmetic';
-
-  const btn = document.getElementById('analyze-btn');
-  btn.disabled = true;
+  document.getElementById('analyze-btn').disabled = true;
   document.getElementById('loading').classList.add('show');
   document.getElementById('results').classList.remove('show');
   document.getElementById('results').innerHTML = '';
-  document.getElementById('error-card').classList.remove('show');
+  document.getElementById('error-msg').classList.remove('show');
 
-  const prompt = `Ești expert în analiza ingredientelor pentru produse ${typeLabel === 'food' ? 'alimentare' : 'cosmetice'}. ${conditionsText}
+  var prompt = 'Ești expert în analiza ingredientelor pentru produse '+typeLabel+'. '+condsText+'\n\nLista de ingrediente: "'+ing+'"\n\nReturnează DOAR JSON valid, fără text înainte sau după:\n{\n  "score": <1-10>,\n  "verdict": "<Excelent/Bun/Acceptabil/Slab/Foarte Slab>",\n  "summary": "<2-3 propoziții în română>",\n  "personal_alerts": [{"condition":"<afecțiune>","severity":"<danger sau warn>","ingredient":"<ingredient>","explanation":"<explicație în română>"}],\n  "ingredients": [{"name":"<ingredient>","rating":"<good/medium/bad>","desc":"<explicație scurtă în română>","risk":"<null sau risc în română>"}],\n  "positives": ["<aspect pozitiv>"],\n  "negatives": ["<aspect negativ>"],\n  "recommendation": "<sfat final în română>"\n}';
 
-Ingrediente de analizat: "${input}"
-
-Analizează și returnează DOAR JSON valid, fără text înainte sau după:
-
-{
-  "score": <1-10>,
-  "verdict": "<Excelent/Bun/Acceptabil/Slab/Foarte Slab>",
-  "summary": "<2-3 propoziții despre calitatea produsului, în română>",
-  "personal_alerts": [
-    {"condition": "<afecțiune>", "severity": "<danger/warn>", "ingredient": "<ingredient problematic>", "explanation": "<de ce e periculos pentru această afecțiune, în română>"}
-  ],
-  "ingredients_analysis": [
-    {"name": "<ingredient>", "rating": "<good/medium/bad>", "explanation": "<scurtă explicație în română>", "personal_risk": "<null sau explicație risc personal>"}
-  ],
-  "positives": ["<aspect pozitiv în română>"],
-  "negatives": ["<aspect negativ în română>"],
-  "recommendation": "<sfat final pentru consumator în română>"
-}
-
-IMPORTANT: personal_alerts trebuie să conțină alerte REALE și SPECIFICE pentru afecțiunile declarate ale utilizatorului, bazate pe ingredientele găsite. Dacă nu există conflicte, returnează array gol.`;
-
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-api-key": getApiKey(), "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1500,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-
-    const data = await response.json();
-    const text = (data.content || []).map(i => i.text || '').join('');
-    let parsed;
-    try {
-      parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-    } catch(e) {
-      throw new Error('Răspuns invalid. Încearcă din nou.');
-    }
-
-    renderResults(parsed, input);
-
-  } catch(err) {
-    showError(err.message || 'A apărut o eroare. Încearcă din nou.');
-  } finally {
-    btn.disabled = false;
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': getKey(),
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1500,
+      messages: [{role:'user', content:prompt}]
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(data) {
+    var text = (data.content||[]).map(function(i){return i.text||'';}).join('');
+    var parsed;
+    try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); }
+    catch(e) { throw new Error('Răspuns invalid. Încearcă din nou.'); }
+    renderResults(parsed, ing);
+  })
+  .catch(function(err) {
+    showError(err.message || 'Eroare. Verifică cheia API și încearcă din nou.');
+  })
+  .finally(function() {
+    document.getElementById('analyze-btn').disabled = false;
     document.getElementById('loading').classList.remove('show');
-  }
+  });
 }
 
-function getColor(score) {
-  if (score >= 7) return 'good';
-  if (score >= 4) return 'medium';
-  return 'bad';
-}
+// RENDER RESULTS
+function scoreColor(s) { return s>=7?'good':s>=4?'medium':'bad'; }
 
-function renderResults(data, rawInput) {
-  const score = data.score || 5;
-  const c = getColor(score);
+function renderResults(d, rawIng) {
+  var s = d.score||5;
+  var c = scoreColor(s);
 
-  // Personal alerts HTML
-  const alerts = (data.personal_alerts || []);
-  const alertsHTML = alerts.map(a => `
-    <div class="alert-banner ${a.severity}">
-      <div class="alert-icon">${a.severity === 'danger' ? '🚨' : '⚠️'}</div>
-      <div class="alert-body">
-        <div class="alert-title">${a.severity === 'danger' ? 'ATENȚIE — Risc pentru tine' : 'Atenție — Verifică'}</div>
-        <div class="alert-text"><strong>${a.ingredient}</strong> — ${a.explanation}</div>
-      </div>
-    </div>
-  `).join('');
-
-  // Ingredients
-  const ingHTML = (data.ingredients_analysis || []).slice(0,15).map(ing => {
-    const dc = ing.rating === 'good' ? 'dot-good' : ing.rating === 'bad' ? 'dot-bad' : 'dot-medium';
-    const sym = ing.rating === 'good' ? '✓' : ing.rating === 'bad' ? '✗' : '~';
-    return `
-      <div class="ing-item">
-        <div class="ing-dot ${dc}">${sym}</div>
-        <div>
-          <div class="ing-name">${ing.name}</div>
-          <div class="ing-desc">${ing.explanation}</div>
-          ${ing.personal_risk && ing.personal_risk !== 'null' ? `<div class="ing-alert">⚠️ ${ing.personal_risk}</div>` : ''}
-        </div>
-      </div>`;
+  var alertsHTML = (d.personal_alerts||[]).map(function(a) {
+    return '<div class="alert-card '+a.severity+'">'
+      +'<div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div>'
+      +'<div><div class="alert-title">'+(a.severity==='danger'?'RISC pentru tine':'Atenție — verifică')+'</div>'
+      +'<div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';
   }).join('');
 
-  const posHTML = (data.positives || []).map(p => `<div class="point-row"><span class="point-icon">✅</span><span>${p}</span></div>`).join('');
-  const negHTML = (data.negatives || []).map(n => `<div class="point-row"><span class="point-icon">⚠️</span><span>${n}</span></div>`).join('');
+  var ingHTML = (d.ingredients||[]).slice(0,14).map(function(i) {
+    var dc = i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';
+    var sym = i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';
+    return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div>'
+      +'<div><div class="ing-name">'+i.name+'</div>'
+      +'<div class="ing-desc">'+i.desc+'</div>'
+      +(i.risk&&i.risk!=='null'?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')
+      +'</div></div>';
+  }).join('');
 
-  const el = document.getElementById('results');
-  el.innerHTML = `
-    ${alertsHTML}
-    <div class="score-row">
-      <div class="score-circle color-${c}">
-        <span class="score-num color-${c}">${score}</span>
-        <span class="score-den">/ 10</span>
-      </div>
-      <div class="score-info">
-        <div class="verdict color-${c}">${data.verdict || ''}</div>
-        <div class="summary">${data.summary || ''}</div>
-      </div>
-    </div>
-    <div class="bar-card">
-      <div class="bar-labels"><span>SLAB</span><span>MEDIU</span><span>EXCELENT</span></div>
-      <div class="bar-track">
-        <div class="bar-fill fill-${c}" id="bar-fill"></div>
-      </div>
-    </div>
-    ${ingHTML ? `<div class="section-card"><div class="section-title">Analiza Ingredientelor</div>${ingHTML}</div>` : ''}
-    ${posHTML ? `<div class="section-card"><div class="section-title">Puncte Forte</div>${posHTML}</div>` : ''}
-    ${negHTML ? `<div class="section-card"><div class="section-title">Puncte Slabe</div>${negHTML}</div>` : ''}
-    ${data.recommendation ? `<div class="reco-box">💡 ${data.recommendation}</div>` : ''}
-    <div class="save-row">
-      <button class="btn-primary" onclick="saveScan(${score}, '${productType}', \`${rawInput.substring(0,60).replace(/`/g,"'")}\`, ${alerts.length})">💾 Salvează în Istoric</button>
-    </div>
-    <div class="disclaimer">⚕️ EtiQuette nu înlocuiește sfatul medical. Consultați medicul pentru decizii privind afecțiunile dumneavoastră.</div>
-  `;
+  var posHTML = (d.positives||[]).map(function(p){return '<div class="point-row"><span>✅</span><span>'+p+'</span></div>';}).join('');
+  var negHTML = (d.negatives||[]).map(function(n){return '<div class="point-row"><span>⚠️</span><span>'+n+'</span></div>';}).join('');
 
-  el.classList.add('show');
-  setTimeout(() => {
-    const f = document.getElementById('bar-fill');
-    if (f) f.style.width = (score/10*100) + '%';
+  var alertCount = (d.personal_alerts||[]).length;
+  var safeExcerpt = rawIng.substring(0,60).replace(/'/g,"").replace(/\n/g,' ');
+
+  document.getElementById('results').innerHTML =
+    alertsHTML +
+    '<div class="score-card">'
+      +'<div class="score-circle c-'+c+'">'
+        +'<div class="score-num c-'+c+'">'+s+'</div>'
+        +'<div class="score-den">/ 10</div></div>'
+      +'<div><div class="score-verdict c-'+c+'">'+(d.verdict||'')+'</div>'
+        +'<div class="score-summary">'+(d.summary||'')+'</div></div></div>'
+    +'<div class="bar-card">'
+      +'<div class="bar-labels"><span>SLAB</span><span>MEDIU</span><span>EXCELENT</span></div>'
+      +'<div class="bar-track"><div class="bar-fill fill-'+c+'" id="bar-fill"></div></div></div>'
+    +(ingHTML?'<div class="section-card"><div class="section-label">Analiza Ingredientelor</div>'+ingHTML+'</div>':'')
+    +(posHTML?'<div class="section-card"><div class="section-label">Puncte Forte</div>'+posHTML+'</div>':'')
+    +(negHTML?'<div class="section-card"><div class="section-label">Puncte Slabe</div>'+negHTML+'</div>':'')
+    +(d.recommendation?'<div class="reco-box">💡 '+d.recommendation+'</div>':'')
+    +'<div style="margin-top:10px;">'
+      +'<button class="btn-primary" onclick="saveToHistory('+s+',\''+productType+'\',\''+safeExcerpt+'\','+alertCount+')">💾 Salvează în Istoric</button>'
+    +'</div>'
+    +'<div class="disclaimer">⚕️ EtiQuette nu înlocuiește sfatul medical.</div>';
+
+  document.getElementById('results').classList.add('show');
+  setTimeout(function() {
+    var f = document.getElementById('bar-fill');
+    if (f) f.style.width = (s/10*100)+'%';
   }, 100);
 }
 
-// ===================== HISTORY =====================
-function saveScan(score, type, excerpt, alertCount) {
-  const entry = {
-    score, type, excerpt,
-    alertCount,
-    date: new Date().toLocaleDateString('ro-RO', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }),
-    id: Date.now()
-  };
-  scanHistory.unshift(entry);
-  if (scanHistory.length > 50) scanHistory = scanHistory.slice(0,50);
-  try { localStorage.setItem('etiqette_history', JSON.stringify(scanHistory)); } catch(e) {}
+// HISTORY
+function saveToHistory(score, type, excerpt, alerts) {
+  scanHistory.unshift({
+    score:score, type:type, excerpt:excerpt, alerts:alerts,
+    date: new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
+  });
+  if (scanHistory.length>50) scanHistory=scanHistory.slice(0,50);
+  try { localStorage.setItem('eq_hist', JSON.stringify(scanHistory)); } catch(e) {}
   alert('✅ Salvat în istoric!');
 }
 
 function renderHistory() {
-  const el = document.getElementById('history-list');
-  if (scanHistory.length === 0) {
-    el.innerHTML = `<div class="empty-state"><div class="es-icon">📋</div><div class="es-text">Nicio scanare salvată încă.<br>Analizează primul tău produs!</div></div>`;
+  var el = document.getElementById('history-list');
+  if (scanHistory.length===0) {
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nicio scanare salvată încă.<br>Analizează primul tău produs!</div></div>';
     return;
   }
-  el.innerHTML = scanHistory.map(h => {
-    const c = getColor(h.score);
-    const typeIcon = h.type === 'food' ? '🍎' : '💄';
-    return `
-      <div class="history-item">
-        <div class="hist-score color-${c}">
-          <div class="hs-num color-${c}">${h.score}</div>
-          <div class="hs-den">/10</div>
-        </div>
-        <div class="hist-info">
-          <div class="hist-type">${typeIcon} ${h.type === 'food' ? 'ALIMENTAR' : 'COSMETIC'}</div>
-          <div class="hist-excerpt">${h.excerpt}...</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
-            <div class="hist-date">${h.date}</div>
-            ${h.alertCount > 0 ? `<div class="hist-alert-pill">⚠️ ${h.alertCount} alertă</div>` : ''}
-          </div>
-        </div>
-      </div>`;
+  el.innerHTML = scanHistory.map(function(h) {
+    var c = scoreColor(h.score);
+    return '<div class="hist-item">'
+      +'<div class="hist-score c-'+c+'"><div class="h-num c-'+c+'">'+h.score+'</div><div class="h-den">/10</div></div>'
+      +'<div class="hist-info">'
+        +'<div class="hist-type">'+(h.type==='food'?'🍎 ALIMENTAR':'💄 COSMETIC')+'</div>'
+        +'<div class="hist-excerpt">'+h.excerpt+'...</div>'
+        +'<div class="hist-meta"><span class="hist-date">'+h.date+'</span>'
+        +(h.alerts>0?'<span class="hist-alert-pill">⚠️ '+h.alerts+' alertă</span>':'')+'</div>'
+      +'</div></div>';
   }).join('');
 }
 
-// ===================== API KEY MANAGEMENT =====================
-function getApiKey() {
-  return localStorage.getItem('etiquette_api_key') || null;
-}
-
-function saveApiKey(key) {
-  localStorage.setItem('etiquette_api_key', key);
-}
-
-function resetApiKey() {
-  localStorage.removeItem('etiquette_api_key');
-  showApiKeyModal();
-}
-
-function showApiKeyModal() {
-  document.getElementById('apikey-modal').classList.add('show');
-}
-
-function closeApiKeyModal() {
-  document.getElementById('apikey-modal').classList.remove('show');
-}
-
-function submitApiKey() {
-  const key = document.getElementById('apikey-input').value.trim();
-  if (!key.startsWith('sk-ant')) {
-    document.getElementById('apikey-error').style.display = 'block';
-    return;
-  }
-  saveApiKey(key);
-  closeApiKeyModal();
-}
-
-
-function triggerCamera() {
-  document.getElementById('camera-input').click();
-}
-
-function clearPhoto() {
-  document.getElementById('photo-preview-wrap').style.display = 'none';
-  document.getElementById('camera-input').value = '';
-  document.getElementById('photo-preview').src = '';
-}
-
-async function handlePhoto(event) {
-  if (!getApiKey()) { showApiKeyModal(); return; }
-  const file = event.target.files[0];
-  if (!file) return;
-
-  // Show preview
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const base64Full = e.target.result;
-    const base64Data = base64Full.split(',')[1];
-    const mimeType = file.type || 'image/jpeg';
-
-    document.getElementById('photo-preview').src = base64Full;
-    document.getElementById('photo-preview-wrap').style.display = 'block';
-    document.getElementById('ocr-status').style.display = 'flex';
-    document.getElementById('ing-input').value = '';
-    document.getElementById('ing-input').placeholder = 'Citesc ingredientele din poză...';
-
-    try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-api-key": getApiKey(), "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 800,
-          messages: [{
-            role: "user",
-            content: [
-              {
-                type: "image",
-                source: { type: "base64", media_type: mimeType, data: base64Data }
-              },
-              {
-                type: "text",
-                text: "Ești expert în citirea etichetelor de produse. Uită-te cu atenție la această imagine și găsește lista de ingrediente. Lista de ingrediente apare de obicei după cuvintele: 'Ingredients:', 'Ingrediente:', 'Ingrediënten:', 'Inhaltsstoffe:', 'Ingrédients:', 'INCI:' sau similar. Extrage DOAR ingredientele — lista separată prin virgule. Ignoră orice alt text (instrucțiuni de utilizare, avertismente, descrieri). Returnează DOAR ingredientele, fără niciun alt cuvânt. Dacă absolut nu găsești nicio listă de ingrediente, returnează: NU_AM_GASIT"
-              }
-            ]
-          }]
-        })
-      });
-
-      const data = await response.json();
-      const text = (data.content || []).map(i => i.text || '').join('').trim();
-
-      document.getElementById('ocr-status').style.display = 'none';
-
-      if (text === 'NU_AM_GASIT' || text.length < 5) {
-        document.getElementById('ing-input').placeholder = 'Nu am găsit ingrediente în poză. Scrie-le manual...';
-        showError('Nu am putut citi ingredientele din poză. Încearcă o poză mai clară sau scrie manual.');
-      } else {
-        document.getElementById('ing-input').value = text;
-        document.getElementById('ing-input').placeholder = '';
-        // Flash green to show success
-        document.getElementById('ing-input').style.borderColor = 'var(--accent)';
-        setTimeout(() => { document.getElementById('ing-input').style.borderColor = ''; }, 2000);
-      }
-
-    } catch(err) {
-      document.getElementById('ocr-status').style.display = 'none';
-      document.getElementById('ing-input').placeholder = 'Eroare la citire. Scrie ingredientele manual...';
-      showError('Eroare la procesarea pozei. Scrie ingredientele manual.');
-    }
-  };
-
-  reader.readAsDataURL(file);
-}
-
-// ===================== UTILS =====================
 function showError(msg) {
-  const el = document.getElementById('error-card');
-  el.textContent = '⚠️ ' + msg;
+  var el = document.getElementById('error-msg');
+  el.textContent = '⚠️ '+msg;
   el.classList.add('show');
 }
 
-init();
+// INIT
+loadState();
+renderCondList();
+updateCondBar();
+updateBadge();
+renderHistory();
+if (!getKey()) showApiModal();
 </script>
 </body>
 </html>
