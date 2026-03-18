@@ -584,8 +584,13 @@ function doAnalyze() {
   .then(function(data) {
     var text = (data.content||[]).map(function(i){return i.text||'';}).join('');
     var parsed;
-    try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); }
-    catch(e) { throw new Error('Răspuns invalid. Încearcă din nou.'); }
+    try {
+      var clean = text.replace(/```json/g,'').replace(/```/g,'').trim();
+      var start = clean.indexOf('{');
+      var end = clean.lastIndexOf('}');
+      if (start !== -1 && end !== -1) clean = clean.substring(start, end+1);
+      parsed = JSON.parse(clean);
+    } catch(e) { throw new Error('Răspuns invalid. Încearcă din nou.'); }
     renderResults(parsed, ing);
   })
   .catch(function(err) {
