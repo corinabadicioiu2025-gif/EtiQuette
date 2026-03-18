@@ -1062,6 +1062,7 @@ function handleOverlayClick(e) {
 // ===================== ANALYZE =====================
 async function analyze() {
   if (!getApiKey()) { showApiKeyModal(); return; }
+  const input = document.getElementById('ing-input').value.trim();
   if (input.length < 5) { showError('Te rog introdu o listă de ingrediente.'); return; }
 
   const activeList = CONDITIONS.filter(c => activeConditions.has(c.id));
@@ -1361,11 +1362,4 @@ async function handlePhoto(event) {
 // ===================== UTILS =====================
 function showError(msg) {
   const el = document.getElementById('error-card');
-  el.textContent = '⚠️ ' + msg;
-  el.classList.add('show');
-}
-
-init();
-</script>
-</body>
-</html>
+  el.textContent = '⚠️ ' + msg
