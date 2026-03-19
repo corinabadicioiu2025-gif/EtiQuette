@@ -20,7 +20,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 /* TOPBAR */
 .topbar{background:var(--surface);border-bottom:1.5px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
 .logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-1.5px;display:flex;align-items:center;gap:8px}
-.logo-qu{color:var(--accent2)}
+.logo-word{letter-spacing:-1.5px}
+.logo-qu{color:var(--accent2);letter-spacing:-1.5px}
 .avatar-btn{width:38px;height:38px;background:var(--accent);border-radius:50%;border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;position:relative}
 .badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--danger);border-radius:50%;border:2px solid var(--bg);font-family:'Syne',sans-serif;font-size:9px;font-weight:700;color:white;display:none;align-items:center;justify-content:center}
 .badge.show{display:flex}
@@ -31,7 +32,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1.5px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0 20px;z-index:50}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1.5px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 0 20px;z-index:50}
 .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px}
 .nav-icon{font-size:22px}
 .nav-label{font-size:9px;letter-spacing:0.1em;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700}
@@ -83,7 +84,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-
 .photo-wrap{display:none;margin-bottom:10px;position:relative}
 .photo-wrap img{width:100%;border-radius:10px;border:1.5px solid var(--border);max-height:160px;object-fit:cover;display:block}
 .photo-close{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
-.ocr-loading{display:none;align-items:center;gap:8px;background:var(--accent-pale);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--accent);margin-top:6px}
+.ing-collapse-header{display:flex;align-items:center;justify-content:space-between;background:var(--accent-pale);border:1.5px solid var(--accent2);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s}
+.ing-collapse-header:hover{background:var(--accent-pale);border-color:var(--accent)}
+
 .ocr-loading.show{display:flex}
 .divider{text-align:center;position:relative;margin:10px 0;color:var(--muted);font-size:11px}
 .divider::before,.divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--border)}
@@ -224,6 +227,22 @@ textarea::placeholder{color:var(--muted)}
 .empty-icon{font-size:48px;margin-bottom:12px}
 .empty-text{font-size:13px;color:var(--muted);line-height:1.6}
 
+/* FAVORITES */
+.heart-btn{background:none;border:none;cursor:pointer;font-size:22px;padding:4px;transition:transform 0.15s;flex-shrink:0}
+.heart-btn:hover{transform:scale(1.2)}
+.fav-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.fav-filter{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all 0.15s}
+.fav-filter:hover{border-color:var(--accent2)}
+.fav-filter.active{background:var(--accent-pale);border-color:var(--accent);color:var(--accent)}
+.fav-item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.fav-score{width:46px;height:46px;border-radius:50%;border:2.5px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.fav-info{flex:1;min-width:0}
+.fav-type{font-size:10px;color:var(--muted);letter-spacing:0.08em;font-family:'Syne',sans-serif;font-weight:700}
+.fav-excerpt{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.fav-date{font-size:10px;color:var(--muted);margin-top:4px}
+.fav-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px}
+.fav-remove:hover{color:var(--danger)}
+
 /* MODALS */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;align-items:flex-end;justify-content:center}
 .overlay.show{display:flex}
@@ -252,7 +271,7 @@ textarea::placeholder{color:var(--muted)}
 <body>
 
 <div class="topbar">
-  <div class="logo">🏷️ Eti<span class="logo-qu">Qu</span>ette</div>
+  <div class="logo">🏷️ <span class="logo-word">Eti<span class="logo-qu">Q</span>uette</span></div>
   <button class="avatar-btn" onclick="goTo('profile')">👤<span class="badge" id="badge"></span></button>
 </div>
 
@@ -305,8 +324,26 @@ textarea::placeholder{color:var(--muted)}
     </div>
   </div>
 
-  <div class="divider"><span>sau scrie manual</span></div>
-  <textarea id="ing-textarea" placeholder="Ingredientele apar automat după foto, sau le poți scrie manual...&#10;&#10;Ex: Apă, zahăr, acid citric (E330)..."></textarea>
+  <div class="divider" id="manual-divider"><span>sau scrie manual</span></div>
+
+  <!-- Collapsible ingredient list -->
+  <div id="ing-collapse-wrap" style="display:none;margin-bottom:10px;">
+    <div class="ing-collapse-header" onclick="toggleIngCollapse()">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:14px;">📋</span>
+        <span style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--accent);" id="ing-collapse-label">Ingrediente găsite</span>
+      </div>
+      <span style="font-size:11px;color:var(--muted);" id="ing-collapse-arrow">▼ Vezi</span>
+    </div>
+    <div id="ing-collapse-body" style="display:none;">
+      <textarea id="ing-textarea" placeholder="Ingredientele apar automat după foto, sau le poți scrie manual...&#10;&#10;Ex: Apă, zahăr, acid citric (E330)..." style="margin-top:8px;"></textarea>
+    </div>
+  </div>
+
+  <!-- Manual textarea (shown when no photo) -->
+  <div id="ing-manual-wrap">
+    <textarea id="ing-textarea-manual" placeholder="Ingredientele apar automat după foto, sau le poți scrie manual...&#10;&#10;Ex: Apă, zahăr, acid citric (E330)..."></textarea>
+  </div>
 
   <div style="margin-top:10px;">
     <button class="btn-primary" id="analyze-btn" onclick="doAnalyze()">⚡ ANALIZEAZĂ</button>
@@ -314,6 +351,18 @@ textarea::placeholder{color:var(--muted)}
   <div class="error-msg" id="error-msg"></div>
   <div class="loading-wrap" id="loading"><div class="spinner"></div><p>analizând ingredientele...</p></div>
   <div class="results-wrap" id="results"></div>
+</div>
+
+<!-- FAVORITE -->
+<div class="page" id="page-favorites">
+  <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:5px;">Produse<br>Favorite ❤️</div>
+  <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">Produsele tale salvate</div>
+  <div class="fav-filters">
+    <button class="fav-filter active" id="fav-filter-all" onclick="setFavFilter('all')">Toate</button>
+    <button class="fav-filter" id="fav-filter-food" onclick="setFavFilter('food')">🍎 Alimentare</button>
+    <button class="fav-filter" id="fav-filter-cosmetic" onclick="setFavFilter('cosmetic')">💄 Cosmetice</button>
+  </div>
+  <div id="favorites-list"></div>
 </div>
 
 <!-- ISTORIC -->
@@ -411,6 +460,7 @@ textarea::placeholder{color:var(--muted)}
 <div class="bottom-nav">
   <button class="nav-btn active" id="nav-home" onclick="goTo('home')"><span class="nav-icon">🔬</span><span class="nav-label">ANALIZĂ</span></button>
   <button class="nav-btn" id="nav-history" onclick="goTo('history')"><span class="nav-icon">📋</span><span class="nav-label">ISTORIC</span></button>
+  <button class="nav-btn" id="nav-favorites" onclick="goTo('favorites')"><span class="nav-icon">❤️</span><span class="nav-label">FAVORITE</span></button>
   <button class="nav-btn" id="nav-profile" onclick="goTo('profile')"><span class="nav-icon">👤</span><span class="nav-label">PROFIL</span></button>
 </div>
 
@@ -515,9 +565,12 @@ var activeConditions = new Set();
 var members = [];
 var selectedMembers = ['__all__'];
 var scanHistory = [];
+var favorites = [];
+var favFilter = 'all';
 var editingAvatarMemberId = null;
 var customConditions = [];
-var defaultScan = 'all'; // 'all', 'self', 'manual'
+var defaultScan = 'all';
+var photoMode = false;
 
 function loadState() {
   try {
@@ -529,6 +582,8 @@ function loadState() {
     if (m) members = JSON.parse(m);
     var cc = localStorage.getItem('eq_custom_conds');
     if (cc) customConditions = JSON.parse(cc);
+    var fav = localStorage.getItem('eq_favorites');
+    if (fav) favorites = JSON.parse(fav);
     var ds = localStorage.getItem('eq_default_scan');
     if (ds) defaultScan = ds;
     // Apply default scan
@@ -557,13 +612,14 @@ function storeKey(k) { localStorage.setItem('eq_key', k); }
 // NAVIGATION
 // ============================================================
 function goTo(page) {
-  ['home','history','profile'].forEach(function(p) {
+  ['home','history','favorites','profile'].forEach(function(p) {
     document.getElementById('page-'+p).classList.toggle('active', p===page);
     document.getElementById('nav-'+p).classList.toggle('active', p===page);
   });
   document.getElementById('fab').style.display = page==='home' ? 'flex' : 'none';
   if (page==='profile') { renderCatGroups(); renderMembersList(); renderCustomConds(); renderDefaultSetting(); }
   if (page==='history') renderHistory();
+  if (page==='favorites') renderFavorites();
   if (page==='home') renderMemberSelector();
 }
 
@@ -867,16 +923,32 @@ function saveApiKey() {
 // ============================================================
 // CAMERA & OCR
 // ============================================================
+var photoMode = false;
+
+function toggleIngCollapse() {
+  var body = document.getElementById('ing-collapse-body');
+  var arrow = document.getElementById('ing-collapse-arrow');
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.textContent = isOpen ? '▼ Vezi' : '▲ Ascunde';
+}
+
 function openCamera() {
   if (!getKey()) {showApiModal();return;}
   document.getElementById('file-input').click();
 }
 
 function clearPhoto() {
+  photoMode = false;
   document.getElementById('photo-wrap').style.display='none';
   document.getElementById('file-input').value='';
   document.getElementById('photo-img').src='';
-  document.getElementById('ing-textarea').value='';
+  document.getElementById('ing-collapse-wrap').style.display='none';
+  document.getElementById('ing-manual-wrap').style.display='block';
+  document.getElementById('manual-divider').style.display='flex';
+  document.getElementById('ing-textarea-manual').value='';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').innerHTML='';
 }
 
 function handlePhoto(e) {
@@ -890,8 +962,9 @@ function handlePhoto(e) {
     document.getElementById('photo-img').src=full;
     document.getElementById('photo-wrap').style.display='block';
     document.getElementById('ocr-loading').classList.add('show');
-    document.getElementById('ing-textarea').value='';
     document.getElementById('error-msg').classList.remove('show');
+    document.getElementById('results').classList.remove('show');
+    document.getElementById('results').innerHTML='';
 
     fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
@@ -911,15 +984,26 @@ function handlePhoto(e) {
       var text = (data.content||[]).map(function(i){return i.text||'';}).join('').trim();
       if (!text||text==='NU_AM_GASIT'||text.length<5) {
         showError('Nu am putut citi ingredientele. Încearcă o poză mai apropiată sau scrie manual.');
+        // Show manual textarea as fallback
+        document.getElementById('ing-manual-wrap').style.display='block';
+        document.getElementById('manual-divider').style.display='flex';
       } else {
-        document.getElementById('ing-textarea').value=text;
-        document.getElementById('ing-textarea').style.borderColor='var(--good)';
-        setTimeout(function(){document.getElementById('ing-textarea').style.borderColor='';},2000);
+        // Save text and show collapsible
+        photoMode = true;
+        document.getElementById('ing-textarea').value = text;
+        document.getElementById('ing-manual-wrap').style.display='none';
+        document.getElementById('manual-divider').style.display='none';
+        document.getElementById('ing-collapse-wrap').style.display='block';
+        document.getElementById('ing-collapse-label').textContent =
+          text.split(',').length + ' ingrediente găsite';
+        // Auto-analyze!
+        setTimeout(function(){ doAnalyze(); }, 300);
       }
     })
     .catch(function(){
       document.getElementById('ocr-loading').classList.remove('show');
       showError('Eroare la procesarea pozei. Scrie ingredientele manual.');
+      document.getElementById('ing-manual-wrap').style.display='block';
     });
   };
   reader.readAsDataURL(file);
@@ -930,7 +1014,9 @@ function handlePhoto(e) {
 // ============================================================
 function doAnalyze() {
   if (!getKey()) {showApiModal();return;}
-  var ing = document.getElementById('ing-textarea').value.trim();
+  var ing = photoMode
+    ? document.getElementById('ing-textarea').value.trim()
+    : document.getElementById('ing-textarea-manual').value.trim();
   if (ing.length<5) {showError('Te rog introdu o listă de ingrediente.');return;}
 
   // Build context for selected members
@@ -1049,7 +1135,12 @@ function renderResults(d,rawIng){
     +(posHTML?'<div class="section-card"><div class="section-label">Puncte Forte</div>'+posHTML+'</div>':'')
     +(negHTML?'<div class="section-card"><div class="section-label">Puncte Slabe</div>'+negHTML+'</div>':'')
     +(d.recommendation?'<div class="reco-box">💡 '+d.recommendation+'</div>':'')
-    +'<div style="margin-top:10px;"><button class="btn-primary" onclick="saveToHistory('+s+',\''+productType+'\',\''+safeExcerpt+'\','+alertCount+')">💾 Salvează în Istoric</button></div>'
+    +'<div style="margin-top:10px;display:flex;gap:8px;">'
+      +'<button class="btn-primary" style="flex:1" onclick="saveToHistory('+s+',\''+productType+'\',\''+safeExcerpt+'\','+alertCount+')">💾 Salvează în Istoric</button>'
+      +'<button class="heart-btn" onclick="toggleFavorite('+s+',\''+productType+'\',\''+safeExcerpt+'\','+alertCount+')" title="Adaugă la Favorite">'
+        +(isFavorite(safeExcerpt,productType)?'❤️':'🤍')
+      +'</button>'
+    +'</div>'
     +'<div class="disclaimer">⚕️ EtiQuette nu înlocuiește sfatul medical.</div>';
 
   document.getElementById('results').classList.add('show');
@@ -1060,8 +1151,63 @@ function renderResults(d,rawIng){
 }
 
 // ============================================================
-// HISTORY
+// FAVORITES
 // ============================================================
+function toggleFavorite(score, type, excerpt, alerts) {
+  var existing = favorites.findIndex(function(f){return f.excerpt===excerpt&&f.type===type;});
+  if (existing > -1) {
+    favorites.splice(existing, 1);
+    alert('💔 Eliminat din favorite');
+  } else {
+    favorites.unshift({
+      score:score, type:type, excerpt:excerpt, alerts:alerts,
+      date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
+    });
+    alert('❤️ Adăugat la favorite!');
+  }
+  try{localStorage.setItem('eq_favorites',JSON.stringify(favorites));}catch(e){}
+}
+
+function isFavorite(excerpt, type) {
+  return favorites.some(function(f){return f.excerpt===excerpt&&f.type===type;});
+}
+
+function removeFavorite(idx) {
+  favorites.splice(idx,1);
+  try{localStorage.setItem('eq_favorites',JSON.stringify(favorites));}catch(e){}
+  renderFavorites();
+}
+
+function setFavFilter(f) {
+  favFilter = f;
+  ['all','food','cosmetic'].forEach(function(v){
+    document.getElementById('fav-filter-'+v).classList.toggle('active', v===f);
+  });
+  renderFavorites();
+}
+
+function renderFavorites() {
+  var el = document.getElementById('favorites-list');
+  var filtered = favFilter==='all' ? favorites : favorites.filter(function(f){return f.type===favFilter;});
+  if (filtered.length===0) {
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">Niciun produs favorit încă.<br>Apasă ❤️ pe orice analiză<br>pentru a o salva aici.</div></div>';
+    return;
+  }
+  el.innerHTML = filtered.map(function(f,i) {
+    var c = scoreColor(f.score);
+    return '<div class="fav-item">'
+      +'<div class="fav-score c-'+c+'"><div class="h-num c-'+c+'">'+f.score+'</div><div class="h-den">/10</div></div>'
+      +'<div class="fav-info">'
+        +'<div class="fav-type">'+(f.type==='food'?'🍎 ALIMENTAR':'💄 COSMETIC')+'</div>'
+        +'<div class="fav-excerpt">'+f.excerpt+'...</div>'
+        +'<div class="fav-date">'+f.date+'</div>'
+      +'</div>'
+      +'<button class="fav-remove" onclick="removeFavorite('+i+')">🗑️</button>'
+    +'</div>';
+  }).join('');
+}
+
+
 function saveToHistory(score,type,excerpt,alerts){
   scanHistory.unshift({score:score,type:type,excerpt:excerpt,alerts:alerts,
     date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});
@@ -1105,6 +1251,7 @@ loadState();
 updateCondBar();
 updateBadge();
 renderHistory();
+renderFavorites();
 renderMemberSelector();
 renderDefaultSetting();
 if(!getKey()) showApiModal();
