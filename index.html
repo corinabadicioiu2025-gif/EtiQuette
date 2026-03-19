@@ -279,14 +279,18 @@ textarea::placeholder{color:var(--muted)}
 .empty-text{font-size:13px;color:var(--muted);line-height:1.6}
 
 /* FAB */
-.fab{position:fixed;bottom:76px;right:18px;width:50px;height:50px;background:var(--accent);color:white;border:none;border-radius:50%;font-size:26px;cursor:pointer;box-shadow:0 4px 18px rgba(26,82,118,0.35);display:flex;align-items:center;justify-content:center;transition:transform 0.15s;z-index:49}
+.fab{position:fixed;bottom:76px;right:18px;width:50px;height:50px;background:var(--accent);color:white;border:none;border-radius:50%;font-size:22px;cursor:pointer;box-shadow:0 4px 18px rgba(26,82,118,0.35);display:flex;align-items:center;justify-content:center;transition:transform 0.15s;z-index:49}
 .fab:hover{transform:scale(1.1)}
+.info-section p{font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:8px;text-align:justify}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="logo">🏷️ <span class="logo-word">Eti<span class="logo-q">Q</span>uette</span></div>
+  <div>
+    <div class="logo">🏷️ <span class="logo-word">Eti<span class="logo-q">Q</span>uette</span></div>
+    <div style="font-size:10px;color:var(--muted);font-style:italic;letter-spacing:0.02em;margin-top:2px;">ajutorul tău pentru alegeri sănătoase</div>
+  </div>
   <button class="avatar-btn" onclick="openMenu()">👤<span class="badge" id="badge"></span></button>
 </div>
 
@@ -383,7 +387,6 @@ textarea::placeholder{color:var(--muted)}
 <!-- PROFIL -->
 <div class="page" id="page-profile">
   <div class="profile-hero">
-    <div class="profile-avatar-big">👤</div>
     <div>
       <div class="profile-name">Profilul meu</div>
       <div class="profile-sub">Afecțiuni • Membri • Personalizare</div>
@@ -460,7 +463,7 @@ textarea::placeholder{color:var(--muted)}
   <div class="info-section"><h3>Date colectate</h3><p>EtiQuette stochează local pe dispozitivul dvs.: profilul familiei (nume, date de naștere, afecțiuni), istoricul scanărilor și produsele favorite. Aceste date nu sunt transmise pe niciun server extern.</p></div>
   <div class="info-section"><h3>GDPR</h3><p>Conform Regulamentului General privind Protecția Datelor (GDPR), aveți dreptul de a accesa, modifica sau șterge datele personale stocate. Puteți șterge toate datele prin dezinstalarea aplicației.</p></div>
   <div class="info-section"><h3>Cheia API</h3><p>Cheia API Anthropic introdusă de dvs. este stocată local pe dispozitiv și este folosită exclusiv pentru procesarea ingredientelor. Nu este transmisă către EtiQuette sau terți.</p></div>
-  <div class="info-section"><h3>Contact</h3><p>Pentru orice întrebări legate de confidențialitate, ne puteți contacta la: contact@etiquette.app</p></div>
+  <div class="info-section"><h3>Contact</h3><p>Pentru orice întrebări legate de confidențialitate, ne puteți contacta la: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2a4945445e4b495e6a4f5e435b5f4f5e5e4f044b5a5a">[email&#160;protected]</a></p></div>
 </div>
 
 <div class="page" id="page-disclaimer">
@@ -479,7 +482,13 @@ textarea::placeholder{color:var(--muted)}
 </div>
 
 <!-- FAB -->
-<button class="fab" id="fab" onclick="openMenu()">☰</button>
+<button class="fab" id="fab" onclick="openMenu()">
+  <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="22" height="2.5" rx="1.25" fill="white"/>
+    <rect y="6.75" width="16" height="2.5" rx="1.25" fill="white"/>
+    <rect y="13.5" width="22" height="2.5" rx="1.25" fill="white"/>
+  </svg>
+</button>
 
 <!-- BOTTOM NAV - 3 tabs -->
 <div class="bottom-nav">
@@ -493,10 +502,9 @@ textarea::placeholder{color:var(--muted)}
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="menu-user">
-      <div class="menu-user-avatar">👤</div>
       <div>
-        <div class="menu-user-name">EtiQuette</div>
-        <div class="menu-user-sub">Profilul tău personal</div>
+        <div class="menu-user-name">🏷️ EtiQuette</div>
+        <div class="menu-user-sub">ajutorul tău pentru alegeri sănătoase</div>
       </div>
     </div>
     <div class="menu-item" onclick="closeMenuGoTo('profile')">
@@ -570,7 +578,7 @@ textarea::placeholder{color:var(--muted)}
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ============================================================
 // CONSTANTS
 // ============================================================
@@ -763,14 +771,21 @@ function goTo(page) {
     var btn = document.getElementById('nav-'+p);
     if (btn) btn.classList.toggle('active', p===page);
   });
+  var infoPages = ['about','terms','privacy','disclaimer','guide'];
+  var isInfoPage = infoPages.indexOf(page) > -1;
   document.getElementById('fab').style.display = (page==='home'||page==='history'||page==='favorites') ? 'flex' : 'none';
+  document.querySelector('.avatar-btn').style.display = isInfoPage ? 'none' : 'flex';
+  document.querySelector('.bottom-nav').style.display = isInfoPage ? 'none' : 'grid';
   if (page==='profile') { renderCatGroups(); renderMembersList(); renderCustomConds(); renderDefaultSetting(); }
   if (page==='history') renderHistory();
   if (page==='favorites') renderFavorites();
   if (page==='home') renderMemberSelector();
 }
 
-function closeInfoPage() { goTo(previousPage||'home'); }
+function closeInfoPage() {
+  goTo(previousPage||'home');
+  setTimeout(function(){ openMenu(); }, 250);
+}
 
 // ============================================================
 // MENU
@@ -1349,16 +1364,4 @@ function showError(msg){var el=document.getElementById('error-msg');el.textConte
 
 // ============================================================
 // INIT
-// ============================================================
-loadState();
-updateCondBar();
-updateBadge();
-renderHistory();
-renderFavorites();
-renderMemberSelector();
-renderDefaultSetting();
-if(!getKey()) showApiModal();
-setTimeout(checkBirthdays, 1000);
-</script>
-</body>
-</html>
+// ================================================
