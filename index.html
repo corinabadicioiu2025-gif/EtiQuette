@@ -4,325 +4,400 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>EtiQuette</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
 :root{
-  --bg:#f8f6f1;--surface:#fff;--surface2:#f0ede6;--border:#e2ddd4;
-  --accent:#1a5276;--accent2:#2e86c1;--accent-pale:#d6eaf8;
-  --warn:#e67e22;--warn-pale:#fdebd0;--danger:#c0392b;--danger-pale:#fadbd8;
-  --good:#1e8449;--good-pale:#d5f5e3;--medium:#d4ac0d;--medium-pale:#fef9e7;
-  --text:#1a1a2e;--text2:#5d6d7e;--muted:#aab7c4;
-  --radius:14px;--shadow:0 2px 16px rgba(26,82,118,0.08)
+  --bg:#FAF8F5;
+  --surface:#FFFFFF;
+  --surface2:#F5F1EB;
+  --border:#EDE5D8;
+  --border2:#E8E0D0;
+  --gold:#C9A96E;
+  --gold-pale:#FDF9F3;
+  --text:#1C1917;
+  --text2:#5C5449;
+  --muted:#B8AD9E;
+  --muted2:#C4B99A;
+  --danger:#C0392B;
+  --danger-pale:#FADBD8;
+  --warn:#E67E22;
+  --warn-pale:#FDEBD0;
+  --good:#2D6A4F;
+  --good-pale:#D5F5E3;
+  --medium:#C9A96E;
+  --medium-pale:#FDF9F3;
+  --radius:10px;
+  --shadow:0 1px 12px rgba(28,25,23,0.06)
 }
-body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden}
 
-/* TOPBAR */
-.topbar{background:var(--surface);border-bottom:1.5px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
-.logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-1.5px;display:flex;align-items:center;gap:8px}
-.logo-word{letter-spacing:-1.5px}
-.logo-q{color:var(--accent2)}
-.avatar-btn{width:38px;height:38px;background:var(--accent);border-radius:50%;border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
-.badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--danger);border-radius:50%;border:2px solid var(--bg);font-family:'Syne',sans-serif;font-size:9px;font-weight:700;color:white;display:none;align-items:center;justify-content:center}
-.badge.show{display:flex}
+body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden}
 
-/* PAGES */
-.page{display:none;padding:20px 20px 90px}
-.page.active{display:block;animation:fadeUp 0.25s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* ===================== TOPBAR ===================== */
+.topbar{background:var(--bg);border-bottom:0.5px solid var(--border2);padding:16px 20px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 
-/* BOTTOM NAV - 3 tabs */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1.5px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 0 20px;z-index:50}
-.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px}
-.nav-icon{font-size:22px}
-.nav-label{font-size:9px;letter-spacing:0.1em;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700}
-.nav-btn.active .nav-label{color:var(--accent)}
+.logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);letter-spacing:0.01em;line-height:1}
+.logo-q{color:var(--gold);font-style:italic}
+.logo-tagline{font-family:'Jost',sans-serif;font-size:9px;color:var(--muted);font-style:italic;letter-spacing:0.08em;margin-top:3px}
 
-/* COMMON */
-.section-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-.btn-primary{width:100%;background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:16px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:0.05em}
-.btn-primary:hover{background:#154360;transform:translateY(-1px)}
-.btn-primary:active{transform:translateY(0)}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
-.btn-secondary{width:100%;background:var(--surface2);color:var(--text2);border:1.5px solid var(--border);border-radius:var(--radius);padding:13px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.menu-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--gold);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.menu-lines{display:flex;flex-direction:column;gap:3px}
+.menu-line{height:1.5px;border-radius:1px;background:var(--gold)}
 
-/* TYPE BUTTONS */
-.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.type-btn{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:16px 10px;cursor:pointer;text-align:center;transition:all 0.15s;font-family:'Syne',sans-serif}
-.type-btn.active{background:var(--accent-pale);border-color:var(--accent)}
-.t-emoji{font-size:26px;margin-bottom:6px;display:block}
-.t-label{font-size:13px;font-weight:700;color:var(--text2)}
-.type-btn.active .t-label{color:var(--accent)}
+/* ===================== PAGES ===================== */
+.page{display:none;padding:20px 20px 90px;animation:fadeIn 0.4s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-/* MEMBER SELECTOR */
-.member-selector{margin-bottom:14px;display:none}
-.member-selector-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+/* ===================== BOTTOM NAV ===================== */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg);border-top:0.5px solid var(--border2);display:grid;grid-template-columns:repeat(3,1fr);padding:10px 0 20px;z-index:50}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:4px}
+.nav-label{font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.06em;color:var(--muted)}
+.nav-btn.active .nav-label{color:var(--gold);font-weight:500}
+.nav-bar{width:18px;height:1px;background:var(--gold);border-radius:1px;opacity:0;margin-top:2px}
+.nav-btn.active .nav-bar{opacity:1}
+
+/* ===================== COMMON ===================== */
+.section-label{font-family:'Jost',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
+
+.btn-primary{width:100%;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:15px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:hover{background:var(--gold-pale)}
+.btn-primary:active{opacity:0.8}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed}
+
+.btn-secondary{width:100%;background:var(--surface);color:var(--text2);border:0.5px solid var(--border);border-radius:6px;padding:13px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:0.1em;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;box-shadow:var(--shadow)}
+
+/* ===================== TYPE SELECTOR ===================== */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.type-btn{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 8px;cursor:pointer;text-align:center;transition:all 0.3s ease;font-family:'Jost',sans-serif}
+.type-btn:hover{border-color:var(--gold)}
+.type-btn.active{background:var(--gold-pale);border:1px solid var(--gold)}
+.type-emoji{font-size:24px;display:block;margin-bottom:6px}
+.type-lbl{font-size:11px;font-weight:400;color:var(--text2);letter-spacing:0.04em}
+.type-btn.active .type-lbl{color:var(--gold);font-weight:500}
+
+/* ===================== MEMBER SELECTOR ===================== */
+.member-selector{margin-bottom:16px;display:none}
 .member-chips{display:flex;flex-wrap:wrap;gap:8px}
-.member-chip{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;transition:all 0.15s;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--text2)}
-.member-chip.active{background:var(--accent-pale);border-color:var(--accent);color:var(--accent)}
-.chip-avatar{width:22px;height:22px;border-radius:50%;background:var(--accent);color:white;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
-.chip-all{background:var(--accent);color:white;border-color:var(--accent)}
-.chip-all.active{background:#154360;border-color:#154360}
-.chip-x{margin-left:2px;font-size:10px;opacity:0.6;cursor:pointer;padding:0 2px}
-.chip-x:hover{opacity:1}
+.member-chip{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surface);border:0.5px solid var(--border);border-radius:20px;cursor:pointer;transition:all 0.3s ease;font-family:'Jost',sans-serif;font-size:11px;color:var(--text2)}
+.member-chip.active{background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold)}
+.chip-avatar{width:20px;height:20px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px}
+.chip-x{font-size:10px;opacity:0.5;margin-left:2px}
+.chip-all{background:var(--gold);color:var(--bg);border-color:var(--gold);font-size:11px}
+.chip-all.active{background:var(--text);border-color:var(--text)}
 
-/* CONDITIONS BAR */
-.conditions-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;box-shadow:var(--shadow)}
-.cond-bar-info{flex:1}
-.cond-bar-label{font-size:10px;color:var(--muted);letter-spacing:0.08em;font-family:'Syne',sans-serif;font-weight:700}
-.cond-bar-value{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);margin-top:2px}
+/* ===================== CONDITIONS BAR ===================== */
+.conditions-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;box-shadow:var(--shadow)}
+.cond-bar-label{font-family:'Jost',sans-serif;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)}
+.cond-bar-value{font-family:'Jost',sans-serif;font-size:11px;font-weight:500;color:var(--text);margin-top:2px}
 .pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.pill{background:var(--accent-pale);color:var(--accent);border-radius:20px;padding:2px 9px;font-size:11px}
+.pill{background:var(--gold-pale);color:var(--gold);border-radius:20px;padding:2px 9px;font-size:10px;font-family:'Jost',sans-serif}
 
-/* CAMERA */
-.camera-btn{width:100%;background:var(--surface);border:2px dashed var(--accent2);border-radius:var(--radius);padding:15px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--accent);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
-.camera-btn:hover{background:var(--accent-pale);border-style:solid}
+/* ===================== CAMERA ===================== */
+.camera-btn{width:100%;background:var(--surface);border:1px dashed var(--gold);border-radius:var(--radius);padding:14px;font-family:'Jost',sans-serif;font-size:11px;color:var(--gold);cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;letter-spacing:0.06em}
+.camera-btn:hover{background:var(--gold-pale);border-style:solid}
+
 .photo-wrap{display:none;margin-bottom:10px;position:relative}
-.photo-wrap img{width:100%;border-radius:10px;border:1.5px solid var(--border);max-height:160px;object-fit:cover;display:block}
-.photo-close{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
-.ocr-loading{display:none;align-items:center;gap:8px;background:var(--accent-pale);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--accent);margin-top:6px}
+.photo-wrap img{width:100%;border-radius:var(--radius);border:0.5px solid var(--border);max-height:160px;object-fit:cover;display:block}
+.photo-close{position:absolute;top:8px;right:8px;background:rgba(28,25,23,0.5);color:var(--bg);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;font-family:'Jost',sans-serif}
+
+.ocr-loading{display:none;align-items:center;gap:8px;background:var(--gold-pale);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--gold);margin-top:6px;font-family:'Jost',sans-serif}
 .ocr-loading.show{display:flex}
-.ing-collapse-header{display:flex;align-items:center;justify-content:space-between;background:var(--accent-pale);border:1.5px solid var(--accent2);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s}
-.divider{text-align:center;position:relative;margin:10px 0;color:var(--muted);font-size:11px}
-.divider::before,.divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--border)}
+
+.ing-collapse-wrap{display:none;margin-bottom:10px}
+.ing-collapse-header{display:flex;align-items:center;justify-content:space-between;background:var(--gold-pale);border:1px solid var(--gold);border-radius:var(--radius);padding:12px 14px;cursor:pointer}
+.ing-collapse-label{font-family:'Jost',sans-serif;font-size:11px;color:var(--gold);letter-spacing:0.04em}
+.ing-collapse-arrow{font-size:10px;color:var(--muted)}
+.ing-collapse-body{display:none;padding-top:8px}
+
+.divider{text-align:center;position:relative;margin:10px 0;color:var(--muted2);font-size:10px;font-family:'Jost',sans-serif;letter-spacing:0.1em}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:38%;height:0.5px;background:var(--border)}
 .divider::before{left:0}.divider::after{right:0}
-textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:14px;color:var(--text);font-family:'DM Mono',monospace;font-size:12.5px;line-height:1.7;resize:none;height:110px;outline:none;transition:border-color 0.15s}
-textarea:focus{border-color:var(--accent)}
+
+textarea{width:100%;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;color:var(--text);font-family:'Jost',sans-serif;font-size:12px;line-height:1.7;resize:none;height:110px;outline:none;transition:border-color 0.3s}
+textarea:focus{border-color:var(--gold)}
 textarea::placeholder{color:var(--muted)}
-.error-msg{background:var(--danger-pale);border:1.5px solid var(--danger);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--danger);margin-top:10px;display:none}
+
+/* ===================== ERROR / LOADING ===================== */
+.error-msg{background:var(--danger-pale);border:0.5px solid var(--danger);border-radius:var(--radius);padding:12px 14px;font-size:11px;color:var(--danger);margin-top:10px;display:none;font-family:'Jost',sans-serif}
 .error-msg.show{display:block}
+
 .loading-wrap{display:none;text-align:center;padding:40px}
 .loading-wrap.show{display:block}
-.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
+.spinner{width:32px;height:32px;border:1.5px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-wrap p{font-size:12px;color:var(--muted)}
+.loading-wrap p{font-size:11px;color:var(--muted);font-family:'Jost',sans-serif;letter-spacing:0.06em;font-style:italic}
 
-/* RESULTS */
-.results-wrap{display:none;margin-top:16px}
-.results-wrap.show{display:block;animation:fadeUp 0.3s ease}
-.alert-card{border-radius:var(--radius);padding:14px;margin-bottom:10px;border:1.5px solid;display:flex;gap:10px}
+/* ===================== RESULTS ===================== */
+.results-wrap{display:none;margin-top:20px}
+.results-wrap.show{display:block;animation:fadeIn 0.4s ease}
+
+.alert-card{border-radius:var(--radius);padding:14px;margin-bottom:10px;border:0.5px solid;display:flex;gap:10px}
 .alert-card.danger{background:var(--danger-pale);border-color:var(--danger)}
 .alert-card.warn{background:var(--warn-pale);border-color:var(--warn)}
-.alert-icon{font-size:20px;flex-shrink:0}
-.alert-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;margin-bottom:3px}
+.alert-icon{font-size:18px;flex-shrink:0}
+.alert-title{font-family:'Jost',sans-serif;font-size:11px;font-weight:500;margin-bottom:3px;letter-spacing:0.04em}
 .alert-card.danger .alert-title{color:var(--danger)}
 .alert-card.warn .alert-title{color:var(--warn)}
-.alert-text{font-size:12px;color:var(--text2);line-height:1.5}
-.score-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:18px;margin-bottom:10px;box-shadow:var(--shadow)}
-.score-circle{width:78px;height:78px;border-radius:50%;border:3px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.score-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:1}
-.score-den{font-size:9px;color:var(--muted)}
-.score-verdict{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:5px}
-.score-summary{font-size:12px;color:var(--text2);line-height:1.5}
+.alert-text{font-size:11px;color:var(--text2);line-height:1.6;font-family:'Jost',sans-serif}
+
+.score-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:18px;margin-bottom:10px;box-shadow:var(--shadow)}
+.score-circle{width:76px;height:76px;border-radius:50%;border:1px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;line-height:1}
+.score-den{font-size:10px;color:var(--muted);font-family:'Jost',sans-serif}
+.score-verdict{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;margin-bottom:4px}
+.score-summary{font-size:11px;color:var(--text2);line-height:1.6;font-family:'Jost',sans-serif}
+
 .c-good{color:var(--good);border-color:var(--good)}
 .c-medium{color:var(--medium);border-color:var(--medium)}
 .c-bad{color:var(--danger);border-color:var(--danger)}
 .fill-good{background:var(--good)}.fill-medium{background:var(--medium)}.fill-bad{background:var(--danger)}
-.bar-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:10px}
-.bar-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:7px;letter-spacing:0.08em}
-.bar-track{height:7px;background:var(--surface2);border-radius:4px;overflow:hidden}
-.bar-fill{height:100%;border-radius:4px;width:0;transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1)}
-.section-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
-.ing-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:12px}
+
+.bar-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:10px}
+.bar-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:8px;letter-spacing:0.08em;font-family:'Jost',sans-serif}
+.bar-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1)}
+
+.section-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
+.ing-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);font-size:11px;font-family:'Jost',sans-serif}
 .ing-row:last-child{border-bottom:none}
-.ing-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-top:1px}
+.ing-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;margin-top:1px}
 .d-good{background:var(--good-pale);color:var(--good)}.d-medium{background:var(--medium-pale);color:var(--medium)}.d-bad{background:var(--danger-pale);color:var(--danger)}
-.ing-name{font-weight:500;margin-bottom:2px}.ing-desc{font-size:11px;color:var(--text2);line-height:1.5}.ing-risk{font-size:11px;color:var(--danger);font-weight:500;margin-top:2px}
-.point-row{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.5}
+.ing-name{font-weight:500;margin-bottom:2px;color:var(--text)}
+.ing-desc{font-size:10px;color:var(--text2);line-height:1.5}
+.ing-risk{font-size:10px;color:var(--danger);font-weight:500;margin-top:2px}
+
+.point-row{display:flex;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:11px;color:var(--text2);line-height:1.5;font-family:'Jost',sans-serif}
 .point-row:last-child{border-bottom:none}
-.reco-box{background:var(--accent-pale);border:1.5px solid var(--accent2);border-radius:var(--radius);padding:14px;font-size:12px;color:var(--accent);line-height:1.6;margin-bottom:10px}
-.disclaimer{text-align:center;font-size:10px;color:var(--muted);line-height:1.5;padding:12px;border-top:1px solid var(--border)}
-.heart-btn{background:none;border:none;cursor:pointer;font-size:22px;padding:4px;transition:transform 0.15s;flex-shrink:0}
+
+.reco-box{background:var(--gold-pale);border:0.5px solid var(--gold);border-radius:var(--radius);padding:14px;font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:10px;font-family:'Jost',sans-serif}
+
+.disclaimer{text-align:center;font-size:10px;color:var(--muted);line-height:1.6;padding:14px;border-top:0.5px solid var(--border);font-family:'Cormorant Garamond',serif;font-style:italic}
+
+.heart-btn{background:none;border:none;cursor:pointer;font-size:20px;padding:4px;transition:transform 0.2s;flex-shrink:0}
 .heart-btn:hover{transform:scale(1.2)}
 
-/* PROFILE */
-.profile-hero{display:flex;align-items:center;gap:14px;margin-bottom:22px}
-.profile-avatar-big{width:54px;height:54px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
-.profile-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
-.profile-sub{font-size:11px;color:var(--muted);margin-top:2px}
+/* ===================== HISTORY ===================== */
+.hist-item{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer}
+.hist-thumb{width:38px;height:38px;border-radius:8px;object-fit:cover;border:0.5px solid var(--border);flex-shrink:0}
+.hist-score{width:44px;height:44px;border-radius:50%;border:1px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.h-num{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;line-height:1}
+.h-den{font-size:8px;color:var(--muted);font-family:'Jost',sans-serif}
+.hist-info{flex:1;min-width:0}
+.hist-type{font-size:9px;color:var(--muted);letter-spacing:0.1em;font-family:'Jost',sans-serif;text-transform:uppercase}
+.hist-excerpt{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;font-family:'Jost',sans-serif}
+.hist-meta{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
+.hist-date{font-size:10px;color:var(--muted);font-family:'Jost',sans-serif}
+.hist-alert-pill{background:var(--danger-pale);color:var(--danger);font-size:9px;padding:1px 7px;border-radius:10px;font-family:'Jost',sans-serif}
 
-/* CATEGORY ACCORDION */
-.cat-group{margin-bottom:10px;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
-.cat-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;background:var(--surface);transition:background 0.15s}
+/* ===================== FAVORITES ===================== */
+.fav-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.fav-filter{background:var(--surface);border:0.5px solid var(--border);border-radius:20px;padding:6px 14px;font-family:'Jost',sans-serif;font-size:11px;color:var(--text2);cursor:pointer;transition:all 0.3s ease;letter-spacing:0.04em}
+.fav-filter.active{background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold)}
+
+/* ===================== PROFILE ===================== */
+.member-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center;flex:1;min-width:0;cursor:pointer;transition:all 0.3s ease}
+.member-card.selected{border:1px solid var(--gold);background:var(--gold-pale)}
+.member-card .m-avatar{width:36px;height:36px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:18px;border:0.5px solid var(--border)}
+.member-card.selected .m-avatar{border:1.5px solid var(--gold)}
+.member-card .m-name{font-family:'Jost',sans-serif;font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member-card.selected .m-name{font-weight:500;color:var(--text)}
+.member-card .m-age{font-family:'Jost',sans-serif;font-size:9px;color:var(--muted);margin-top:2px}
+.add-member-card{background:transparent;border:1px dashed var(--border);border-radius:var(--radius);padding:12px;text-align:center;flex:0 0 52px;cursor:pointer;transition:all 0.3s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.add-member-card:hover{border-color:var(--gold)}
+.add-member-plus{font-size:18px;color:var(--muted2);line-height:1}
+.add-member-lbl{font-family:'Jost',sans-serif;font-size:9px;color:var(--muted2)}
+
+.empty-conds{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:24px 14px;text-align:center;margin-bottom:10px}
+.empty-conds-txt{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--muted);line-height:1.6}
+
+/* ACCORDION */
+.cat-group{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;box-shadow:var(--shadow)}
+.cat-header{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;cursor:pointer;transition:background 0.2s}
 .cat-header:hover{background:var(--surface2)}
 .cat-header-left{display:flex;align-items:center;gap:10px}
-.cat-icon{font-size:20px}
-.cat-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
-.cat-count{font-size:11px;color:var(--muted);margin-top:1px}
-.cat-arrow{font-size:12px;color:var(--muted);transition:transform 0.2s}
+.cat-icon{font-size:18px}
+.cat-name{font-family:'Jost',sans-serif;font-size:12px;font-weight:500;color:var(--text)}
+.cat-count{font-family:'Jost',sans-serif;font-size:9px;color:var(--muted);margin-top:2px}
+.cat-arrow{font-size:10px;color:var(--gold);transition:transform 0.2s}
 .cat-group.open .cat-arrow{transform:rotate(180deg)}
-.cat-body{display:none;border-top:1px solid var(--border);padding:10px}
+.cat-body{display:none;border-top:0.5px solid var(--border);padding:10px 12px}
 .cat-group.open .cat-body{display:block}
-.cond-item{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.15s;margin-bottom:6px}
-.cond-item:last-child{margin-bottom:0}
-.cond-item.on{border-color:var(--accent);background:var(--accent-pale)}
-.cond-left{display:flex;align-items:center;gap:10px}
-.cond-emoji{font-size:18px}
-.cond-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
-.toggle{width:38px;height:20px;background:var(--border);border-radius:10px;position:relative;transition:background 0.2s;flex-shrink:0}
-.toggle::after{content:'';position:absolute;width:14px;height:14px;background:white;border-radius:50%;top:3px;left:3px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
-.cond-item.on .toggle{background:var(--accent)}
-.cond-item.on .toggle::after{transform:translateX(18px)}
-.custom-row{display:flex;gap:8px;margin:12px 0}
-.custom-input{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);outline:none}
-.custom-input:focus{border-color:var(--accent)}
-.custom-input::placeholder{color:var(--muted)}
-.add-btn{background:var(--accent);color:white;border:none;border-radius:10px;padding:0 16px;font-size:22px;cursor:pointer}
-.count-badge{background:var(--accent-pale);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:11px;font-family:'Syne',sans-serif;font-weight:700}
 
-/* MEMBERS */
-.member-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
-.member-card-top{display:flex;align-items:center;gap:12px}
-.member-avatar-big{width:48px;height:48px;border-radius:50%;background:var(--accent);color:white;font-size:20px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;cursor:pointer;flex-shrink:0;position:relative}
-.member-avatar-big .edit-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.4);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:14px}
-.member-avatar-big:hover .edit-overlay{display:flex}
-.member-info{flex:1}
-.member-name-input{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--text);background:none;border:none;outline:none;width:100%;padding:0}
-.member-name-input::placeholder{color:var(--muted)}
-.member-dob-row{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
-.member-dob-label{font-size:11px;color:var(--muted)}
-.member-dob-input{background:var(--surface2);border:1.5px solid var(--border);border-radius:6px;padding:5px 8px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);outline:none}
-.member-dob-input:focus{border-color:var(--accent)}
-.member-age-display{font-size:11px;color:var(--accent);font-weight:500;background:var(--accent-pale);padding:3px 8px;border-radius:10px}
-.member-delete{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px}
-.member-delete:hover{color:var(--danger)}
-.member-conds{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-.member-conds-label{font-size:10px;color:var(--muted);letter-spacing:0.08em;font-family:'Syne',sans-serif;font-weight:700;margin-bottom:8px}
-.member-cond-chips{display:flex;flex-wrap:wrap;gap:6px}
-.member-cond-chip{background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;cursor:pointer;transition:all 0.15s;font-family:'Syne',sans-serif;font-weight:600;color:var(--text2)}
-.member-cond-chip.active{background:var(--accent-pale);border-color:var(--accent);color:var(--accent)}
-.add-member-btn{width:100%;background:var(--surface);border:2px dashed var(--border);border-radius:var(--radius);padding:14px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
-.add-member-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cond-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border:0.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.2s;margin-bottom:6px}
+.cond-item:last-child{margin-bottom:0}
+.cond-item.on{border-color:var(--gold);background:var(--gold-pale)}
+.cond-left{display:flex;align-items:center;gap:10px}
+.cond-emoji{font-size:16px}
+.cond-name{font-family:'Jost',sans-serif;font-size:12px;color:var(--text)}
+
+.toggle{width:36px;height:20px;background:var(--border);border-radius:10px;position:relative;transition:background 0.3s;flex-shrink:0}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;background:white;border-radius:50%;top:3px;left:3px;transition:transform 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+.cond-item.on .toggle{background:var(--gold)}
+.cond-item.on .toggle::after{transform:translateX(16px)}
 
 /* SETTINGS */
-.setting-option{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;transition:background 0.15s}
+.setting-option{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;cursor:pointer;transition:background 0.2s}
 .setting-option:hover{background:var(--surface2)}
-.setting-option.active{background:var(--accent-pale)}
+.setting-option.active{background:var(--gold-pale)}
 .setting-left{display:flex;align-items:center;gap:12px}
-.setting-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
-.setting-option.active .setting-radio{border-color:var(--accent);background:var(--accent)}
-.setting-option.active .setting-radio::after{content:'';width:8px;height:8px;background:white;border-radius:50%;display:block}
+.setting-label{font-family:'Jost',sans-serif;font-size:12px;color:var(--text)}
+.setting-sub{font-family:'Jost',sans-serif;font-size:10px;color:var(--muted);margin-top:2px}
+.setting-option.active .setting-label{color:var(--gold)}
+.radio-btn{width:18px;height:18px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
+.setting-option.active .radio-btn{border-color:var(--gold);background:var(--gold)}
+.radio-btn::after{content:'';width:7px;height:7px;border-radius:50%;background:white;display:none}
+.setting-option.active .radio-btn::after{display:block}
 
-/* HISTORY */
-.hist-item{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer}
-.hist-score{width:46px;height:46px;border-radius:50%;border:2.5px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.h-num{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;line-height:1}
-.h-den{font-size:8px;color:var(--muted)}
-.hist-info{flex:1;min-width:0}
-.hist-type{font-size:10px;color:var(--muted);letter-spacing:0.08em;font-family:'Syne',sans-serif;font-weight:700}
-.hist-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hist-excerpt{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hist-meta{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
-.hist-date{font-size:10px;color:var(--muted)}
-.hist-alert-pill{background:var(--danger-pale);color:var(--danger);font-size:10px;padding:1px 7px;border-radius:10px}
-.hist-thumb{width:40px;height:40px;border-radius:8px;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
+/* MEMBER CARD IN PROFILE */
+.member-profile-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.member-profile-top{display:flex;align-items:center;gap:12px}
+.member-avatar-edit{width:46px;height:46px;border-radius:50%;background:var(--border);color:var(--bg);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0}
+.avatar-edit-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.3);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:12px}
+.member-avatar-edit:hover .avatar-edit-overlay{display:flex}
+.member-name-input{font-family:'Jost',sans-serif;font-size:14px;font-weight:500;color:var(--text);background:none;border:none;outline:none;width:100%;padding:0}
+.member-name-input::placeholder{color:var(--muted)}
+.member-dob-row{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+.member-dob-label{font-family:'Jost',sans-serif;font-size:10px;color:var(--muted);letter-spacing:0.04em}
+.member-dob-input{background:var(--surface2);border:0.5px solid var(--border);border-radius:6px;padding:5px 8px;font-family:'Jost',sans-serif;font-size:11px;color:var(--text);outline:none}
+.member-dob-input:focus{border-color:var(--gold)}
+.member-age-badge{font-family:'Jost',sans-serif;font-size:10px;color:var(--gold);background:var(--gold-pale);padding:3px 8px;border-radius:10px}
+.member-delete{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px}
+.member-delete:hover{color:var(--danger)}
+.member-conds-section{margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border)}
+.member-cond-chips{display:flex;flex-wrap:wrap;gap:6px}
+.member-cond-chip{background:var(--surface2);border:0.5px solid var(--border);border-radius:20px;padding:3px 10px;font-size:10px;cursor:pointer;transition:all 0.2s;font-family:'Jost',sans-serif;color:var(--text2)}
+.member-cond-chip.active{background:var(--gold-pale);border-color:var(--gold);color:var(--gold)}
+.add-member-btn{width:100%;background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius);padding:13px;font-family:'Jost',sans-serif;font-size:11px;color:var(--muted);cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;letter-spacing:0.06em}
+.add-member-btn:hover{border-color:var(--gold);color:var(--gold)}
 
-/* FAVORITES */
-.fav-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.fav-filter{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:all 0.15s}
-.fav-filter.active{background:var(--accent-pale);border-color:var(--accent);color:var(--accent)}
+/* COUNT BADGE */
+.count-badge{background:var(--gold-pale);color:var(--gold);padding:2px 10px;border-radius:10px;font-size:10px;font-family:'Jost',sans-serif;font-weight:500}
 
-/* MENU MODAL */
-.menu-item{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;transition:background 0.15s;border-radius:10px}
-.menu-item:hover{background:var(--surface2)}
-.menu-item-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0}
-.menu-item-label{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
-.menu-item-sub{font-size:11px;color:var(--muted);margin-top:1px}
-.menu-divider{height:1px;background:var(--border);margin:8px 0}
-.menu-user{display:flex;align-items:center;gap:12px;padding:16px;background:var(--accent-pale);border-radius:12px;margin-bottom:16px}
-.menu-user-avatar{width:44px;height:44px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px}
-.menu-user-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--accent)}
-.menu-user-sub{font-size:11px;color:var(--accent2);margin-top:2px}
-
-/* INFO PAGES */
-.info-page{padding:0}
-.info-header{display:flex;align-items:center;gap:12px;margin-bottom:24px}
-.back-btn{background:none;border:none;cursor:pointer;font-size:20px;padding:4px;color:var(--text2)}
-.info-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
-.info-section{margin-bottom:20px}
-.info-section h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;margin-bottom:8px;color:var(--accent)}
-.info-section p{font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:8px}
-
-/* MODALS */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;align-items:flex-end;justify-content:center}
+/* ===================== OVERLAYS ===================== */
+.overlay{display:none;position:fixed;inset:0;z-index:100;background:var(--bg);flex-direction:column;animation:fadeIn 0.4s ease}
 .overlay.show{display:flex}
-.modal{background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:430px;animation:slideUp 0.3s ease;max-height:90vh;overflow-y:auto}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px}
-.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:8px}
-.modal-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:16px}
-.api-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:13px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);outline:none;margin-bottom:8px;transition:border-color 0.15s}
-.api-input:focus{border-color:var(--accent)}
-.api-input::placeholder{color:var(--muted)}
-.api-error{color:var(--danger);font-size:11px;margin-bottom:8px;display:none}
-.api-error.show{display:block}
-.api-note{font-size:10px;color:var(--muted);text-align:center;margin-top:8px}
 
-/* AVATAR PICKER */
+/* MENU OVERLAY */
+.menu-overlay-header{padding:16px 20px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border2);flex-shrink:0}
+.close-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--gold);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.close-x{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);line-height:1}
+
+.menu-body{flex:1;padding:20px 24px;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto}
+.menu-section-title{font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;margin-top:16px}
+.menu-section-title:first-child{margin-top:0}
+.menu-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--border2);cursor:pointer;transition:opacity 0.2s}
+.menu-item:hover{opacity:0.7}
+.menu-item:last-child{border-bottom:none}
+.menu-item-label{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;color:var(--text);letter-spacing:0.01em}
+.menu-arrow{font-family:'Jost',sans-serif;font-size:14px;color:var(--gold);opacity:0.7}
+.menu-divider{height:0.5px;background:var(--border2);margin:8px 0}
+.menu-api{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.menu-api-label{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--text)}
+.menu-api-badge{font-family:'Jost',sans-serif;font-size:9px;color:var(--gold);border:0.5px solid var(--gold);border-radius:4px;padding:3px 8px;letter-spacing:0.06em}
+.menu-footer{padding-top:16px;border-top:0.5px solid var(--border2)}
+.menu-footer-txt{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:var(--muted);text-align:center;line-height:1.6}
+
+/* INFO PAGES OVERLAY */
+.info-overlay-header{padding:16px 20px 10px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid var(--border2);flex-shrink:0}
+.info-body{flex:1;padding:24px 20px;overflow-y:auto}
+.info-page-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--text);line-height:1.1;margin-bottom:10px;letter-spacing:0.01em}
+.info-title-line{width:28px;height:1px;background:var(--gold);margin-bottom:20px}
+.info-sec-title{font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;margin-top:16px}
+.info-sec-title:first-of-type{margin-top:0}
+.info-text{font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--text2);line-height:1.8;text-align:justify;margin-bottom:8px}
+.info-text-italic{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--muted);line-height:1.8;text-align:justify;margin-bottom:8px}
+.info-divider{height:0.5px;background:var(--border);margin:12px 0}
+
+/* API KEY MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,25,23,0.5);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--bg);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:430px;animation:slideUp 0.3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:32px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 20px}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:8px;color:var(--text)}
+.modal-desc{font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px;font-family:'Jost',sans-serif}
+.api-input{width:100%;background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:13px;font-family:'Jost',sans-serif;font-size:12px;color:var(--text);outline:none;margin-bottom:8px;transition:border-color 0.3s}
+.api-input:focus{border-color:var(--gold)}
+.api-input::placeholder{color:var(--muted)}
+.api-error{color:var(--danger);font-size:10px;margin-bottom:8px;display:none;font-family:'Jost',sans-serif}
+.api-error.show{display:block}
+.api-note{font-size:10px;color:var(--muted);text-align:center;margin-top:8px;font-family:'Jost',sans-serif;font-style:italic}
+
+/* AVATAR MODAL */
 .avatar-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
-.avatar-opt{width:44px;height:44px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:all 0.15s}
-.avatar-opt:hover,.avatar-opt.selected{border-color:var(--accent);background:var(--accent-pale)}
+.avatar-opt{width:40px;height:40px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all 0.2s}
+.avatar-opt:hover,.avatar-opt.sel{border-color:var(--gold);background:var(--gold-pale)}
 
 /* BIRTHDAY MODAL */
 .birthday-modal{text-align:center;padding:10px 0}
-.confetti-wrap{font-size:40px;margin-bottom:16px;animation:bounce 0.6s ease infinite alternate}
-@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-10px)}}
-.birthday-name{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--accent);margin-bottom:8px}
-.birthday-msg{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px}
-.birthday-age{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--accent2);background:var(--accent-pale);padding:6px 16px;border-radius:20px;display:inline-block;margin-bottom:16px}
-.birthday-update{font-size:11px;color:var(--muted);margin-bottom:16px;font-style:italic}
+.bday-anim{font-size:36px;margin-bottom:16px;animation:bounce 0.8s ease infinite alternate}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+.bday-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold);margin-bottom:8px}
+.bday-age{font-family:'Jost',sans-serif;font-size:12px;font-weight:500;color:var(--gold);background:var(--gold-pale);padding:5px 16px;border-radius:20px;display:inline-block;margin-bottom:12px;letter-spacing:0.06em}
+.bday-msg{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--text2);line-height:1.6;margin-bottom:8px}
+.bday-update{font-family:'Jost',sans-serif;font-size:10px;color:var(--muted);margin-bottom:20px;font-style:italic}
 
-/* EMPTY */
+/* EMPTY STATE */
 .empty-state{text-align:center;padding:50px 20px}
-.empty-icon{font-size:48px;margin-bottom:12px}
-.empty-text{font-size:13px;color:var(--muted);line-height:1.6}
+.empty-icon{font-size:40px;margin-bottom:14px}
+.empty-text{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--muted);line-height:1.7}
 
-/* FAB */
-.fab{position:fixed;bottom:76px;right:18px;width:50px;height:50px;background:var(--accent);color:white;border:none;border-radius:50%;font-size:22px;cursor:pointer;box-shadow:0 4px 18px rgba(26,82,118,0.35);display:flex;align-items:center;justify-content:center;transition:transform 0.15s;z-index:49}
-.fab:hover{transform:scale(1.1)}
-.info-section p{font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:8px;text-align:justify}
+/* PAGE TITLES */
+.page-heading{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:4px}
+.page-sub{font-family:'Jost',sans-serif;font-size:11px;color:var(--muted);margin-bottom:20px;font-style:italic}
 </style>
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div class="topbar">
   <div>
-    <div class="logo">🏷️ <span class="logo-word">Eti<span class="logo-q">Q</span>uette</span></div>
-    <div style="font-size:10px;color:var(--muted);font-style:italic;letter-spacing:0.02em;margin-top:2px;">ajutorul tău pentru alegeri sănătoase</div>
+    <div class="logo">Eti<span class="logo-q">Q</span>uette</div>
+    <div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div>
   </div>
-  <button class="avatar-btn" onclick="openMenu()">👤<span class="badge" id="badge"></span></button>
+  <button class="menu-btn" onclick="openMenu()">
+    <div class="menu-lines">
+      <div class="menu-line" style="width:15px"></div>
+      <div class="menu-line" style="width:11px"></div>
+      <div class="menu-line" style="width:15px"></div>
+    </div>
+  </button>
 </div>
 
-<!-- HOME -->
+<!-- PAGE: ANALIZĂ -->
 <div class="page active" id="page-home">
-  <div style="margin-bottom:18px;">
-    <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;line-height:1.2;margin-bottom:5px;">Analizează<br>produsul tău</div>
-    <div style="font-size:12px;color:var(--text2);">Ingrediente + profilul familiei = scor personalizat</div>
+  <div style="margin-bottom:20px">
+    <div class="page-heading">Analizează<br>produsul tău</div>
+    <div class="page-sub">Ingrediente + profilul familiei = scor personalizat</div>
   </div>
 
   <div class="member-selector" id="member-selector">
-    <div class="member-selector-label">Analizează pentru</div>
+    <div class="section-label" style="margin-bottom:8px">Analizează pentru</div>
     <div class="member-chips" id="member-chips"></div>
   </div>
 
   <div class="conditions-bar" id="conditions-bar">
-    <div style="font-size:20px;">🛡️</div>
-    <div class="cond-bar-info">
-      <div class="cond-bar-label">PROFIL ACTIV</div>
+    <div style="font-size:18px">🛡️</div>
+    <div style="flex:1">
+      <div class="cond-bar-label">Profil activ</div>
       <div class="cond-bar-value" id="cond-summary">Nicio afecțiune selectată</div>
       <div class="pills" id="cond-pills"></div>
     </div>
-    <button class="btn-secondary" style="width:auto;padding:7px 12px;font-size:11px;" onclick="openMenu()">Editează</button>
+    <button class="btn-secondary" style="width:auto;padding:7px 12px;font-size:10px;letter-spacing:0.1em" onclick="openMenu()">Editează</button>
   </div>
 
   <div class="section-label">Tip produs</div>
   <div class="type-grid">
     <button class="type-btn active" id="btn-food" onclick="selectType('food')">
-      <span class="t-emoji">🍎</span><span class="t-label">Alimentar</span>
+      <span class="type-emoji">🍎</span><span class="type-lbl">Alimentar</span>
     </button>
     <button class="type-btn" id="btn-cosm" onclick="selectType('cosmetic')">
-      <span class="t-emoji">💄</span><span class="t-label">Cosmetic</span>
+      <span class="type-emoji">💄</span><span class="type-lbl">Cosmetic</span>
     </button>
   </div>
 
@@ -334,21 +409,18 @@ textarea::placeholder{color:var(--muted)}
     <img id="photo-img" src="" alt="">
     <button class="photo-close" onclick="clearPhoto()">✕</button>
     <div class="ocr-loading" id="ocr-loading">
-      <div class="spinner" style="width:18px;height:18px;border-width:2px;margin:0;"></div>
+      <div class="spinner" style="width:16px;height:16px;border-width:1.5px;margin:0"></div>
       <span>Citesc ingredientele din poză...</span>
     </div>
   </div>
 
-  <div id="ing-collapse-wrap" style="display:none;margin-bottom:10px;">
+  <div class="ing-collapse-wrap" id="ing-collapse-wrap">
     <div class="ing-collapse-header" onclick="toggleIngCollapse()">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:14px;">📋</span>
-        <span style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--accent);" id="ing-collapse-label">Ingrediente găsite</span>
-      </div>
-      <span style="font-size:11px;color:var(--muted);" id="ing-collapse-arrow">▼ Vezi</span>
+      <span class="ing-collapse-label" id="ing-collapse-label">Ingrediente găsite</span>
+      <span class="ing-collapse-arrow" id="ing-collapse-arrow">▼ Vezi</span>
     </div>
-    <div id="ing-collapse-body" style="display:none;">
-      <textarea id="ing-textarea" style="margin-top:8px;" placeholder="Ingredientele citite din poză..."></textarea>
+    <div class="ing-collapse-body" id="ing-collapse-body">
+      <textarea id="ing-textarea" style="margin-top:0" placeholder="Ingredientele citite din poză..."></textarea>
     </div>
   </div>
 
@@ -357,25 +429,26 @@ textarea::placeholder{color:var(--muted)}
     <textarea id="ing-textarea-manual" placeholder="Lipește sau scrie lista de ingrediente...&#10;&#10;Ex: Apă, zahăr, acid citric (E330)..."></textarea>
   </div>
 
-  <div style="margin-top:10px;">
-    <button class="btn-primary" id="analyze-btn" onclick="doAnalyze()">⚡ ANALIZEAZĂ</button>
+  <div style="margin-top:12px">
+    <button class="btn-primary" id="analyze-btn" onclick="doAnalyze()">Analizează</button>
   </div>
+
   <div class="error-msg" id="error-msg"></div>
   <div class="loading-wrap" id="loading"><div class="spinner"></div><p>analizând ingredientele...</p></div>
   <div class="results-wrap" id="results"></div>
 </div>
 
-<!-- ISTORIC -->
+<!-- PAGE: ISTORIC -->
 <div class="page" id="page-history">
-  <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:5px;">Istoricul<br>scanărilor</div>
-  <div style="font-size:12px;color:var(--text2);margin-bottom:20px;">Ultimele 50 de produse analizate</div>
+  <div class="page-heading">Istoricul<br>scanărilor</div>
+  <div class="page-sub">Ultimele 50 de produse analizate</div>
   <div id="history-list"></div>
 </div>
 
-<!-- FAVORITE -->
+<!-- PAGE: FAVORITE -->
 <div class="page" id="page-favorites">
-  <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:5px;">Produse<br>Favorite ❤️</div>
-  <div style="font-size:12px;color:var(--text2);margin-bottom:16px;">Produsele tale salvate</div>
+  <div class="page-heading">Produse<br>Favorite</div>
+  <div class="page-sub">Produsele tale salvate</div>
   <div class="fav-filters">
     <button class="fav-filter active" id="fav-filter-all" onclick="setFavFilter('all')">Toate</button>
     <button class="fav-filter" id="fav-filter-food" onclick="setFavFilter('food')">🍎 Alimentare</button>
@@ -384,651 +457,662 @@ textarea::placeholder{color:var(--muted)}
   <div id="favorites-list"></div>
 </div>
 
-<!-- PROFIL -->
-<div class="page" id="page-profile">
-  <div class="profile-hero">
-    <div>
-      <div class="profile-name">Profilul meu</div>
-      <div class="profile-sub">Afecțiuni • Membri • Personalizare</div>
-    </div>
-  </div>
-
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-    <div class="section-label" style="margin:0;">👨‍👩‍👧 Membri familie</div>
-  </div>
-  <div id="members-list"></div>
-  <button class="add-member-btn" onclick="addMember()">+ Adaugă membru</button>
-
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;margin-top:8px;">
-    <div class="section-label" style="margin:0;">🛡️ Afecțiunile mele</div>
-    <span class="count-badge" id="count-badge">0 active</span>
-  </div>
-  <div id="cat-groups"></div>
-
-  <div class="section-label" style="margin-top:6px;margin-bottom:8px;">✏️ Adaugă afecțiune proprie</div>
-  <div style="border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);">
-    <div style="padding:12px">
-      <div class="custom-row" style="margin:0">
-        <input class="custom-input" id="custom-input" type="text" placeholder="ex: Alergie la latex..." maxlength="40">
-        <button class="add-btn" onclick="addCustom()">+</button>
-      </div>
-      <div id="custom-conds" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;"></div>
-    </div>
-  </div>
-
-  <!-- Default scan setting -->
-  <div style="margin-top:20px;">
-    <div class="section-label" style="margin-bottom:12px;">⚙️ Scanare implicită</div>
-    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);">
-      <div class="setting-option" id="set-all" onclick="setDefaultScan('all')">
-        <div class="setting-left"><span style="font-size:18px;">👨‍👩‍👧</span><div><div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;">Toți membrii</div><div style="font-size:11px;color:var(--muted);">Scanare pentru întreaga familie</div></div></div>
-        <div class="setting-radio" id="radio-all"></div>
-      </div>
-      <div style="height:1px;background:var(--border);"></div>
-      <div class="setting-option" id="set-self" onclick="setDefaultScan('self')">
-        <div class="setting-left"><span style="font-size:18px;">👤</span><div><div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;">Doar eu</div><div style="font-size:11px;color:var(--muted);">Scanare doar pentru profilul tău</div></div></div>
-        <div class="setting-radio" id="radio-self"></div>
-      </div>
-      <div style="height:1px;background:var(--border);"></div>
-      <div class="setting-option" id="set-manual" onclick="setDefaultScan('manual')">
-        <div class="setting-left"><span style="font-size:18px;">👆</span><div><div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;">Selectez manual</div><div style="font-size:11px;color:var(--muted);">Alegi de fiecare dată</div></div></div>
-        <div class="setting-radio" id="radio-manual"></div>
-      </div>
-    </div>
-  </div>
-
-  <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
-    <button class="btn-primary" onclick="saveProfile()">💾 SALVEAZĂ PROFILUL</button>
-  </div>
-</div>
-
-<!-- INFO PAGES -->
-<div class="page" id="page-about">
-  <div class="info-header"><button class="back-btn" onclick="closeInfoPage()">←</button><div class="info-title">ℹ️ Despre EtiQuette</div></div>
-  <div class="info-section"><h3>Ce este EtiQuette?</h3><p>EtiQuette este o aplicație care analizează ingredientele produselor alimentare și cosmetice, oferind un scor de la 1 la 10 bazat pe calitatea și siguranța ingredientelor.</p><p>Algoritmul ține cont de ordinea ingredientelor pe etichetă, de afecțiunile declarate ale utilizatorului și de vârsta membrilor familiei pentru a oferi recomandări personalizate.</p></div>
-  <div class="info-section"><h3>Cum funcționează scorul?</h3><p>Ingredientele sunt listate în ordine descrescătoare după cantitate — primul ingredient este cel mai abundent. Un ingredient problematic pe poziția 1 afectează scorul mai mult decât același ingredient pe poziția 10.</p><p>Scorul final ține cont de: calitatea ingredientelor, prezența aditivilor controversați, compatibilitatea cu afecțiunile declarate și vârsta utilizatorilor.</p></div>
-  <div class="info-section"><h3>Surse științifice</h3><p>Baza de date de ingrediente este construită pe date din: EFSA (Autoritatea Europeană pentru Siguranța Alimentară), EWG (Environmental Working Group), OMS (Organizația Mondială a Sănătății), studii peer-reviewed publicate.</p></div>
-</div>
-
-<div class="page" id="page-terms">
-  <div class="info-header"><button class="back-btn" onclick="closeInfoPage()">←</button><div class="info-title">📋 Termeni & Condiții</div></div>
-  <div class="info-section"><h3>1. Acceptarea Termenilor</h3><p>Prin utilizarea aplicației EtiQuette, acceptați în totalitate prezentii Termeni și Condiții. Dacă nu sunteți de acord cu acești termeni, vă rugăm să nu utilizați aplicația.</p></div>
-  <div class="info-section"><h3>2. Descrierea Serviciului</h3><p>EtiQuette oferă informații despre ingredientele produselor alimentare și cosmetice în scop educațional și informativ. Aplicația nu oferă sfaturi medicale, nutriționale sau cosmetologice profesionale.</p></div>
-  <div class="info-section"><h3>3. Limitarea Răspunderii</h3><p>EtiQuette nu poate fi trasă la răspundere pentru deciziile luate de utilizatori pe baza informațiilor furnizate de aplicație. Informațiile sunt furnizate "ca atare", fără garanții de acuratețe completă.</p></div>
-  <div class="info-section"><h3>4. Proprietate Intelectuală</h3><p>Toate drepturile asupra aplicației EtiQuette, inclusiv design, cod și conținut, sunt proprietatea exclusivă a dezvoltatorilor.</p></div>
-</div>
-
-<div class="page" id="page-privacy">
-  <div class="info-header"><button class="back-btn" onclick="closeInfoPage()">←</button><div class="info-title">🔒 Politică de Confidențialitate</div></div>
-  <div class="info-section"><h3>Date colectate</h3><p>EtiQuette stochează local pe dispozitivul dvs.: profilul familiei (nume, date de naștere, afecțiuni), istoricul scanărilor și produsele favorite. Aceste date nu sunt transmise pe niciun server extern.</p></div>
-  <div class="info-section"><h3>GDPR</h3><p>Conform Regulamentului General privind Protecția Datelor (GDPR), aveți dreptul de a accesa, modifica sau șterge datele personale stocate. Puteți șterge toate datele prin dezinstalarea aplicației.</p></div>
-  <div class="info-section"><h3>Cheia API</h3><p>Cheia API Anthropic introdusă de dvs. este stocată local pe dispozitiv și este folosită exclusiv pentru procesarea ingredientelor. Nu este transmisă către EtiQuette sau terți.</p></div>
-  <div class="info-section"><h3>Contact</h3><p>Pentru orice întrebări legate de confidențialitate, ne puteți contacta la: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2a4945445e4b495e6a4f5e435b5f4f5e5e4f044b5a5a">[email&#160;protected]</a></p></div>
-</div>
-
-<div class="page" id="page-disclaimer">
-  <div class="info-header"><button class="back-btn" onclick="closeInfoPage()">←</button><div class="info-title">⚕️ Disclaimer Medical</div></div>
-  <div class="info-section"><h3>Important</h3><p>EtiQuette este o aplicație informativă și educațională. Informațiile furnizate NU constituie sfat medical, nutrițional sau cosmetologic profesionist.</p></div>
-  <div class="info-section"><h3>Consultați un specialist</h3><p>Deciziile privind sănătatea, alimentația sau îngrijirea personală trebuie luate întotdeauna în consultare cu un medic, nutriționist sau alt specialist calificat.</p><p>Acest lucru este deosebit de important pentru persoanele cu afecțiuni cronice, alergii severe, femei însărcinate sau care alăptează, și copii.</p></div>
-  <div class="info-section"><h3>Alergii și reacții adverse</h3><p>Dacă suspectați o reacție alergică sau o intoleranță alimentară, consultați imediat un medic. Nu vă bazați exclusiv pe această aplicație pentru gestionarea alergiilor severe.</p></div>
-</div>
-
-<div class="page" id="page-guide">
-  <div class="info-header"><button class="back-btn" onclick="closeInfoPage()">←</button><div class="info-title">❓ Ghid de Utilizare</div></div>
-  <div class="info-section"><h3>Cum scanezi un produs</h3><p>1. Selectează tipul de produs: Alimentar sau Cosmetic</p><p>2. Apasă "Fotografiază ingredientele" și fă o poză clară listei de ingrediente de pe ambalaj</p><p>3. Ingredientele sunt citite automat și analiza pornește</p><p>4. Alternativ, poți scrie sau lipi manual ingredientele</p></div>
-  <div class="info-section"><h3>Sfaturi pentru o poză bună</h3><p>• Asigură-te că textul e bine iluminat și în focus</p><p>• Fotografiază de aproape, astfel încât textul să ocupe cea mai mare parte a pozei</p><p>• Evită reflexiile și umbrele</p></div>
-  <div class="info-section"><h3>Profilul familiei</h3><p>Adaugă membrii familiei cu data de naștere și afecțiunile lor. La scanare, selectează pentru cine analizezi — aplicația va ține cont de vârstă și afecțiuni automat.</p></div>
-  <div class="info-section"><h3>Favorite vs Istoric</h3><p>Istoricul păstrează ultimele 50 de scanări. Produsele pe care vrei să le regăsești oricând le adaugi la Favorite apăsând ❤️.</p></div>
-</div>
-
-<!-- FAB -->
-<button class="fab" id="fab" onclick="openMenu()">
-  <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="22" height="2.5" rx="1.25" fill="white"/>
-    <rect y="6.75" width="16" height="2.5" rx="1.25" fill="white"/>
-    <rect y="13.5" width="22" height="2.5" rx="1.25" fill="white"/>
-  </svg>
-</button>
-
-<!-- BOTTOM NAV - 3 tabs -->
+<!-- BOTTOM NAV -->
 <div class="bottom-nav">
-  <button class="nav-btn active" id="nav-home" onclick="goTo('home')"><span class="nav-icon">🔬</span><span class="nav-label">ANALIZĂ</span></button>
-  <button class="nav-btn" id="nav-history" onclick="goTo('history')"><span class="nav-icon">📋</span><span class="nav-label">ISTORIC</span></button>
-  <button class="nav-btn" id="nav-favorites" onclick="goTo('favorites')"><span class="nav-icon">❤️</span><span class="nav-label">FAVORITE</span></button>
+  <button class="nav-btn active" id="nav-home" onclick="goTo('home')"><span class="nav-label">Analiză</span><div class="nav-bar"></div></button>
+  <button class="nav-btn" id="nav-history" onclick="goTo('history')"><span class="nav-label">Istoric</span><div class="nav-bar"></div></button>
+  <button class="nav-btn" id="nav-favorites" onclick="goTo('favorites')"><span class="nav-label">Favorite</span><div class="nav-bar"></div></button>
 </div>
 
-<!-- MAIN MENU MODAL (avatar) -->
-<div class="overlay" id="menu-overlay" onclick="handleMenuOverlay(event)">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="menu-user">
-      <div>
-        <div class="menu-user-name">🏷️ EtiQuette</div>
-        <div class="menu-user-sub">ajutorul tău pentru alegeri sănătoase</div>
+<!-- MENU OVERLAY -->
+<div class="overlay" id="menu-overlay">
+  <div class="menu-overlay-header">
+    <div>
+      <div class="logo">Eti<span class="logo-q">Q</span>uette</div>
+      <div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div>
+    </div>
+    <button class="close-btn" onclick="closeMenu()"><div class="close-x">×</div></button>
+  </div>
+  <div class="menu-body">
+    <div>
+      <div class="menu-section-title">Contul meu</div>
+      <div class="menu-item" onclick="menuGoTo('profile')">
+        <div class="menu-item-label">Profil</div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-section-title">Informații</div>
+      <div class="menu-item" onclick="menuGoTo('about')">
+        <div class="menu-item-label">Despre EtiQuette</div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="menuGoTo('terms')">
+        <div class="menu-item-label">Termeni & Condiții</div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="menuGoTo('privacy')">
+        <div class="menu-item-label">Confidențialitate</div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="menuGoTo('disclaimer')">
+        <div class="menu-item-label">Disclaimer Medical</div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-item" onclick="menuGoTo('guide')">
+        <div class="menu-item-label">Ghid de Utilizare</div>
+        <div class="menu-arrow">›</div>
+      </div>
+      <div class="menu-divider"></div>
+      <div class="menu-api" onclick="closeMenu();showApiModal()">
+        <div class="menu-api-label">Cheie API</div>
+        <div class="menu-api-badge">Configurează</div>
       </div>
     </div>
-    <div class="menu-item" onclick="closeMenuGoTo('profile')">
-      <div class="menu-item-icon">👤</div>
-      <div><div class="menu-item-label">Profil</div><div class="menu-item-sub">Membri familie, afecțiuni, setări</div></div>
+    <div class="menu-footer">
+      <div class="menu-footer-txt">EtiQuette nu înlocuiește sfatul medical profesionist</div>
     </div>
-    <div class="menu-divider"></div>
-    <div class="menu-item" onclick="closeMenuGoTo('about')">
-      <div class="menu-item-icon">ℹ️</div>
-      <div><div class="menu-item-label">Despre EtiQuette</div><div class="menu-item-sub">Cum funcționează aplicația</div></div>
+  </div>
+</div>
+
+<!-- PROFILE OVERLAY -->
+<div class="overlay" id="profile-overlay">
+  <div class="info-overlay-header">
+    <button class="close-btn" onclick="closeInfoOverlay('profile-overlay')"><div class="close-x">‹</div></button>
+    <div>
+      <div class="logo">Eti<span class="logo-q">Q</span>uette</div>
+      <div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div>
     </div>
-    <div class="menu-item" onclick="closeMenuGoTo('terms')">
-      <div class="menu-item-icon">📋</div>
-      <div><div class="menu-item-label">Termeni & Condiții</div></div>
+  </div>
+  <div class="info-body" style="padding:20px">
+    <div class="section-label">Membri familie</div>
+    <div style="display:flex;gap:8px;margin-bottom:20px" id="profile-members-row"></div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="section-label" style="margin:0" id="conds-section-label">Afecțiunile mele</div>
+      <span class="count-badge" id="count-badge">0 active</span>
     </div>
-    <div class="menu-item" onclick="closeMenuGoTo('privacy')">
-      <div class="menu-item-icon">🔒</div>
-      <div><div class="menu-item-label">Politică de Confidențialitate</div></div>
+
+    <div id="empty-conds-wrap" class="empty-conds">
+      <div class="empty-conds-txt">Selectează un membru pentru<br>a vizualiza și edita afecțiunile</div>
     </div>
-    <div class="menu-item" onclick="closeMenuGoTo('disclaimer')">
-      <div class="menu-item-icon">⚕️</div>
-      <div><div class="menu-item-label">Disclaimer Medical</div></div>
+
+    <div id="cat-groups" style="display:none"></div>
+
+    <div style="margin-top:16px">
+      <div class="section-label">Scanare implicită</div>
+      <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)">
+        <div class="setting-option" id="set-all" onclick="setDefaultScan('all')">
+          <div class="setting-left"><div><div class="setting-label">Toți membrii</div><div class="setting-sub">Scanare pentru întreaga familie</div></div></div>
+          <div class="radio-btn"></div>
+        </div>
+        <div style="height:0.5px;background:var(--border)"></div>
+        <div class="setting-option" id="set-self" onclick="setDefaultScan('self')">
+          <div class="setting-left"><div><div class="setting-label">Doar eu</div><div class="setting-sub">Profilul tău personal</div></div></div>
+          <div class="radio-btn"></div>
+        </div>
+        <div style="height:0.5px;background:var(--border)"></div>
+        <div class="setting-option" id="set-manual" onclick="setDefaultScan('manual')">
+          <div class="setting-left"><div><div class="setting-label">Selectez manual</div><div class="setting-sub">Alegi de fiecare dată</div></div></div>
+          <div class="radio-btn"></div>
+        </div>
+      </div>
     </div>
-    <div class="menu-item" onclick="closeMenuGoTo('guide')">
-      <div class="menu-item-icon">❓</div>
-      <div><div class="menu-item-label">Ghid de Utilizare & FAQ</div></div>
-    </div>
-    <div class="menu-divider"></div>
-    <div class="menu-item" onclick="closeMenu();showApiModal()">
-      <div class="menu-item-icon">🔑</div>
-      <div><div class="menu-item-label">Cheie API</div><div class="menu-item-sub">Schimbă cheia Anthropic</div></div>
-    </div>
+  </div>
+  <div style="padding:10px 20px 30px">
+    <button class="btn-primary" onclick="saveProfile()">Salvează</button>
+  </div>
+</div>
+
+<!-- INFO OVERLAYS -->
+<div class="overlay" id="about-overlay">
+  <div class="info-overlay-header">
+    <button class="close-btn" onclick="closeInfoOverlay('about-overlay')"><div class="close-x">‹</div></button>
+    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
+  </div>
+  <div class="info-body">
+    <div class="info-page-title">Despre<br>EtiQuette</div>
+    <div class="info-title-line"></div>
+    <div class="info-sec-title">Ce este EtiQuette?</div>
+    <div class="info-text">EtiQuette este o aplicație care analizează ingredientele produselor alimentare și cosmetice, oferind un scor de la 1 la 10 bazat pe calitatea și siguranța ingredientelor. Algoritmul ține cont de ordinea ingredientelor pe etichetă, de afecțiunile declarate și de vârsta membrilor familiei.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">Cum funcționează scorul?</div>
+    <div class="info-text">Ingredientele sunt listate în ordine descrescătoare după cantitate — primul ingredient este cel mai abundent. Un ingredient problematic pe poziția 1 afectează scorul mai mult decât același ingredient pe poziția 10.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">Surse științifice</div>
+    <div class="info-text-italic">Baza de date este construită pe informații din EFSA, EWG, OMS și studii peer-reviewed publicate.</div>
+  </div>
+</div>
+
+<div class="overlay" id="terms-overlay">
+  <div class="info-overlay-header">
+    <button class="close-btn" onclick="closeInfoOverlay('terms-overlay')"><div class="close-x">‹</div></button>
+    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
+  </div>
+  <div class="info-body">
+    <div class="info-page-title">Termeni &<br>Condiții</div>
+    <div class="info-title-line"></div>
+    <div class="info-sec-title">1. Acceptarea termenilor</div>
+    <div class="info-text">Prin utilizarea aplicației EtiQuette, acceptați în totalitate prezenții Termeni și Condiții. Dacă nu sunteți de acord cu acești termeni, vă rugăm să nu utilizați aplicația.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">2. Descrierea serviciului</div>
+    <div class="info-text">EtiQuette oferă informații despre ingredientele produselor alimentare și cosmetice în scop educațional și informativ. Aplicația nu oferă sfaturi medicale, nutriționale sau cosmetologice profesionale.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">3. Limitarea răspunderii</div>
+    <div class="info-text">EtiQuette nu poate fi trasă la răspundere pentru deciziile luate de utilizatori pe baza informațiilor furnizate. Informațiile sunt furnizate fără garanții de acuratețe completă.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">4. Proprietate intelectuală</div>
+    <div class="info-text-italic">Toate drepturile asupra aplicației EtiQuette, inclusiv design, cod și conținut, sunt proprietatea exclusivă a dezvoltatorilor.</div>
+  </div>
+</div>
+
+<div class="overlay" id="privacy-overlay">
+  <div class="info-overlay-header">
+    <button class="close-btn" onclick="closeInfoOverlay('privacy-overlay')"><div class="close-x">‹</div></button>
+    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
+  </div>
+  <div class="info-body">
+    <div class="info-page-title">Politică de<br>Confidențialitate</div>
+    <div class="info-title-line"></div>
+    <div class="info-sec-title">Date colectate</div>
+    <div class="info-text">EtiQuette stochează local pe dispozitivul dvs. profilul familiei (nume, date de naștere, afecțiuni), istoricul scanărilor și produsele favorite. Aceste date nu sunt transmise pe niciun server extern.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">GDPR</div>
+    <div class="info-text">Conform Regulamentului General privind Protecția Datelor, aveți dreptul de a accesa, modifica sau șterge datele personale stocate. Puteți șterge toate datele prin dezinstalarea aplicației.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">Cheia API</div>
+    <div class="info-text-italic">Cheia API Anthropic este stocată local pe dispozitiv și folosită exclusiv pentru procesarea ingredientelor. Nu este transmisă către EtiQuette sau terți.</div>
+  </div>
+</div>
+
+<div class="overlay" id="disclaimer-overlay">
+  <div class="info-overlay-header">
+    <button class="close-btn" onclick="closeInfoOverlay('disclaimer-overlay')"><div class="close-x">‹</div></button>
+    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
+  </div>
+  <div class="info-body">
+    <div class="info-page-title">Disclaimer<br>Medical</div>
+    <div class="info-title-line"></div>
+    <div class="info-sec-title">Important</div>
+    <div class="info-text">EtiQuette este o aplicație informativă și educațională. Informațiile furnizate nu constituie sfat medical, nutrițional sau cosmetologic profesionist.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">Consultați un specialist</div>
+    <div class="info-text">Deciziile privind sănătatea, alimentația sau îngrijirea personală trebuie luate întotdeauna în consultare cu un medic sau specialist calificat. Acest lucru este deosebit de important pentru persoanele cu afecțiuni cronice, femei însărcinate sau care alăptează, și copii.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">Alergii severe</div>
+    <div class="info-text-italic">Nu vă bazați exclusiv pe această aplicație pentru gestionarea alergiilor severe sau afecțiunilor cronice. Consultați imediat un medic la orice semn de reacție alergică.</div>
+  </div>
+</div>
+
+<div class="overlay" id="guide-overlay">
+  <div class="info-overlay-header">
+    <button class="close-btn" onclick="closeInfoOverlay('guide-overlay')"><div class="close-x">‹</div></button>
+    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
+  </div>
+  <div class="info-body">
+    <div class="info-page-title">Ghid de<br>Utilizare</div>
+    <div class="info-title-line"></div>
+    <div class="info-sec-title">Cum scanezi un produs</div>
+    <div class="info-text">Selectează tipul de produs (Alimentar sau Cosmetic), apasă "Fotografiază ingredientele" și fă o poză clară listei de ingrediente de pe ambalaj. Ingredientele sunt citite automat și analiza pornește imediat.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">Sfaturi pentru o poză bună</div>
+    <div class="info-text">Asigură-te că textul este bine iluminat și în focus. Fotografiază de aproape, astfel încât lista de ingrediente să ocupe cea mai mare parte a pozei. Evită reflexiile și umbrele.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">Profilul familiei</div>
+    <div class="info-text">Adaugă membrii familiei cu data de naștere și afecțiunile lor din meniu. La scanare, selectează pentru cine analizezi — aplicația va ține cont de vârstă și afecțiuni automat.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">Favorite vs Istoric</div>
+    <div class="info-text-italic">Istoricul păstrează ultimele 50 de scanări. Produsele pe care vrei să le regăsești oricând le adaugi la Favorite apăsând ❤️ după analiză.</div>
   </div>
 </div>
 
 <!-- API KEY MODAL -->
-<div class="overlay" id="api-overlay">
+<div class="modal-overlay" id="api-overlay">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">🔑 Cheie API</div>
-    <div class="modal-desc">Introdu cheia ta API Anthropic. O găsești pe <strong>console.anthropic.com</strong> → API Keys.</div>
+    <div class="modal-title">Cheie API</div>
+    <div class="modal-desc">Introdu cheia ta API Anthropic pentru a activa analiza. O găsești pe <strong>console.anthropic.com</strong> → API Keys.</div>
     <input class="api-input" type="password" id="api-input" placeholder="sk-ant-api03-...">
-    <div class="api-error" id="api-error">⚠️ Cheie invalidă. Trebuie să înceapă cu sk-ant</div>
-    <button class="btn-primary" onclick="saveApiKey()">✓ Salvează cheia</button>
+    <div class="api-error" id="api-error">Cheie invalidă. Trebuie să înceapă cu sk-ant</div>
+    <button class="btn-primary" onclick="saveApiKey()">Salvează cheia</button>
     <div class="api-note">Cheia se salvează doar pe acest dispozitiv.</div>
   </div>
 </div>
 
-<!-- AVATAR PICKER -->
-<div class="overlay" id="avatar-overlay" onclick="handleAvatarOverlay(event)">
+<!-- AVATAR MODAL -->
+<div class="modal-overlay" id="avatar-overlay" onclick="handleAvatarOverlay(event)">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">Alege avatar</div>
     <div class="avatar-grid" id="avatar-grid"></div>
-    <button class="btn-primary" onclick="closeAvatarModal()">✓ Gata</button>
+    <button class="btn-primary" onclick="closeAvatarModal()">Gata</button>
   </div>
 </div>
 
 <!-- BIRTHDAY MODAL -->
-<div class="overlay" id="birthday-overlay">
+<div class="modal-overlay" id="birthday-overlay">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="birthday-modal">
-      <div class="confetti-wrap">🎂🎉🎊</div>
-      <div class="birthday-name" id="birthday-name"></div>
-      <div class="birthday-age" id="birthday-age"></div>
-      <div class="birthday-msg" id="birthday-msg"></div>
-      <div class="birthday-update" id="birthday-update"></div>
-      <button class="btn-primary" onclick="closeBirthday()">Mulțumesc! 🎉</button>
+      <div class="bday-anim">🎂🎉</div>
+      <div class="bday-name" id="bday-name"></div>
+      <div class="bday-age" id="bday-age"></div>
+      <div class="bday-msg" id="bday-msg"></div>
+      <div class="bday-update" id="bday-update"></div>
+      <button class="btn-primary" onclick="closeBirthday()">Mulțumesc!</button>
     </div>
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ============================================================
 // CONSTANTS
 // ============================================================
-const AVATARS = ['👦','👧','👨','👩','👴','👵','🧒','🧑','👶','🧔','👱','🧕','🧑‍🦰','🧑‍🦱','🧑‍🦳','🧑‍🦲','😀','😎','🤓','🥰'];
+var AVATARS = ['👦','👧','👨','👩','👴','👵','🧒','🧑','👶','🧔','👱','🧕','🧑‍🦰','🧑‍🦱','🧑‍🦳','🧑‍🦲','😀','😎','🤓','🥰'];
 
-const AGE_GROUPS = [
-  {max:0.5, label:'0-6 luni', foodKeys:['sugar','sucrose','glucose','fructose','salt','sodium','honey','miere','nitrite','nitrate','zahar','sare','preservative','colorant','aditiv','e-','sweetener'], cosmeticKeys:['fragrance','parfum','alcohol','sls','sles','parabens','phenoxyethanol','methylisothiazolinone','formaldehyde','dyes']},
-  {max:1, label:'6-12 luni', foodKeys:['honey','miere','salt','sodium','sugar','sucrose','zahar','sare','nitrite','sweetener','artificial','colorant'], cosmeticKeys:['fragrance','parfum','alcohol denat','sls','sles','parabens','phenoxyethanol','methylisothiazolinone']},
-  {max:3, label:'1-3 ani', foodKeys:['salt','sodium','sugar','sucrose','zahar','sare','artificial','sweetener','caffeine','cafeina','colorant'], cosmeticKeys:['fragrance','parfum','alcohol denat','sls','parabens']},
-  {max:12, label:'3-12 ani', foodKeys:['caffeine','cafeina','artificial color','tartrazine','e102','e110','e122','e124','e129'], cosmeticKeys:['fragrance','parfum','alcohol denat','parabens']},
-  {max:18, label:'12-18 ani', foodKeys:[], cosmeticKeys:[]},
-  {max:999, label:'Adult', foodKeys:[], cosmeticKeys:[]}
+var AGE_GROUPS = [
+  {max:0.5,label:'0-6 luni',foodKeys:['sugar','sucrose','glucose','fructose','salt','sodium','honey','miere','nitrite','zahar','sare','sweetener','colorant'],cosKeys:['fragrance','parfum','alcohol','sls','sles','parabens','phenoxyethanol','methylisothiazolinone','formaldehyde']},
+  {max:1,label:'6-12 luni',foodKeys:['honey','miere','salt','sodium','sugar','sucrose','zahar','sare','nitrite','sweetener','artificial','colorant'],cosKeys:['fragrance','parfum','alcohol denat','sls','sles','parabens','phenoxyethanol']},
+  {max:3,label:'1-3 ani',foodKeys:['salt','sodium','sugar','sucrose','zahar','sare','artificial','sweetener','caffeine','cafeina','colorant'],cosKeys:['fragrance','parfum','alcohol denat','sls','parabens']},
+  {max:12,label:'3-12 ani',foodKeys:['caffeine','cafeina','e102','e110','e122','e124','e129'],cosKeys:['fragrance','parfum','alcohol denat','parabens']},
+  {max:18,label:'12-18 ani',foodKeys:[],cosKeys:[]},
+  {max:999,label:'Adult',foodKeys:[],cosKeys:[]}
 ];
 
-const CONDITION_CATEGORIES = [
+var CONDITION_CATEGORIES = [
   {id:'allergies',icon:'🤧',name:'Alergii & Intoleranțe',conditions:[
     {id:'gluten',icon:'🌾',name:'Intoleranță Gluten',keys:['wheat','gluten','triticum','barley','rye','spelt','kamut','malt','semolina','orz','secara','grau','hordeum','triticale','bulgur','durum']},
     {id:'lactoza',icon:'🥛',name:'Intoleranță Lactoză',keys:['lactose','milk','lactis','whey','casein','lactalbumin','cream','butter','lapte','zer','cazeina','lactoza']},
-    {id:'arahide',icon:'🥜',name:'Alergie Arahide',keys:['peanut','arachide','arachis','groundnut','arahida']},
+    {id:'arahide',icon:'🥜',name:'Alergie Arahide',keys:['peanut','arachide','arachis','groundnut']},
     {id:'soia',icon:'🫘',name:'Alergie Soia',keys:['soy','soya','soia','tofu','miso','edamame','glycine max']},
     {id:'nuci',icon:'🌰',name:'Alergie Nuci',keys:['almond','walnut','hazelnut','cashew','pistachio','nuca','migdale','alune']},
     {id:'oua',icon:'🥚',name:'Alergie Ouă',keys:['egg','albumin','ovalbumin','lysozyme','ou','oua']},
     {id:'peste',icon:'🐟',name:'Alergie Pește',keys:['fish','salmon','tuna','cod','anchovy','peste','somon','ton']},
     {id:'fructe-mare',icon:'🦐',name:'Alergie Fructe de Mare',keys:['shrimp','prawn','crab','lobster','shellfish','crustacean']},
-    {id:'susan',icon:'🌿',name:'Alergie Susan',keys:['sesame','tahini','susan','sesamum']},
+    {id:'susan',icon:'🌿',name:'Alergie Susan',keys:['sesame','tahini','susan','sesamum']}
   ]},
   {id:'chronic',icon:'🏥',name:'Afecțiuni Cronice',conditions:[
     {id:'diabet',icon:'🩸',name:'Diabet Tip 1 & 2',keys:['sugar','sucrose','glucose','fructose','dextrose','maltose','syrup','corn syrup','high-fructose','maltodextrin','zahar','glucoza','sirop','honey','miere','dextrin','caramel','sorbitol','xylitol']},
     {id:'hipertensiune',icon:'🫀',name:'Hipertensiune',keys:['sodium','salt','sare','msg','monosodium glutamate','sodium chloride','sodium nitrite','sodium benzoate','disodium','natriu','bicarbonate']},
     {id:'colesterol',icon:'🫁',name:'Colesterol Mărit',keys:['hydrogenated','partially hydrogenated','trans fat','palm oil','palmier','lard','tallow','shortening']},
-    {id:'ibs',icon:'🫃',name:'Colon Iritabil (IBS)',keys:['fructose','lactose','sorbitol','mannitol','xylitol','inulin','fructooligosaccharides','wheat','rye']},
+    {id:'ibs',icon:'🫃',name:'Colon Iritabil (IBS)',keys:['fructose','lactose','sorbitol','mannitol','xylitol','inulin','wheat','rye']},
     {id:'reflux',icon:'🔥',name:'Reflux / GERD',keys:['citric acid','acetic acid','vinegar','caffeine','alcohol','menthol','peppermint','acid citric','otet']},
-    {id:'guta',icon:'🦴',name:'Gută',keys:['fructose','high-fructose corn syrup','fructoza','sirop de fructoza']},
+    {id:'guta',icon:'🦴',name:'Gută',keys:['fructose','high-fructose corn syrup','fructoza']}
   ]},
   {id:'cosmetic-skin',icon:'✨',name:'Afecțiuni de Piele',conditions:[
     {id:'dermatita',icon:'🌸',name:'Dermatită Atopică',keys:['sodium lauryl sulfate','sodium laureth sulfate','sls','sles','alcohol denat','parfum','fragrance','methylparaben','ethylparaben','propylparaben','butylparaben','quaternium-15','dmdm hydantoin','propylene glycol','formaldehyde','lanolin','retinol']},
     {id:'acnee',icon:'🫧',name:'Acnee / Ten Acneic',keys:['isopropyl myristate','isopropyl palmitate','cocoa butter','coconut oil','cocos nucifera','mineral oil','paraffinum liquidum','lanolin','dimethicone','cyclopentasiloxane','laureth-4']},
     {id:'piele-sens',icon:'🌿',name:'Piele Sensibilă',keys:['fragrance','parfum','alcohol denat','witch hazel','menthol','eucalyptus','limonene','linalool','geraniol','methylparaben','sodium lauryl sulfate']},
     {id:'rozacee',icon:'🌹',name:'Rozacee',keys:['alcohol','menthol','eucalyptus','peppermint','witch hazel','fragrance','parfum','sodium lauryl sulfate']},
-    {id:'psoriazis',icon:'🔴',name:'Psoriazis',keys:['fragrance','parfum','alcohol denat','sodium lauryl sulfate','parabens','methylparaben']},
+    {id:'psoriazis',icon:'🔴',name:'Psoriazis',keys:['fragrance','parfum','alcohol denat','sodium lauryl sulfate','parabens','methylparaben']}
   ]},
   {id:'cosmetic-special',icon:'💎',name:'Preferințe Cosmetice',conditions:[
     {id:'sarcina',icon:'🤰',name:'Sarcină / Alăptare',keys:['retinol','retinyl','tretinoin','retinoic acid','salicylic acid','oxybenzone','benzophenone','hydroquinone','formaldehyde','methylparaben','propylparaben']},
-    {id:'noncomedo',icon:'🫧',name:'Non-Comedogenic',keys:['isopropyl myristate','isopropyl palmitate','cocoa butter','coconut oil','cocos nucifera','mineral oil','paraffinum liquidum','lanolin','dimethicone','cyclopentasiloxane','wheat germ oil','soybean oil']},
-    {id:'fara-parfum',icon:'🚫',name:'Fără Parfum',keys:['fragrance','parfum','perfume','limonene','linalool','geraniol','citronellol','eugenol','cinnamal','benzyl alcohol','coumarin','farnesol']},
+    {id:'noncomedo',icon:'🫧',name:'Non-Comedogenic',keys:['isopropyl myristate','isopropyl palmitate','cocoa butter','coconut oil','cocos nucifera','mineral oil','paraffinum liquidum','lanolin','dimethicone','cyclopentasiloxane']},
+    {id:'fara-parfum',icon:'🚫',name:'Fără Parfum',keys:['fragrance','parfum','perfume','limonene','linalool','geraniol','citronellol','eugenol','cinnamal','benzyl alcohol','coumarin','farnesol']}
   ]},
   {id:'lifestyle',icon:'🌱',name:'Stil de Viață',conditions:[
     {id:'vegan',icon:'🌱',name:'Vegan / Vegetarian',keys:['gelatine','gelatin','gelatina','carmine','cochineal','e120','casein','whey','albumin','isinglass','lanolin','beeswax','cera alba','keratin','collagen','silk','honey','miere','tallow','lard']},
     {id:'halal',icon:'☪️',name:'Halal',keys:['pork','lard','gelatin','alcohol','ethanol','carmine','cochineal','e120','porc','gelatina','alcool']},
-    {id:'kosher',icon:'✡️',name:'Kosher',keys:['pork','shellfish','lard','gelatin','porc','gelatina']},
+    {id:'kosher',icon:'✡️',name:'Kosher',keys:['pork','shellfish','lard','gelatin','porc','gelatina']}
   ]}
 ];
 
-function getAllConditions() {
-  var all = [];
-  CONDITION_CATEGORIES.forEach(function(cat){cat.conditions.forEach(function(c){all.push(c);});});
-  return all;
-}
+function getAllConditions(){var a=[];CONDITION_CATEGORIES.forEach(function(c){c.conditions.forEach(function(x){a.push(x);});});return a;}
 
 // ============================================================
 // STATE
 // ============================================================
-var productType = 'food';
-var activeConditions = new Set();
-var members = [];
-var selectedMembers = ['__all__'];
-var scanHistory = [];
-var favorites = [];
-var favFilter = 'all';
-var defaultScan = 'all';
-var photoMode = false;
-var editingAvatarMemberId = null;
-var customConditions = [];
-var currentAnalysisData = null;
-var previousPage = 'home';
+var productType='food';
+var activeConditions=new Set();
+var members=[];
+var selectedMembers=['__all__'];
+var scanHistory=[];
+var favorites=[];
+var favFilter='all';
+var defaultScan='all';
+var photoMode=false;
+var editingAvatarId=null;
+var currentAnalysisData=null;
+var selectedProfileMemberId=null;
 
-function loadState() {
-  try {
-    var c = localStorage.getItem('eq_conds'); if(c) activeConditions = new Set(JSON.parse(c));
-    var h = localStorage.getItem('eq_hist'); if(h) scanHistory = JSON.parse(h);
-    var m = localStorage.getItem('eq_members'); if(m) members = JSON.parse(m);
-    var cc = localStorage.getItem('eq_custom_conds'); if(cc) customConditions = JSON.parse(cc);
-    var fav = localStorage.getItem('eq_favorites'); if(fav) favorites = JSON.parse(fav);
-    var ds = localStorage.getItem('eq_default_scan'); if(ds) defaultScan = ds;
-    if(defaultScan==='all') selectedMembers=['__all__'];
-    else if(defaultScan==='self') selectedMembers=['__self__'];
-  } catch(e){}
+function loadState(){
+  try{
+    var c=localStorage.getItem('eq_conds');if(c)activeConditions=new Set(JSON.parse(c));
+    var h=localStorage.getItem('eq_hist');if(h)scanHistory=JSON.parse(h);
+    var m=localStorage.getItem('eq_members');if(m)members=JSON.parse(m);
+    var f=localStorage.getItem('eq_fav');if(f)favorites=JSON.parse(f);
+    var ds=localStorage.getItem('eq_dscan');if(ds)defaultScan=ds;
+    if(defaultScan==='all')selectedMembers=['__all__'];
+    else if(defaultScan==='self')selectedMembers=['__self__'];
+  }catch(e){}
 }
-
 function saveConditions(){try{localStorage.setItem('eq_conds',JSON.stringify([...activeConditions]));}catch(e){}}
 function saveMembers(){try{localStorage.setItem('eq_members',JSON.stringify(members));}catch(e){}}
-function saveCustomConds(){try{localStorage.setItem('eq_custom_conds',JSON.stringify(customConditions));}catch(e){}}
 function getKey(){return localStorage.getItem('eq_key')||null;}
 function storeKey(k){localStorage.setItem('eq_key',k);}
 
 // ============================================================
 // AGE UTILS
 // ============================================================
-function calcAgeMonths(dobStr) {
-  if (!dobStr) return null;
-  var dob = new Date(dobStr);
-  var now = new Date();
-  var months = (now.getFullYear()-dob.getFullYear())*12+(now.getMonth()-dob.getMonth());
-  return months;
-}
-
-function calcAgeYears(dobStr) {
-  if (!dobStr) return null;
-  var months = calcAgeMonths(dobStr);
-  return months/12;
-}
-
-function getAgeLabel(dobStr) {
-  if (!dobStr) return null;
-  var months = calcAgeMonths(dobStr);
-  if (months < 1) return 'Nou-născut';
-  if (months < 12) return months+' luni';
-  var years = Math.floor(months/12);
-  var remMonths = months%12;
-  if (remMonths === 0) return years+' an'+(years===1?'':'i');
-  return years+' an'+(years===1?'':'i')+' și '+remMonths+' lun'+(remMonths===1?'ă':'i');
-}
-
-function getAgeGroup(dobStr) {
-  if (!dobStr) return AGE_GROUPS[AGE_GROUPS.length-1];
-  var years = calcAgeYears(dobStr);
-  for (var i=0; i<AGE_GROUPS.length; i++) {
-    if (years <= AGE_GROUPS[i].max) return AGE_GROUPS[i];
-  }
-  return AGE_GROUPS[AGE_GROUPS.length-1];
-}
-
-function getAgeWarnings(dobStr, type) {
-  var group = getAgeGroup(dobStr);
-  return type==='food' ? group.foodKeys : group.cosmeticKeys;
-}
+function calcAgeMonths(dob){if(!dob)return null;var d=new Date(dob),n=new Date();return(n.getFullYear()-d.getFullYear())*12+(n.getMonth()-d.getMonth());}
+function getAgeLabel(dob){if(!dob)return null;var m=calcAgeMonths(dob);if(m<1)return'Nou-născut';if(m<12)return m+' luni';var y=Math.floor(m/12),r=m%12;if(r===0)return y+(y===1?' an':' ani');return y+(y===1?' an':' ani')+' și '+r+(r===1?' lună':' luni');}
+function getAgeGroup(dob){if(!dob)return AGE_GROUPS[AGE_GROUPS.length-1];var y=calcAgeMonths(dob)/12;for(var i=0;i<AGE_GROUPS.length;i++){if(y<=AGE_GROUPS[i].max)return AGE_GROUPS[i];}return AGE_GROUPS[AGE_GROUPS.length-1];}
+function getAgeWarnings(dob,type){var g=getAgeGroup(dob);return type==='food'?g.foodKeys:g.cosKeys;}
 
 // ============================================================
-// BIRTHDAY CHECK
+// BIRTHDAY
 // ============================================================
-function checkBirthdays() {
-  var today = new Date();
-  var todayMD = (today.getMonth()+1)+'-'+today.getDate();
-  var currentYear = today.getFullYear();
-  var shownKey = 'eq_bday_shown_'+currentYear;
-  var shownIds = [];
-  try { shownIds = JSON.parse(localStorage.getItem(shownKey)||'[]'); } catch(e){}
-
-  var toShow = [];
-
-  members.forEach(function(m) {
-    if (!m.dob) return;
-    if (shownIds.includes(m.id)) return;
-    var dob = new Date(m.dob);
-    var dobMD = (dob.getMonth()+1)+'-'+dob.getDate();
-    if (dobMD === todayMD) {
-      toShow.push(m);
+function checkBirthdays(){
+  var today=new Date(),todayMD=(today.getMonth()+1)+'-'+today.getDate(),yr=today.getFullYear();
+  var key='eq_bday_'+yr,shown=[];
+  try{shown=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
+  for(var i=0;i<members.length;i++){
+    var m=members[i];
+    if(!m.dob||shown.includes(m.id))continue;
+    var d=new Date(m.dob),md=(d.getMonth()+1)+'-'+d.getDate();
+    if(md===todayMD){
+      var ag=getAgeLabel(m.dob),gr=getAgeGroup(m.dob);
+      document.getElementById('bday-name').textContent='La mulți ani, '+(m.name||'dragule')+'!';
+      document.getElementById('bday-age').textContent='Astăzi ai împlinit '+ag+'!';
+      document.getElementById('bday-msg').textContent='EtiQuette îți urează o zi minunată plină de produse cu ingrediente curate!';
+      document.getElementById('bday-update').textContent=gr.label!=='Adult'?'Recomandările s-au actualizat pentru grupa: '+gr.label+'.':'';
+      document.getElementById('birthday-overlay').classList.add('show');
+      shown.push(m.id);
+      try{localStorage.setItem(key,JSON.stringify(shown));}catch(e){}
+      break;
     }
-  });
-
-  if (toShow.length > 0) {
-    var m = toShow[0];
-    var ageLabel = getAgeLabel(m.dob);
-    var group = getAgeGroup(m.dob);
-    document.getElementById('birthday-name').textContent = '🎂 La mulți ani, '+(m.name||'dragule')+'!';
-    document.getElementById('birthday-age').textContent = 'Astăzi ai împlinit '+ageLabel+'!';
-    document.getElementById('birthday-msg').textContent = 'EtiQuette îți urează o zi minunată plină de produse cu ingrediente curate! 🌟';
-    var updateMsg = group.label !== 'Adult' ? 'Recomandările tale s-au actualizat automat pentru grupa de vârstă: '+group.label+'.' : '';
-    document.getElementById('birthday-update').textContent = updateMsg;
-    document.getElementById('birthday-overlay').classList.add('show');
-    shownIds.push(m.id);
-    try { localStorage.setItem(shownKey, JSON.stringify(shownIds)); } catch(e){}
   }
 }
-
-function closeBirthday() {
-  document.getElementById('birthday-overlay').classList.remove('show');
-}
+function closeBirthday(){document.getElementById('birthday-overlay').classList.remove('show');}
 
 // ============================================================
 // NAVIGATION
 // ============================================================
-var allPages = ['home','history','favorites','profile','about','terms','privacy','disclaimer','guide'];
-
-function goTo(page) {
-  allPages.forEach(function(p) {
-    document.getElementById('page-'+p).classList.toggle('active', p===page);
+function goTo(page){
+  ['home','history','favorites'].forEach(function(p){
+    document.getElementById('page-'+p).classList.toggle('active',p===page);
+    document.getElementById('nav-'+p).classList.toggle('active',p===page);
   });
-  ['home','history','favorites'].forEach(function(p) {
-    var btn = document.getElementById('nav-'+p);
-    if (btn) btn.classList.toggle('active', p===page);
-  });
-  var infoPages = ['about','terms','privacy','disclaimer','guide'];
-  var isInfoPage = infoPages.indexOf(page) > -1;
-  document.getElementById('fab').style.display = (page==='home'||page==='history'||page==='favorites') ? 'flex' : 'none';
-  document.querySelector('.avatar-btn').style.display = isInfoPage ? 'none' : 'flex';
-  document.querySelector('.bottom-nav').style.display = isInfoPage ? 'none' : 'grid';
-  if (page==='profile') { renderCatGroups(); renderMembersList(); renderCustomConds(); renderDefaultSetting(); }
-  if (page==='history') renderHistory();
-  if (page==='favorites') renderFavorites();
-  if (page==='home') renderMemberSelector();
-}
-
-function closeInfoPage() {
-  goTo(previousPage||'home');
-  setTimeout(function(){ openMenu(); }, 250);
+  if(page==='history')renderHistory();
+  if(page==='favorites')renderFavorites();
+  if(page==='home')renderMemberSelector();
 }
 
 // ============================================================
-// MENU
+// MENU & OVERLAYS
 // ============================================================
-function openMenu() { document.getElementById('menu-overlay').classList.add('show'); }
-function closeMenu() { document.getElementById('menu-overlay').classList.remove('show'); }
-function handleMenuOverlay(e) { if(e.target===document.getElementById('menu-overlay')) closeMenu(); }
-function closeMenuGoTo(page) {
+function openMenu(){document.getElementById('menu-overlay').classList.add('show');}
+function closeMenu(){document.getElementById('menu-overlay').classList.remove('show');}
+
+function menuGoTo(page){
   closeMenu();
-  previousPage = document.querySelector('.page.active') ? document.querySelector('.page.active').id.replace('page-','') : 'home';
-  goTo(page);
+  setTimeout(function(){
+    if(page==='profile'){openProfileOverlay();}
+    else{document.getElementById(page+'-overlay').classList.add('show');}
+  },50);
+}
+
+function closeInfoOverlay(id){
+  document.getElementById(id).classList.remove('show');
+  setTimeout(function(){openMenu();},50);
+}
+
+function openProfileOverlay(){
+  selectedProfileMemberId=null;
+  renderProfileMembers();
+  renderCatGroups();
+  updateCountBadge();
+  renderDefaultSetting();
+  document.getElementById('empty-conds-wrap').style.display='block';
+  document.getElementById('cat-groups').style.display='none';
+  document.getElementById('conds-section-label').textContent='Afecțiunile mele';
+  document.getElementById('profile-overlay').classList.add('show');
 }
 
 // ============================================================
 // TYPE
 // ============================================================
-function selectType(t) {
-  productType = t;
-  document.getElementById('btn-food').classList.toggle('active', t==='food');
-  document.getElementById('btn-cosm').classList.toggle('active', t==='cosmetic');
+function selectType(t){
+  productType=t;
+  document.getElementById('btn-food').classList.toggle('active',t==='food');
+  document.getElementById('btn-cosm').classList.toggle('active',t==='cosmetic');
 }
 
 // ============================================================
-// MEMBER SELECTOR
+// MEMBER SELECTOR (home)
 // ============================================================
-function renderMemberSelector() {
-  var sel = document.getElementById('member-selector');
-  var bar = document.getElementById('conditions-bar');
-  if (members.length===0) { sel.style.display='none'; bar.style.display='flex'; updateCondBar(); return; }
-  sel.style.display='block'; bar.style.display='none';
-  var allActive = selectedMembers.includes('__all__');
-  var selfActive = selectedMembers.includes('__self__') && !allActive;
-  var chips = '<button class="member-chip chip-all '+(allActive?'active':'')+'" onclick="toggleMemberSelect(\'__all__\')">👨‍👩‍👧 Toți</button>';
-  chips += '<button class="member-chip '+(selfActive?'active':'')+'" onclick="toggleMemberSelect(\'__self__\')">'
+function renderMemberSelector(){
+  var sel=document.getElementById('member-selector');
+  var bar=document.getElementById('conditions-bar');
+  if(members.length===0){sel.style.display='none';bar.style.display='flex';updateCondBar();return;}
+  sel.style.display='block';bar.style.display='none';
+  var allActive=selectedMembers.includes('__all__');
+  var selfActive=selectedMembers.includes('__self__')&&!allActive;
+  var html='<button class="member-chip chip-all '+(allActive?'active':'')+'" onclick="toggleMemberSelect(\'__all__\')">👨‍👩‍👧 Toți</button>';
+  html+='<button class="member-chip '+(selfActive?'active':'')+'" onclick="toggleMemberSelect(\'__self__\')">'
     +'<div class="chip-avatar">👤</div> Eu'
     +(selfActive?'<span class="chip-x" onclick="removeMemberSelect(\'__self__\',event)">✕</span>':'')
     +'</button>';
-  members.forEach(function(m) {
-    var isActive = selectedMembers.includes(m.id)||allActive;
-    chips += '<button class="member-chip '+(isActive?'active':'')+'" onclick="toggleMemberSelect(\''+m.id+'\')">'
+  members.forEach(function(m){
+    var isActive=selectedMembers.includes(m.id)||allActive;
+    html+='<button class="member-chip '+(isActive?'active':'')+'" onclick="toggleMemberSelect(\''+m.id+'\')">'
       +'<div class="chip-avatar">'+m.avatar+'</div> '+(m.name||'Membru')
       +(isActive&&!allActive?'<span class="chip-x" onclick="removeMemberSelect(\''+m.id+'\',event)">✕</span>':'')
       +'</button>';
   });
-  document.getElementById('member-chips').innerHTML = chips;
+  document.getElementById('member-chips').innerHTML=html;
 }
 
-function toggleMemberSelect(id) {
-  if (id==='__all__') { selectedMembers=['__all__']; }
-  else {
-    selectedMembers = selectedMembers.filter(function(s){return s!=='__all__';});
-    var idx = selectedMembers.indexOf(id);
-    if (idx>-1) selectedMembers.splice(idx,1); else selectedMembers.push(id);
-    if (selectedMembers.length===0) selectedMembers=['__self__'];
+function toggleMemberSelect(id){
+  if(id==='__all__'){selectedMembers=['__all__'];}
+  else{
+    selectedMembers=selectedMembers.filter(function(s){return s!=='__all__';});
+    var i=selectedMembers.indexOf(id);
+    if(i>-1)selectedMembers.splice(i,1);else selectedMembers.push(id);
+    if(selectedMembers.length===0)selectedMembers=['__self__'];
   }
   renderMemberSelector();
 }
 
-function removeMemberSelect(id,e) {
+function removeMemberSelect(id,e){
   e.stopPropagation();
-  selectedMembers = selectedMembers.filter(function(s){return s!==id;});
-  if (selectedMembers.length===0) selectedMembers=['__self__'];
+  selectedMembers=selectedMembers.filter(function(s){return s!==id;});
+  if(selectedMembers.length===0)selectedMembers=['__self__'];
   renderMemberSelector();
 }
 
 // ============================================================
+// PROFILE MEMBERS
+// ============================================================
+function renderProfileMembers(){
+  var row=document.getElementById('profile-members-row');
+  var html='';
+  members.forEach(function(m){
+    var age=m.dob?getAgeLabel(m.dob):'';
+    html+='<div class="member-card '+(selectedProfileMemberId===m.id?'selected':'')+'" onclick="selectProfileMember(\''+m.id+'\')">'
+      +'<div class="m-avatar">'+m.avatar+'</div>'
+      +'<div class="m-name">'+(m.name||'Membru')+'</div>'
+      +(age?'<div class="m-age">'+age+'</div>':'')
+      +'</div>';
+  });
+  html+='<div class="add-member-card" onclick="addMember()">'
+    +'<div class="add-member-plus">+</div>'
+    +'<div class="add-member-lbl">Adaugă</div>'
+    +'</div>';
+  row.innerHTML=html;
+}
+
+function selectProfileMember(id){
+  selectedProfileMemberId=id;
+  var m=members.find(function(x){return x.id===id;});
+  if(!m)return;
+  renderProfileMembers();
+  document.getElementById('conds-section-label').textContent='Afecțiunile '+(m.name||'membrului');
+  document.getElementById('empty-conds-wrap').style.display='none';
+  document.getElementById('cat-groups').style.display='block';
+  renderCatGroups();
+  updateCountBadge();
+}
+
+function addMember(){
+  var id='m_'+Date.now();
+  members.push({id:id,name:'',dob:'',avatar:'👤',conditions:[]});
+  saveMembers();
+  renderProfileMembers();
+}
+
+function updateMemberField(id,field,val){
+  members.forEach(function(m){if(m.id===id)m[field]=val;});
+  if(field==='dob')renderProfileMembers();
+}
+
+function deleteMember(id){
+  members=members.filter(function(m){return m.id!==id;});
+  saveMembers();
+  if(selectedProfileMemberId===id){
+    selectedProfileMemberId=null;
+    document.getElementById('empty-conds-wrap').style.display='block';
+    document.getElementById('cat-groups').style.display='none';
+    document.getElementById('conds-section-label').textContent='Afecțiunile mele';
+  }
+  renderProfileMembers();
+  renderMemberSelector();
+}
+
+function toggleMemberCond(memberId,condId){
+  members.forEach(function(m){
+    if(m.id===memberId){
+      if(!m.conditions)m.conditions=[];
+      var i=m.conditions.indexOf(condId);
+      if(i>-1)m.conditions.splice(i,1);else m.conditions.push(condId);
+    }
+  });
+  renderCatGroups();
+}
+
+function openAvatarModal(memberId){
+  editingAvatarId=memberId;
+  var m=members.find(function(x){return x.id===memberId;});
+  document.getElementById('avatar-grid').innerHTML=AVATARS.map(function(a){
+    return '<div class="avatar-opt '+(m&&m.avatar===a?'sel':'')+'" onclick="selectAvatar(\''+a+'\')">'+a+'</div>';
+  }).join('');
+  document.getElementById('avatar-overlay').classList.add('show');
+}
+
+function selectAvatar(a){
+  members.forEach(function(m){if(m.id===editingAvatarId)m.avatar=a;});
+  document.querySelectorAll('.avatar-opt').forEach(function(o){o.classList.remove('sel');});
+  event.target.classList.add('sel');
+  renderProfileMembers();
+}
+
+function closeAvatarModal(){document.getElementById('avatar-overlay').classList.remove('show');}
+function handleAvatarOverlay(e){if(e.target===document.getElementById('avatar-overlay'))closeAvatarModal();}
+
+// ============================================================
 // CONDITIONS
 // ============================================================
-function renderCatGroups() {
-  var html = '';
-  CONDITION_CATEGORIES.forEach(function(cat) {
-    var activeInCat = cat.conditions.filter(function(c){return activeConditions.has(c.id);}).length;
-    html += '<div class="cat-group" id="cat-'+cat.id+'">'
+function getActiveConds(){
+  if(selectedProfileMemberId){
+    var m=members.find(function(x){return x.id===selectedProfileMemberId;});
+    return m?new Set(m.conditions||[]):new Set();
+  }
+  return activeConditions;
+}
+
+function toggleCond(id){
+  if(selectedProfileMemberId){
+    toggleMemberCond(selectedProfileMemberId,id);
+  } else {
+    if(activeConditions.has(id))activeConditions.delete(id);else activeConditions.add(id);
+    saveConditions();
+  }
+  renderCatGroups();
+  updateCondBar();
+  updateCountBadge();
+}
+
+function renderCatGroups(){
+  var activeConds=getActiveConds();
+  var html='';
+  CONDITION_CATEGORIES.forEach(function(cat){
+    var activeInCat=cat.conditions.filter(function(c){return activeConds.has(c.id);}).length;
+    html+='<div class="cat-group" id="cat-'+cat.id+'">'
       +'<div class="cat-header" onclick="toggleCat(\''+cat.id+'\')">'
         +'<div class="cat-header-left"><span class="cat-icon">'+cat.icon+'</span>'
           +'<div><div class="cat-name">'+cat.name+'</div>'
           +'<div class="cat-count">'+(activeInCat>0?activeInCat+' active':'Niciuna activă')+'</div></div></div>'
         +'<span class="cat-arrow">▼</span></div>'
       +'<div class="cat-body">';
-    cat.conditions.forEach(function(c) {
-      html += '<div class="cond-item '+(activeConditions.has(c.id)?'on':'')+'" onclick="toggleCond(\''+c.id+'\')">'
+    cat.conditions.forEach(function(c){
+      html+='<div class="cond-item '+(activeConds.has(c.id)?'on':'')+'" onclick="toggleCond(\''+c.id+'\')">'
         +'<div class="cond-left"><span class="cond-emoji">'+c.icon+'</span>'
-          +'<div><div class="cond-name">'+c.name+'</div></div></div>'
+          +'<div class="cond-name">'+c.name+'</div></div>'
         +'<div class="toggle"></div></div>';
     });
-    html += '</div></div>';
+    html+='</div></div>';
   });
-  document.getElementById('cat-groups').innerHTML = html;
-  document.getElementById('count-badge').textContent = activeConditions.size+' active';
+  var el=document.getElementById('cat-groups');
+  if(el)el.innerHTML=html;
+  updateCountBadge();
 }
 
-function toggleCat(id) { document.getElementById('cat-'+id).classList.toggle('open'); }
-
-function toggleCond(id) {
-  if(activeConditions.has(id)) activeConditions.delete(id); else activeConditions.add(id);
-  renderCatGroups(); updateCondBar(); updateBadge(); saveConditions();
+function toggleCat(id){
+  var el=document.getElementById('cat-'+id);
+  if(el)el.classList.toggle('open');
 }
 
-function addCustom() {
-  var inp = document.getElementById('custom-input');
-  var val = inp.value.trim(); if(!val) return;
-  var id = 'c_'+Date.now();
-  customConditions.push({id:id,icon:'⚕️',name:val,keys:[]});
-  activeConditions.add(id); inp.value='';
-  saveCustomConds(); saveConditions(); renderCustomConds(); updateBadge(); updateCondBar();
+function updateCountBadge(){
+  var activeConds=getActiveConds();
+  var b=document.getElementById('count-badge');
+  if(b)b.textContent=activeConds.size+' active';
 }
 
-function renderCustomConds() {
-  var el = document.getElementById('custom-conds'); if(!el) return;
-  el.innerHTML = customConditions.map(function(c) {
-    return '<div class="cond-item '+(activeConditions.has(c.id)?'on':'')+'" onclick="toggleCustomCond(\''+c.id+'\')">'
-      +'<div class="cond-left"><span class="cond-emoji">'+c.icon+'</span><div><div class="cond-name">'+c.name+'</div></div></div>'
-      +'<div class="toggle"></div></div>';
-  }).join('');
+function saveProfile(){
+  saveConditions();
+  saveMembers();
+  updateCondBar();
+  renderMemberSelector();
+  document.getElementById('profile-overlay').classList.remove('show');
+  setTimeout(function(){openMenu();},50);
 }
 
-function toggleCustomCond(id) {
-  if(activeConditions.has(id)) activeConditions.delete(id); else activeConditions.add(id);
-  renderCustomConds(); updateBadge(); updateCondBar(); saveConditions();
-}
-
-function saveProfile() { saveConditions(); saveMembers(); updateCondBar(); updateBadge(); goTo('home'); }
-
-function updateBadge() {
-  var b = document.getElementById('badge');
-  b.textContent = activeConditions.size;
-  b.classList.toggle('show', activeConditions.size>0);
-}
-
-function updateCondBar() {
-  var all = getAllConditions().concat(customConditions);
-  var active = all.filter(function(c){return activeConditions.has(c.id);});
-  document.getElementById('cond-summary').textContent = active.length===0?'Nicio afecțiune selectată':active.length+(active.length===1?' afecțiune activă':' afecțiuni active');
-  document.getElementById('cond-pills').innerHTML = active.slice(0,4).map(function(c){return '<div class="pill">'+c.icon+' '+c.name.split(' ')[0]+'</div>';}).join('')+(active.length>4?'<div class="pill">+'+(active.length-4)+'</div>':'');
+function updateCondBar(){
+  var all=getAllConditions();
+  var active=all.filter(function(c){return activeConditions.has(c.id);});
+  document.getElementById('cond-summary').textContent=active.length===0?'Nicio afecțiune selectată':active.length+(active.length===1?' afecțiune activă':' afecțiuni active');
+  document.getElementById('cond-pills').innerHTML=active.slice(0,4).map(function(c){return '<div class="pill">'+c.icon+' '+c.name.split(' ')[0]+'</div>';}).join('')+(active.length>4?'<div class="pill">+'+(active.length-4)+'</div>':'');
 }
 
 // ============================================================
-// FAMILY MEMBERS
+// DEFAULT SCAN
 // ============================================================
-function addMember() {
-  members.push({id:'m_'+Date.now(),name:'',dob:'',avatar:'👤',conditions:[]});
-  renderMembersList();
+function setDefaultScan(v){
+  defaultScan=v;
+  try{localStorage.setItem('eq_dscan',v);}catch(e){}
+  if(v==='all')selectedMembers=['__all__'];
+  else if(v==='self')selectedMembers=['__self__'];
+  renderDefaultSetting();
+  renderMemberSelector();
 }
 
-function deleteMember(id) {
-  members = members.filter(function(m){return m.id!==id;});
-  renderMembersList(); saveMembers(); renderMemberSelector();
-}
-
-function renderMembersList() {
-  var el = document.getElementById('members-list');
-  if(members.length===0){el.innerHTML='';return;}
-  el.innerHTML = members.map(function(m) {
-    var ageLabel = m.dob ? getAgeLabel(m.dob) : null;
-    var condChips = getAllConditions().concat(customConditions).map(function(c) {
-      var active = m.conditions&&m.conditions.includes(c.id);
-      return '<div class="member-cond-chip '+(active?'active':'')+'" onclick="toggleMemberCond(\''+m.id+'\',\''+c.id+'\')">'
-        +c.icon+' '+c.name+'</div>';
-    }).join('');
-    return '<div class="member-card">'
-      +'<div class="member-card-top">'
-        +'<div class="member-avatar-big" onclick="openAvatarModal(\''+m.id+'\')">'+m.avatar+'<div class="edit-overlay">✏️</div></div>'
-        +'<div class="member-info">'
-          +'<input class="member-name-input" type="text" placeholder="Nume..." value="'+m.name+'" oninput="updateMemberField(\''+m.id+'\',\'name\',this.value)">'
-          +'<div class="member-dob-row">'
-            +'<span class="member-dob-label">📅 Data nașterii:</span>'
-            +'<input class="member-dob-input" type="date" value="'+m.dob+'" onchange="updateMemberField(\''+m.id+'\',\'dob\',this.value)">'
-            +(ageLabel?'<span class="member-age-display">'+ageLabel+'</span>':'')
-          +'</div>'
-        +'</div>'
-        +'<button class="member-delete" onclick="deleteMember(\''+m.id+'\')">🗑️</button>'
-      +'</div>'
-      +'<div class="member-conds">'
-        +'<div class="member-conds-label">AFECȚIUNI</div>'
-        +'<div class="member-cond-chips">'+condChips+'</div>'
-      +'</div>'
-    +'</div>';
-  }).join('');
-}
-
-function updateMemberField(id,field,val) {
-  members.forEach(function(m){if(m.id===id){m[field]=val;}});
-  if(field==='dob') renderMembersList();
-}
-
-function toggleMemberCond(memberId,condId) {
-  members.forEach(function(m) {
-    if(m.id===memberId){
-      if(!m.conditions) m.conditions=[];
-      var idx=m.conditions.indexOf(condId);
-      if(idx>-1) m.conditions.splice(idx,1); else m.conditions.push(condId);
-    }
-  });
-  renderMembersList();
-}
-
-function openAvatarModal(memberId) {
-  editingAvatarMemberId = memberId;
-  var member = members.find(function(m){return m.id===memberId;});
-  document.getElementById('avatar-grid').innerHTML = AVATARS.map(function(a) {
-    return '<div class="avatar-opt '+(member&&member.avatar===a?'selected':'')+'" onclick="selectAvatar(\''+a+'\')">'+a+'</div>';
-  }).join('');
-  document.getElementById('avatar-overlay').classList.add('show');
-}
-
-function selectAvatar(a) {
-  members.forEach(function(m){if(m.id===editingAvatarMemberId) m.avatar=a;});
-  document.querySelectorAll('.avatar-opt').forEach(function(o){o.classList.remove('selected');});
-  event.target.classList.add('selected');
-  renderMembersList();
-}
-
-function closeAvatarModal() { document.getElementById('avatar-overlay').classList.remove('show'); }
-function handleAvatarOverlay(e) { if(e.target===document.getElementById('avatar-overlay')) closeAvatarModal(); }
-
-// ============================================================
-// DEFAULT SCAN SETTING
-// ============================================================
-function setDefaultScan(val) {
-  defaultScan=val;
-  try{localStorage.setItem('eq_default_scan',val);}catch(e){}
-  if(val==='all') selectedMembers=['__all__'];
-  else if(val==='self') selectedMembers=['__self__'];
-  renderDefaultSetting(); renderMemberSelector();
-}
-
-function renderDefaultSetting() {
-  ['all','self','manual'].forEach(function(v) {
-    var opt=document.getElementById('set-'+v);
-    if(opt) opt.classList.toggle('active',defaultScan===v);
+function renderDefaultSetting(){
+  ['all','self','manual'].forEach(function(v){
+    var el=document.getElementById('set-'+v);
+    if(el)el.classList.toggle('active',defaultScan===v);
   });
 }
 
 // ============================================================
 // API KEY
 // ============================================================
-function showApiModal() {
+function showApiModal(){
   document.getElementById('api-input').value='';
   document.getElementById('api-error').classList.remove('show');
   document.getElementById('api-overlay').classList.add('show');
 }
 
-function saveApiKey() {
+function saveApiKey(){
   var val=document.getElementById('api-input').value.trim();
   if(!val.startsWith('sk-ant')){document.getElementById('api-error').classList.add('show');return;}
   storeKey(val);
@@ -1038,9 +1122,9 @@ function saveApiKey() {
 // ============================================================
 // CAMERA & OCR
 // ============================================================
-function openCamera() { if(!getKey()){showApiModal();return;} document.getElementById('file-input').click(); }
+function openCamera(){if(!getKey()){showApiModal();return;}document.getElementById('file-input').click();}
 
-function clearPhoto() {
+function clearPhoto(){
   photoMode=false;
   document.getElementById('photo-wrap').style.display='none';
   document.getElementById('file-input').value='';
@@ -1052,21 +1136,19 @@ function clearPhoto() {
   document.getElementById('results').innerHTML='';
 }
 
-function toggleIngCollapse() {
-  var body=document.getElementById('ing-collapse-body');
-  var arrow=document.getElementById('ing-collapse-arrow');
-  var isOpen=body.style.display!=='none';
-  body.style.display=isOpen?'none':'block';
-  arrow.textContent=isOpen?'▼ Vezi':'▲ Ascunde';
+function toggleIngCollapse(){
+  var b=document.getElementById('ing-collapse-body');
+  var a=document.getElementById('ing-collapse-arrow');
+  var open=b.style.display!=='none';
+  b.style.display=open?'none':'block';
+  a.textContent=open?'▼ Vezi':'▲ Ascunde';
 }
 
-function handlePhoto(e) {
-  var file=e.target.files[0]; if(!file) return;
+function handlePhoto(e){
+  var file=e.target.files[0];if(!file)return;
   var reader=new FileReader();
-  reader.onload=function(ev) {
-    var full=ev.target.result;
-    var b64=full.split(',')[1];
-    var mime=file.type||'image/jpeg';
+  reader.onload=function(ev){
+    var full=ev.target.result,b64=full.split(',')[1],mime=file.type||'image/jpeg';
     document.getElementById('photo-img').src=full;
     document.getElementById('photo-wrap').style.display='block';
     document.getElementById('ocr-loading').classList.add('show');
@@ -1079,13 +1161,13 @@ function handlePhoto(e) {
       headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
         {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-        {type:'text',text:'Uită-te cu atenție la această imagine de pe un ambalaj de produs. Găsește și extrage TOATĂ lista de ingrediente. Ingredientele apar după: Ingredients, Ingrediente, Inhaltsstoffe, INCI, Composition, Ingrédients. Returnează DOAR ingredientele separate prin virgule, fără alt text. Dacă nu găsești, returnează: NU_AM_GASIT'}
+        {type:'text',text:'Uită-te cu atenție la această imagine de pe un ambalaj. Găsește lista de ingrediente — apare după: Ingredients, Ingrediente, Inhaltsstoffe, INCI, Composition, Ingrédients. Returnează DOAR ingredientele separate prin virgule, fără alt text. Dacă nu găsești, returnează: NU_AM_GASIT'}
       ]}]})
     })
     .then(function(r){return r.json();})
-    .then(function(data){
+    .then(function(d){
       document.getElementById('ocr-loading').classList.remove('show');
-      var text=(data.content||[]).map(function(i){return i.text||'';}).join('').trim();
+      var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
       if(!text||text==='NU_AM_GASIT'||text.length<5){
         showError('Nu am putut citi ingredientele. Încearcă o poză mai apropiată sau scrie manual.');
         document.getElementById('ing-manual-wrap').style.display='block';
@@ -1109,55 +1191,47 @@ function handlePhoto(e) {
 // ============================================================
 // ANALYZE
 // ============================================================
-function doAnalyze() {
+function doAnalyze(){
   if(!getKey()){showApiModal();return;}
-  var ing = photoMode ? document.getElementById('ing-textarea').value.trim() : document.getElementById('ing-textarea-manual').value.trim();
+  var ing=photoMode?document.getElementById('ing-textarea').value.trim():document.getElementById('ing-textarea-manual').value.trim();
   if(ing.length<5){showError('Te rog introdu o listă de ingrediente.');return;}
 
-  var all = getAllConditions().concat(customConditions);
-  var foodCats=['allergies','chronic','lifestyle'];
-  var cosmeticCats=['cosmetic-skin','cosmetic-special','lifestyle'];
-  var relevantCatIds = productType==='food'?foodCats:cosmeticCats;
+  var all=getAllConditions();
+  var foodCats=['allergies','chronic','lifestyle'],cosCats=['cosmetic-skin','cosmetic-special','lifestyle'];
+  var relCats=productType==='food'?foodCats:cosCats;
 
-  function isRelevant(condId) {
-    if(condId.startsWith('c_')) return true;
+  function isRel(id){
     for(var i=0;i<CONDITION_CATEGORIES.length;i++){
-      if(CONDITION_CATEGORIES[i].conditions.find(function(c){return c.id===condId;}))
-        return relevantCatIds.indexOf(CONDITION_CATEGORIES[i].id)>-1;
+      if(CONDITION_CATEGORIES[i].conditions.find(function(c){return c.id===id;}))
+        return relCats.indexOf(CONDITION_CATEGORIES[i].id)>-1;
     }
     return true;
   }
 
-  var filteredAll = all.filter(function(c){return isRelevant(c.id);});
+  var filteredAll=all.filter(function(c){return isRel(c.id);});
+  var contexts=[];
 
-  // Build member context with age
-  var memberContexts = [];
-
-  if(selectedMembers.includes('__all__')||selectedMembers.includes('__self__')) {
-    var selfActive = filteredAll.filter(function(c){return activeConditions.has(c.id);});
-    var ageWarnings = [];
-    var selfContext = 'Eu';
-    if(selfActive.length>0) selfContext += ' — Afecțiuni: '+selfActive.map(function(c){return c.name;}).join(', ');
-    memberContexts.push(selfContext);
+  if(selectedMembers.includes('__all__')||selectedMembers.includes('__self__')){
+    var selfActive=filteredAll.filter(function(c){return activeConditions.has(c.id);});
+    var ctx='Eu';
+    if(selfActive.length>0)ctx+=' — Afecțiuni: '+selfActive.map(function(c){return c.name;}).join(', ');
+    contexts.push(ctx);
   }
 
-  var targetMembers = selectedMembers.includes('__all__') ? members : members.filter(function(m){return selectedMembers.includes(m.id);});
-
-  targetMembers.forEach(function(m) {
-    var ageLabel = m.dob ? getAgeLabel(m.dob) : null;
-    var ageGroup = m.dob ? getAgeGroup(m.dob) : null;
-    var ageWarn = m.dob ? getAgeWarnings(m.dob, productType) : [];
-    var mConds = (m.conditions||[]).filter(function(cid){return isRelevant(cid);}).map(function(cid){
-      var found=filteredAll.find(function(c){return c.id===cid;}); return found?found.name:cid;
-    });
-    var ctx = (m.name||'Membru')+(ageLabel?' ('+ageLabel+', grupa: '+ageGroup.label+')':'');
-    if(mConds.length>0) ctx += ' — Afecțiuni: '+mConds.join(', ');
-    if(ageWarn.length>0) ctx += ' — ATENȚIE VÂRSTĂ: evită ingrediente care conțin '+ageWarn.slice(0,5).join(', ');
-    memberContexts.push(ctx);
+  var targetMembers=selectedMembers.includes('__all__')?members:members.filter(function(m){return selectedMembers.includes(m.id);});
+  targetMembers.forEach(function(m){
+    var age=m.dob?getAgeLabel(m.dob):null;
+    var gr=m.dob?getAgeGroup(m.dob):null;
+    var warn=m.dob?getAgeWarnings(m.dob,productType):[];
+    var mConds=(m.conditions||[]).filter(function(id){return isRel(id);}).map(function(id){var f=filteredAll.find(function(c){return c.id===id;});return f?f.name:id;});
+    var ctx=(m.name||'Membru')+(age?' ('+age+(gr?', grupa '+gr.label:'')+')':'');
+    if(mConds.length>0)ctx+=' — Afecțiuni: '+mConds.join(', ');
+    if(warn.length>0)ctx+=' — ATENȚIE VÂRSTĂ: evită '+warn.slice(0,5).join(', ');
+    contexts.push(ctx);
   });
 
-  var condsText = memberContexts.length>0 ? memberContexts.join(' | ') : 'Nicio afecțiune declarată.';
-  var typeLabel = productType==='food'?'alimentare':'cosmetice';
+  var condsText=contexts.length>0?contexts.join(' | '):'Nicio afecțiune declarată.';
+  var typeLabel=productType==='food'?'alimentare':'cosmetice';
 
   document.getElementById('analyze-btn').disabled=true;
   document.getElementById('loading').classList.add('show');
@@ -1165,7 +1239,7 @@ function doAnalyze() {
   document.getElementById('results').innerHTML='';
   document.getElementById('error-msg').classList.remove('show');
 
-  var prompt = 'Ești expert în analiza ingredientelor pentru produse '+typeLabel+'. Profilul utilizatorilor: '+condsText+'\n\nIngrediente: "'+ing+'"\n\nReturnează DOAR JSON valid:\n{\n"score":<1-10>,\n"verdict":"<Excelent/Bun/Acceptabil/Slab/Foarte Slab>",\n"summary":"<2-3 propoziții în română>",\n"personal_alerts":[{"person":"<Eu sau nume>","condition":"<afecțiune sau vârstă>","severity":"<danger/warn>","ingredient":"<ingredient>","explanation":"<în română>"}],\n"ingredients":[{"name":"<ingredient>","rating":"<good/medium/bad>","desc":"<scurt în română>","risk":"<null sau risc specific în română>"}],\n"positives":["<aspect pozitiv>"],\n"negatives":["<aspect negativ>"],\n"recommendation":"<sfat final în română, menționează specific persoanele cu risc>"\n}';
+  var prompt='Ești expert în analiza ingredientelor pentru produse '+typeLabel+'. Profilul: '+condsText+'\n\nIngrediente: "'+ing+'"\n\nReturnează DOAR JSON valid:\n{"score":<1-10>,"verdict":"<Excelent/Bun/Acceptabil/Slab/Foarte Slab>","summary":"<2-3 propoziții în română>","personal_alerts":[{"person":"<Eu sau nume>","condition":"<afecțiune>","severity":"<danger/warn>","ingredient":"<ingredient>","explanation":"<în română>"}],"ingredients":[{"name":"<ingredient>","rating":"<good/medium/bad>","desc":"<scurt în română>","risk":"<null sau risc în română>"}],"positives":["<pozitiv>"],"negatives":["<negativ>"],"recommendation":"<sfat final în română>"}';
 
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
@@ -1173,13 +1247,13 @@ function doAnalyze() {
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
   })
   .then(function(r){return r.json();})
-  .then(function(data){
-    var text=(data.content||[]).map(function(i){return i.text||'';}).join('');
+  .then(function(d){
+    var text=(d.content||[]).map(function(i){return i.text||'';}).join('');
     var parsed;
     try{
       var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
-      var s=clean.indexOf('{'),e=clean.lastIndexOf('}');
-      if(s!==-1&&e!==-1) clean=clean.substring(s,e+1);
+      var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
+      if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
       parsed=JSON.parse(clean);
     }catch(err){throw new Error('Răspuns invalid. Încearcă din nou.');}
     renderResults(parsed,ing);
@@ -1198,14 +1272,15 @@ function scoreColor(s){return s>=7?'good':s>=4?'medium':'bad';}
 
 function renderResults(d,rawIng){
   currentAnalysisData=d;
-  var s=d.score||5; var c=scoreColor(s);
-  var alertsHTML=(d.personal_alerts||[]).map(function(a){
+  var s=d.score||5,c=scoreColor(s);
+  var aHTML=(d.personal_alerts||[]).map(function(a){
     return '<div class="alert-card '+a.severity+'">'
       +'<div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div>'
       +'<div><div class="alert-title">'+(a.person?'Risc pentru '+a.person:'Atenție')+'</div>'
       +'<div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';
   }).join('');
-  var ingHTML=(d.ingredients||[]).slice(0,14).map(function(i){
+
+  var iHTML=(d.ingredients||[]).slice(0,14).map(function(i){
     var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';
     var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';
     return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div>'
@@ -1213,30 +1288,28 @@ function renderResults(d,rawIng){
       +(i.risk&&i.risk!=='null'?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')
       +'</div></div>';
   }).join('');
+
   var posHTML=(d.positives||[]).map(function(p){return '<div class="point-row"><span>✅</span><span>'+p+'</span></div>';}).join('');
   var negHTML=(d.negatives||[]).map(function(n){return '<div class="point-row"><span>⚠️</span><span>'+n+'</span></div>';}).join('');
-  var alertCount=(d.personal_alerts||[]).length;
-  var safeExcerpt=rawIng.substring(0,60).replace(/'/g,'').replace(/\n/g,' ');
-  var thumbSrc = document.getElementById('photo-img').src||'';
+  var ac=(d.personal_alerts||[]).length;
+  var ex=rawIng.substring(0,60).replace(/'/g,'').replace(/\n/g,' ');
+  var thumb=document.getElementById('photo-img').src||'';
 
   document.getElementById('results').innerHTML=
-    alertsHTML
-    +'<div class="score-card">'
-      +'<div class="score-circle c-'+c+'"><div class="score-num c-'+c+'">'+s+'</div><div class="score-den">/ 10</div></div>'
-      +'<div><div class="score-verdict c-'+c+'">'+(d.verdict||'')+'</div><div class="score-summary">'+(d.summary||'')+'</div></div>'
+    aHTML
+    +'<div class="score-card"><div class="score-circle c-'+c+'"><div class="score-num c-'+c+'">'+s+'</div><div class="score-den">/ 10</div></div>'
+    +'<div><div class="score-verdict c-'+c+'">'+(d.verdict||'')+'</div><div class="score-summary">'+(d.summary||'')+'</div></div></div>'
+    +'<div class="bar-card"><div class="bar-labels"><span>Slab</span><span>Mediu</span><span>Excelent</span></div>'
+    +'<div class="bar-track"><div class="bar-fill fill-'+c+'" id="bar-fill"></div></div></div>'
+    +(iHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:12px">Analiza ingredientelor</div>'+iHTML+'</div>':'')
+    +(posHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte forte</div>'+posHTML+'</div>':'')
+    +(negHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte slabe</div>'+negHTML+'</div>':'')
+    +(d.recommendation?'<div class="reco-box">'+d.recommendation+'</div>':'')
+    +'<div style="margin-top:12px;display:flex;gap:8px">'
+    +'<button class="btn-primary" style="flex:1" onclick="saveToHistory('+s+',\''+productType+'\',\''+ex+'\','+ac+')">Salvează în Istoric</button>'
+    +'<button class="heart-btn" onclick="toggleFavorite('+s+',\''+productType+'\',\''+ex+'\','+ac+')">'+(isFavorite(ex,productType)?'❤️':'🤍')+'</button>'
     +'</div>'
-    +'<div class="bar-card"><div class="bar-labels"><span>SLAB</span><span>MEDIU</span><span>EXCELENT</span></div>'
-      +'<div class="bar-track"><div class="bar-fill fill-'+c+'" id="bar-fill"></div></div></div>'
-    +(ingHTML?'<div class="section-card"><div class="section-label">Analiza Ingredientelor</div>'+ingHTML+'</div>':'')
-    +(posHTML?'<div class="section-card"><div class="section-label">Puncte Forte</div>'+posHTML+'</div>':'')
-    +(negHTML?'<div class="section-card"><div class="section-label">Puncte Slabe</div>'+negHTML+'</div>':'')
-    +(d.recommendation?'<div class="reco-box">💡 '+d.recommendation+'</div>':'')
-    +'<div style="margin-top:10px;display:flex;gap:8px;">'
-      +'<button class="btn-primary" style="flex:1" onclick="saveToHistory('+s+',\''+productType+'\',\''+safeExcerpt+'\','+alertCount+')">💾 Salvează în Istoric</button>'
-      +'<button class="heart-btn" onclick="toggleFavorite('+s+',\''+productType+'\',\''+safeExcerpt+'\','+alertCount+')" title="Adaugă la Favorite">'
-        +(isFavorite(safeExcerpt,productType)?'❤️':'🤍')+'</button>'
-    +'</div>'
-    +'<div class="disclaimer">⚕️ EtiQuette nu înlocuiește sfatul medical.</div>';
+    +'<div class="disclaimer">EtiQuette nu înlocuiește sfatul medical profesionist.</div>';
 
   document.getElementById('results').classList.add('show');
   setTimeout(function(){var f=document.getElementById('bar-fill');if(f)f.style.width=(s/10*100)+'%';},100);
@@ -1246,76 +1319,57 @@ function renderResults(d,rawIng){
 // HISTORY
 // ============================================================
 function saveToHistory(score,type,excerpt,alerts){
-  var thumbSrc = document.getElementById('photo-img').src||'';
-  scanHistory.unshift({
-    score:score,type:type,excerpt:excerpt,alerts:alerts,
-    thumb: thumbSrc&&thumbSrc.length>100?thumbSrc:'',
+  var thumb=document.getElementById('photo-img').src||'';
+  scanHistory.unshift({score:score,type:type,excerpt:excerpt,alerts:alerts,
+    thumb:thumb&&thumb.length>100?thumb:'',
     fullData:currentAnalysisData,
-    date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
-  });
-  if(scanHistory.length>50) scanHistory=scanHistory.slice(0,50);
+    date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});
+  if(scanHistory.length>50)scanHistory=scanHistory.slice(0,50);
   try{localStorage.setItem('eq_hist',JSON.stringify(scanHistory));}catch(e){}
   alert('✅ Salvat în istoric!');
 }
 
 function toggleHistItem(idx){
-  var body=document.getElementById('hist-body-'+idx);
-  var arrow=document.getElementById('hist-arrow-'+idx);
-  if(!body) return;
-  var isOpen=body.style.display!=='none';
-  body.style.display=isOpen?'none':'block';
-  if(arrow) arrow.textContent=isOpen?'▼':'▲';
-  if(!isOpen){setTimeout(function(){var f=document.getElementById('hist-bar-'+idx);if(f)f.style.width=(scanHistory[idx].score/10*100)+'%';},100);}
+  var b=document.getElementById('hb-'+idx),a=document.getElementById('ha-'+idx);
+  if(!b)return;
+  var open=b.style.display!=='none';
+  b.style.display=open?'none':'block';
+  if(a)a.textContent=open?'▼':'▲';
+  if(!open){setTimeout(function(){var f=document.getElementById('hbar-'+idx);if(f)f.style.width=(scanHistory[idx].score/10*100)+'%';},100);}
 }
 
 function renderHistory(){
   var el=document.getElementById('history-list');
   if(scanHistory.length===0){el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nicio scanare salvată încă.<br>Analizează primul tău produs!</div></div>';return;}
   el.innerHTML=scanHistory.map(function(h,idx){
-    var c=scoreColor(h.score);
-    var d=h.fullData;
-    var heartIcon=isFavorite(h.excerpt,h.type)?'❤️':'🤍';
-    var expandedHTML='';
+    var c=scoreColor(h.score),d=h.fullData;
+    var hrt=isFavorite(h.excerpt,h.type)?'❤️':'🤍';
+    var exp='';
     if(d){
-      var aHTML=(d.personal_alerts||[]).map(function(a){
-        return '<div class="alert-card '+a.severity+'" style="margin-bottom:8px;">'
-          +'<div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div>'
-          +'<div><div class="alert-title">'+(a.person?'Risc pentru '+a.person:'Atenție')+'</div>'
-          +'<div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';
-      }).join('');
-      var iHTML=(d.ingredients||[]).slice(0,8).map(function(i){
-        var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';
-        var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';
-        return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div><div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div></div></div>';
-      }).join('');
-      expandedHTML='<div style="padding:0 14px 14px;">'
-        +aHTML
-        +'<div class="bar-card" style="margin-bottom:10px;"><div class="bar-labels"><span>SLAB</span><span>MEDIU</span><span>EXCELENT</span></div>'
-          +'<div class="bar-track"><div class="bar-fill fill-'+c+'" id="hist-bar-'+idx+'" style="width:0"></div></div></div>'
-        +(d.summary?'<div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px;">'+d.summary+'</div>':'')
-        +(iHTML?'<div class="section-card" style="margin-bottom:10px;"><div class="section-label">Ingrediente</div>'+iHTML+'</div>':'')
-        +(d.recommendation?'<div class="reco-box">💡 '+d.recommendation+'</div>':'')
-        +'<div style="margin-top:10px;display:flex;gap:8px;">'
-          +'<button class="heart-btn" onclick="toggleFavorite('+h.score+',\''+h.type+'\',\''+h.excerpt+'\','+h.alerts+')" style="font-size:20px;">'+heartIcon+' Favorite</button>'
-        +'</div>'
-      +'</div>';
+      var aH=(d.personal_alerts||[]).map(function(a){return '<div class="alert-card '+a.severity+'" style="margin-bottom:8px"><div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div><div><div class="alert-title">'+(a.person?'Risc pentru '+a.person:'Atenție')+'</div><div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';}).join('');
+      var iH=(d.ingredients||[]).slice(0,8).map(function(i){var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div><div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div></div></div>';}).join('');
+      exp='<div style="padding:14px">'+aH
+        +'<div class="bar-card" style="margin-bottom:10px"><div class="bar-labels"><span>Slab</span><span>Mediu</span><span>Excelent</span></div><div class="bar-track"><div class="bar-fill fill-'+c+'" id="hbar-'+idx+'" style="width:0"></div></div></div>'
+        +(d.summary?'<div style="font-family:\'Jost\',sans-serif;font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px">'+d.summary+'</div>':'')
+        +(iH?'<div class="section-card" style="margin-bottom:10px"><div class="section-label" style="margin-bottom:10px">Ingrediente</div>'+iH+'</div>':'')
+        +(d.recommendation?'<div class="reco-box">'+d.recommendation+'</div>':'')
+        +'<div style="margin-top:10px;display:flex;gap:8px">'
+        +'<button class="heart-btn" onclick="toggleFavorite('+h.score+',\''+h.type+'\',\''+h.excerpt+'\','+h.alerts+')" style="font-size:18px">'+hrt+' Favorite</button>'
+        +'</div></div>';
     } else {
-      expandedHTML='<div style="padding:12px 14px;font-size:12px;color:var(--muted);">Detalii complete nu sunt disponibile pentru această scanare.</div>';
+      exp='<div style="padding:14px;font-family:\'Jost\',sans-serif;font-size:11px;color:var(--muted);font-style:italic">Detalii complete nu sunt disponibile pentru această scanare.</div>';
     }
-    return '<div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden;">'
+    return '<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden">'
       +'<div class="hist-item" onclick="toggleHistItem('+idx+')">'
-        +(h.thumb?'<img class="hist-thumb" src="'+h.thumb+'" alt="">':'')
-        +'<div class="hist-score c-'+c+'"><div class="h-num c-'+c+'">'+h.score+'</div><div class="h-den">/10</div></div>'
-        +'<div class="hist-info">'
-          +'<div class="hist-type">'+(h.type==='food'?'🍎 ALIMENTAR':'💄 COSMETIC')+'</div>'
-          +'<div class="hist-excerpt">'+h.excerpt+'...</div>'
-          +'<div class="hist-meta"><span class="hist-date">'+h.date+'</span>'
-          +(h.alerts>0?'<span class="hist-alert-pill">⚠️ '+h.alerts+' alertă</span>':'')+'</div>'
-        +'</div>'
-        +'<span id="hist-arrow-'+idx+'" style="font-size:12px;color:var(--muted);flex-shrink:0;padding:4px;">▼</span>'
+      +(h.thumb?'<img class="hist-thumb" src="'+h.thumb+'" alt="">':'')
+      +'<div class="hist-score c-'+c+'"><div class="h-num c-'+c+'">'+h.score+'</div><div class="h-den">/10</div></div>'
+      +'<div class="hist-info"><div class="hist-type">'+(h.type==='food'?'Alimentar':'Cosmetic')+'</div>'
+      +'<div class="hist-excerpt">'+h.excerpt+'...</div>'
+      +'<div class="hist-meta"><span class="hist-date">'+h.date+'</span>'+(h.alerts>0?'<span class="hist-alert-pill">'+h.alerts+' alertă</span>':'')+'</div></div>'
+      +'<span id="ha-'+idx+'" style="font-size:11px;color:var(--muted);flex-shrink:0;padding:4px;font-family:\'Jost\',sans-serif">▼</span>'
       +'</div>'
-      +'<div id="hist-body-'+idx+'" style="display:none;border-top:1px solid var(--border);">'+expandedHTML+'</div>'
-    +'</div>';
+      +'<div id="hb-'+idx+'" style="display:none;border-top:0.5px solid var(--border)">'+exp+'</div>'
+      +'</div>';
   }).join('');
 }
 
@@ -1323,15 +1377,15 @@ function renderHistory(){
 // FAVORITES
 // ============================================================
 function toggleFavorite(score,type,excerpt,alerts){
-  var existing=favorites.findIndex(function(f){return f.excerpt===excerpt&&f.type===type;});
-  if(existing>-1){favorites.splice(existing,1);alert('💔 Eliminat din favorite');}
+  var i=favorites.findIndex(function(f){return f.excerpt===excerpt&&f.type===type;});
+  if(i>-1){favorites.splice(i,1);alert('💔 Eliminat din favorite');}
   else{favorites.unshift({score:score,type:type,excerpt:excerpt,alerts:alerts,date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});alert('❤️ Adăugat la favorite!');}
-  try{localStorage.setItem('eq_favorites',JSON.stringify(favorites));}catch(e){}
+  try{localStorage.setItem('eq_fav',JSON.stringify(favorites));}catch(e){}
 }
 
 function isFavorite(excerpt,type){return favorites.some(function(f){return f.excerpt===excerpt&&f.type===type;});}
 
-function removeFavorite(idx){favorites.splice(idx,1);try{localStorage.setItem('eq_favorites',JSON.stringify(favorites));}catch(e){}renderFavorites();}
+function removeFavorite(idx){favorites.splice(idx,1);try{localStorage.setItem('eq_fav',JSON.stringify(favorites));}catch(e){}renderFavorites();}
 
 function setFavFilter(f){
   favFilter=f;
@@ -1341,19 +1395,17 @@ function setFavFilter(f){
 
 function renderFavorites(){
   var el=document.getElementById('favorites-list');
-  var filtered=favFilter==='all'?favorites:favorites.filter(function(f){return f.type===favFilter;});
-  if(filtered.length===0){el.innerHTML='<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">Niciun produs favorit încă.<br>Apasă ❤️ pe orice analiză<br>pentru a o salva aici.</div></div>';return;}
-  el.innerHTML=filtered.map(function(f,i){
+  var list=favFilter==='all'?favorites:favorites.filter(function(f){return f.type===favFilter;});
+  if(list.length===0){el.innerHTML='<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">Niciun produs favorit încă.<br>Apasă ❤️ după orice analiză.</div></div>';return;}
+  el.innerHTML=list.map(function(f,i){
     var c=scoreColor(f.score);
-    return '<div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;padding:14px;">'
+    return '<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:10px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;padding:14px">'
       +'<div class="hist-score c-'+c+'"><div class="h-num c-'+c+'">'+f.score+'</div><div class="h-den">/10</div></div>'
-      +'<div class="hist-info">'
-        +'<div class="hist-type">'+(f.type==='food'?'🍎 ALIMENTAR':'💄 COSMETIC')+'</div>'
-        +'<div class="hist-excerpt">'+f.excerpt+'...</div>'
-        +'<div class="hist-date">'+f.date+'</div>'
-      +'</div>'
-      +'<button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px;" onclick="removeFavorite('+i+')">🗑️</button>'
-    +'</div>';
+      +'<div class="hist-info"><div class="hist-type">'+(f.type==='food'?'Alimentar':'Cosmetic')+'</div>'
+      +'<div class="hist-excerpt">'+f.excerpt+'...</div>'
+      +'<div class="hist-date">'+f.date+'</div></div>'
+      +'<button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px" onclick="removeFavorite('+i+')">🗑️</button>'
+      +'</div>';
   }).join('');
 }
 
@@ -1364,4 +1416,15 @@ function showError(msg){var el=document.getElementById('error-msg');el.textConte
 
 // ============================================================
 // INIT
-// ================================================
+// ============================================================
+loadState();
+updateCondBar();
+renderHistory();
+renderFavorites();
+renderMemberSelector();
+renderDefaultSetting();
+if(!getKey())showApiModal();
+setTimeout(checkBirthdays,1000);
+</script>
+</body>
+</html>
