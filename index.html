@@ -7,213 +7,210 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-
 :root{
-  --bg:#FAF8F5;
-  --surface:#FFFFFF;
-  --surface2:#F5F1EB;
-  --border:#EDE5D8;
-  --border2:#E8E0D0;
-  --gold:#C9A96E;
-  --gold-pale:#FDF9F3;
-  --text:#1C1917;
-  --text2:#5C5449;
-  --muted:#B8AD9E;
-  --muted2:#C4B99A;
-  --danger:#C0392B;
-  --danger-pale:#FADBD8;
-  --warn:#E67E22;
-  --warn-pale:#FDEBD0;
-  --good:#2D6A4F;
-  --good-pale:#D5F5E3;
-  --medium:#C9A96E;
-  --medium-pale:#FDF9F3;
-  --radius:10px;
-  --shadow:0 1px 12px rgba(28,25,23,0.06)
+  --bg:#FAF8F5;--surface:#FFFFFF;--surface2:#F5F1EB;
+  --border:#EDE5D8;--border2:#E8E0D0;
+  --gold:#C9A96E;--gold-pale:#FDF9F3;
+  --text:#1C1917;--text2:#5C5449;--muted:#B8AD9E;--muted2:#C4B99A;
+  --danger:#C0392B;--danger-pale:#FADBD8;
+  --warn:#E67E22;--warn-pale:#FDEBD0;
+  --good:#2D6A4F;--good-pale:#D5F5E3;
+  --medium:#C9A96E;--medium-pale:#FDF9F3;
+  --radius:10px;--shadow:0 1px 12px rgba(28,25,23,0.06)
 }
+body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-size:clamp(13px,3.5vw,16px);min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden}
 
-body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden}
-
-/* ===================== TOPBAR ===================== */
+/* TOPBAR */
 .topbar{background:var(--bg);border-bottom:0.5px solid var(--border2);padding:16px 20px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
-
-.logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);letter-spacing:0.01em;line-height:1}
+.logo{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,5.5vw,26px);font-weight:600;color:var(--text);letter-spacing:0.01em;line-height:1}
 .logo-q{color:var(--gold);font-style:italic}
-.logo-tagline{font-family:'Jost',sans-serif;font-size:9px;color:var(--muted);font-style:italic;letter-spacing:0.08em;margin-top:3px}
-
+.logo-tagline{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);color:var(--muted);font-style:italic;letter-spacing:0.08em;margin-top:3px}
 .menu-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--gold);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
 .menu-lines{display:flex;flex-direction:column;gap:3px}
 .menu-line{height:1.5px;border-radius:1px;background:var(--gold)}
 
-/* ===================== PAGES ===================== */
-.page{display:none;padding:20px 20px 90px;animation:fadeIn 0.4s ease}
+/* PAGES */
+.page{display:none;padding:20px 20px 100px;animation:fadeIn 0.4s ease}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-/* ===================== BOTTOM NAV ===================== */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg);border-top:0.5px solid var(--border2);display:grid;grid-template-columns:repeat(3,1fr);padding:10px 0 20px;z-index:50}
-.nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:4px}
-.nav-label{font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.06em;color:var(--muted)}
+/* BOTTOM NAV — 4 tabs */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg);border-top:0.5px solid var(--border2);display:grid;grid-template-columns:1fr 1.3fr 1fr 1fr;padding:10px 0 22px;z-index:50;align-items:center}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:4px}
+.nav-label{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);letter-spacing:0.05em;color:var(--muted)}
 .nav-btn.active .nav-label{color:var(--gold);font-weight:500}
-.nav-bar{width:18px;height:1px;background:var(--gold);border-radius:1px;opacity:0;margin-top:2px}
+.nav-bar{width:16px;height:1px;background:var(--gold);border-radius:1px;opacity:0;margin-top:2px}
 .nav-btn.active .nav-bar{opacity:1}
+.nav-oval-wrap{display:flex;align-items:center;justify-content:center}
+.nav-oval{border-radius:20px;padding:8px 18px;font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);font-weight:500;letter-spacing:0.08em;border:none;cursor:pointer;transition:background 0.3s ease;color:var(--bg)}
+.nav-oval.on-dashboard{background:var(--gold)}
+.nav-oval.on-analyze{background:var(--text)}
+.nav-oval.default{background:var(--gold)}
 
-/* ===================== COMMON ===================== */
-.section-label{font-family:'Jost',sans-serif;font-size:9px;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
+/* COMMON */
+.section-label{font-family:'Jost',sans-serif;font-size:clamp(8px,2vw,10px);font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
+.page-heading{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,7vw,34px);font-weight:600;color:var(--text);line-height:1.2;margin-bottom:4px}
+.page-sub{font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);color:var(--muted);margin-bottom:20px;font-style:italic}
 
-.btn-primary{width:100%;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:15px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{width:100%;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:16px;font-family:'Cormorant Garamond',serif;font-size:clamp(14px,3.5vw,17px);font-weight:600;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-primary:hover{background:var(--gold-pale)}
 .btn-primary:active{opacity:0.8}
 .btn-primary:disabled{opacity:0.4;cursor:not-allowed}
-
-.btn-secondary{width:100%;background:var(--surface);color:var(--text2);border:0.5px solid var(--border);border-radius:6px;padding:13px;font-family:'Jost',sans-serif;font-size:11px;font-weight:400;letter-spacing:0.1em;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-secondary{width:100%;background:var(--surface);color:var(--text2);border:0.5px solid var(--border);border-radius:6px;padding:13px;font-family:'Jost',sans-serif;font-size:clamp(10px,2.5vw,12px);font-weight:400;letter-spacing:0.1em;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:6px}
 .btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
-
 .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;box-shadow:var(--shadow)}
 
-/* ===================== TYPE SELECTOR ===================== */
+/* DASHBOARD */
+.greeting-time{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.greeting-name{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,7.5vw,36px);font-weight:600;color:var(--text);line-height:1.1}
+.greeting-line{width:24px;height:1px;background:var(--gold);margin-top:8px;margin-bottom:20px}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.kpi-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.kpi-card.accent{background:var(--gold-pale);border-color:var(--gold)}
+.kpi-label{font-family:'Jost',sans-serif;font-size:clamp(8px,2vw,10px);letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.kpi-value{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,8vw,40px);font-weight:600;color:var(--text);line-height:1}
+.kpi-card.accent .kpi-value{color:var(--gold)}
+.kpi-value.danger{color:var(--danger)}
+.kpi-sub{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);color:var(--muted);margin-top:4px;font-style:italic}
+.last-scan-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);cursor:pointer;transition:border-color 0.2s}
+.last-scan-card:hover{border-color:var(--gold)}
+.ls-score{width:44px;height:44px;border-radius:50%;border:1px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ls-num{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;line-height:1}
+.ls-den{font-family:'Jost',sans-serif;font-size:8px;color:var(--muted)}
+.ls-info{flex:1;min-width:0}
+.ls-type{font-family:'Jost',sans-serif;font-size:clamp(8px,2vw,10px);letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+.ls-excerpt{font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;font-weight:500}
+.ls-date{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);color:var(--muted);margin-top:2px}
+.ls-arrow{font-size:14px;color:var(--gold);opacity:0.7;flex-shrink:0}
+
+/* TYPE SELECTOR */
 .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.type-btn{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 8px;cursor:pointer;text-align:center;transition:all 0.3s ease;font-family:'Jost',sans-serif}
+.type-btn{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:18px 8px 14px;cursor:pointer;text-align:center;transition:all 0.3s ease;font-family:'Jost',sans-serif;display:flex;flex-direction:column;align-items:center;gap:10px}
 .type-btn:hover{border-color:var(--gold)}
 .type-btn.active{background:var(--gold-pale);border:1px solid var(--gold)}
-.type-emoji{font-size:24px;display:block;margin-bottom:6px}
-.type-lbl{font-size:11px;font-weight:400;color:var(--text2);letter-spacing:0.04em}
+.type-icon{width:36px;height:36px;color:var(--muted);transition:color 0.3s;display:flex;align-items:center;justify-content:center}
+.type-btn.active .type-icon{color:var(--gold)}
+.type-btn:hover .type-icon{color:var(--gold)}
+.type-lbl{font-size:clamp(11px,2.8vw,13px);font-weight:400;color:var(--text2);letter-spacing:0.06em}
 .type-btn.active .type-lbl{color:var(--gold);font-weight:500}
 
-/* ===================== MEMBER SELECTOR ===================== */
+/* MEMBER SELECTOR */
 .member-selector{margin-bottom:16px;display:none}
 .member-chips{display:flex;flex-wrap:wrap;gap:8px}
-.member-chip{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surface);border:0.5px solid var(--border);border-radius:20px;cursor:pointer;transition:all 0.3s ease;font-family:'Jost',sans-serif;font-size:11px;color:var(--text2)}
+.member-chip{display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surface);border:0.5px solid var(--border);border-radius:20px;cursor:pointer;transition:all 0.3s ease;font-family:'Jost',sans-serif;font-size:clamp(10px,2.5vw,12px);color:var(--text2)}
 .member-chip.active{background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold)}
 .chip-avatar{width:20px;height:20px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px}
 .chip-x{font-size:10px;opacity:0.5;margin-left:2px}
-.chip-all{background:var(--gold);color:var(--bg);border-color:var(--gold);font-size:11px}
+.chip-all{background:var(--gold);color:var(--bg);border-color:var(--gold)}
 .chip-all.active{background:var(--text);border-color:var(--text)}
 
-/* ===================== CONDITIONS BAR ===================== */
+/* CONDITIONS BAR */
 .conditions-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;box-shadow:var(--shadow)}
-.cond-bar-label{font-family:'Jost',sans-serif;font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)}
-.cond-bar-value{font-family:'Jost',sans-serif;font-size:11px;font-weight:500;color:var(--text);margin-top:2px}
+.cond-bar-label{font-family:'Jost',sans-serif;font-size:clamp(8px,2vw,10px);letter-spacing:0.14em;text-transform:uppercase;color:var(--muted)}
+.cond-bar-value{font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);font-weight:500;color:var(--text);margin-top:2px}
 .pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.pill{background:var(--gold-pale);color:var(--gold);border-radius:20px;padding:2px 9px;font-size:10px;font-family:'Jost',sans-serif}
+.pill{background:var(--gold-pale);color:var(--gold);border-radius:20px;padding:2px 9px;font-size:clamp(9px,2.2vw,11px);font-family:'Jost',sans-serif}
 
-/* ===================== CAMERA ===================== */
-.camera-btn{width:100%;background:var(--surface);border:1px dashed var(--gold);border-radius:var(--radius);padding:14px;font-family:'Jost',sans-serif;font-size:11px;color:var(--gold);cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;letter-spacing:0.06em}
+/* CAMERA */
+.camera-btn{width:100%;background:var(--surface);border:1px dashed var(--gold);border-radius:var(--radius);padding:14px;font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);color:var(--gold);cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;letter-spacing:0.06em}
 .camera-btn:hover{background:var(--gold-pale);border-style:solid}
-
 .photo-wrap{display:none;margin-bottom:10px;position:relative}
 .photo-wrap img{width:100%;border-radius:var(--radius);border:0.5px solid var(--border);max-height:160px;object-fit:cover;display:block}
-.photo-close{position:absolute;top:8px;right:8px;background:rgba(28,25,23,0.5);color:var(--bg);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;font-family:'Jost',sans-serif}
-
-.ocr-loading{display:none;align-items:center;gap:8px;background:var(--gold-pale);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--gold);margin-top:6px;font-family:'Jost',sans-serif}
+.photo-close{position:absolute;top:8px;right:8px;background:rgba(28,25,23,0.5);color:var(--bg);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+.ocr-loading{display:none;align-items:center;gap:8px;background:var(--gold-pale);border-radius:8px;padding:10px 12px;font-size:clamp(10px,2.5vw,12px);color:var(--gold);margin-top:6px;font-family:'Jost',sans-serif}
 .ocr-loading.show{display:flex}
-
 .ing-collapse-wrap{display:none;margin-bottom:10px}
 .ing-collapse-header{display:flex;align-items:center;justify-content:space-between;background:var(--gold-pale);border:1px solid var(--gold);border-radius:var(--radius);padding:12px 14px;cursor:pointer}
-.ing-collapse-label{font-family:'Jost',sans-serif;font-size:11px;color:var(--gold);letter-spacing:0.04em}
+.ing-collapse-label{font-family:'Jost',sans-serif;font-size:clamp(10px,2.5vw,12px);color:var(--gold);letter-spacing:0.04em}
 .ing-collapse-arrow{font-size:10px;color:var(--muted)}
 .ing-collapse-body{display:none;padding-top:8px}
-
-.divider{text-align:center;position:relative;margin:10px 0;color:var(--muted2);font-size:10px;font-family:'Jost',sans-serif;letter-spacing:0.1em}
+.divider{text-align:center;position:relative;margin:10px 0;color:var(--muted2);font-size:clamp(9px,2.2vw,11px);font-family:'Jost',sans-serif;letter-spacing:0.1em}
 .divider::before,.divider::after{content:'';position:absolute;top:50%;width:38%;height:0.5px;background:var(--border)}
 .divider::before{left:0}.divider::after{right:0}
-
-textarea{width:100%;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;color:var(--text);font-family:'Jost',sans-serif;font-size:12px;line-height:1.7;resize:none;height:110px;outline:none;transition:border-color 0.3s}
+textarea{width:100%;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;color:var(--text);font-family:'Jost',sans-serif;font-size:clamp(12px,3vw,14px);line-height:1.7;resize:none;height:110px;outline:none;transition:border-color 0.3s}
 textarea:focus{border-color:var(--gold)}
 textarea::placeholder{color:var(--muted)}
 
-/* ===================== ERROR / LOADING ===================== */
-.error-msg{background:var(--danger-pale);border:0.5px solid var(--danger);border-radius:var(--radius);padding:12px 14px;font-size:11px;color:var(--danger);margin-top:10px;display:none;font-family:'Jost',sans-serif}
+/* ERROR / LOADING */
+.error-msg{background:var(--danger-pale);border:0.5px solid var(--danger);border-radius:var(--radius);padding:12px 14px;font-size:clamp(10px,2.5vw,12px);color:var(--danger);margin-top:10px;display:none;font-family:'Jost',sans-serif}
 .error-msg.show{display:block}
-
 .loading-wrap{display:none;text-align:center;padding:40px}
 .loading-wrap.show{display:block}
 .spinner{width:32px;height:32px;border:1.5px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-wrap p{font-size:11px;color:var(--muted);font-family:'Jost',sans-serif;letter-spacing:0.06em;font-style:italic}
+.loading-wrap p{font-size:clamp(10px,2.5vw,12px);color:var(--muted);font-family:'Jost',sans-serif;letter-spacing:0.06em;font-style:italic}
 
-/* ===================== RESULTS ===================== */
+/* RESULTS */
 .results-wrap{display:none;margin-top:20px}
 .results-wrap.show{display:block;animation:fadeIn 0.4s ease}
-
 .alert-card{border-radius:var(--radius);padding:14px;margin-bottom:10px;border:0.5px solid;display:flex;gap:10px}
 .alert-card.danger{background:var(--danger-pale);border-color:var(--danger)}
 .alert-card.warn{background:var(--warn-pale);border-color:var(--warn)}
 .alert-icon{font-size:18px;flex-shrink:0}
-.alert-title{font-family:'Jost',sans-serif;font-size:11px;font-weight:500;margin-bottom:3px;letter-spacing:0.04em}
+.alert-title{font-family:'Jost',sans-serif;font-size:clamp(10px,2.5vw,12px);font-weight:500;margin-bottom:3px;letter-spacing:0.04em}
 .alert-card.danger .alert-title{color:var(--danger)}
 .alert-card.warn .alert-title{color:var(--warn)}
-.alert-text{font-size:11px;color:var(--text2);line-height:1.6;font-family:'Jost',sans-serif}
-
+.alert-text{font-size:clamp(10px,2.5vw,12px);color:var(--text2);line-height:1.6;font-family:'Jost',sans-serif}
 .score-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:18px;margin-bottom:10px;box-shadow:var(--shadow)}
 .score-circle{width:76px;height:76px;border-radius:50%;border:1px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.score-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;line-height:1}
-.score-den{font-size:10px;color:var(--muted);font-family:'Jost',sans-serif}
-.score-verdict{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;margin-bottom:4px}
-.score-summary{font-size:11px;color:var(--text2);line-height:1.6;font-family:'Jost',sans-serif}
-
+.score-num{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,7vw,36px);font-weight:600;line-height:1}
+.score-den{font-size:clamp(9px,2.2vw,11px);color:var(--muted);font-family:'Jost',sans-serif}
+.score-verdict{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,4.5vw,20px);font-weight:600;margin-bottom:4px}
+.score-summary{font-size:clamp(10px,2.5vw,12px);color:var(--text2);line-height:1.6;font-family:'Jost',sans-serif}
 .c-good{color:var(--good);border-color:var(--good)}
 .c-medium{color:var(--medium);border-color:var(--medium)}
 .c-bad{color:var(--danger);border-color:var(--danger)}
 .fill-good{background:var(--good)}.fill-medium{background:var(--medium)}.fill-bad{background:var(--danger)}
-
 .bar-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:10px}
-.bar-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:8px;letter-spacing:0.08em;font-family:'Jost',sans-serif}
+.bar-labels{display:flex;justify-content:space-between;font-size:clamp(8px,2vw,10px);color:var(--muted);margin-bottom:8px;letter-spacing:0.08em;font-family:'Jost',sans-serif}
 .bar-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
 .bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1)}
-
 .section-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
-.ing-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);font-size:11px;font-family:'Jost',sans-serif}
+.ing-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border);font-size:clamp(10px,2.5vw,12px);font-family:'Jost',sans-serif}
 .ing-row:last-child{border-bottom:none}
 .ing-dot{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;margin-top:1px}
 .d-good{background:var(--good-pale);color:var(--good)}.d-medium{background:var(--medium-pale);color:var(--medium)}.d-bad{background:var(--danger-pale);color:var(--danger)}
 .ing-name{font-weight:500;margin-bottom:2px;color:var(--text)}
-.ing-desc{font-size:10px;color:var(--text2);line-height:1.5}
-.ing-risk{font-size:10px;color:var(--danger);font-weight:500;margin-top:2px}
-
-.point-row{display:flex;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:11px;color:var(--text2);line-height:1.5;font-family:'Jost',sans-serif}
+.ing-desc{font-size:clamp(9px,2.2vw,11px);color:var(--text2);line-height:1.5}
+.ing-risk{font-size:clamp(9px,2.2vw,11px);color:var(--danger);font-weight:500;margin-top:2px}
+.point-row{display:flex;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:clamp(10px,2.5vw,12px);color:var(--text2);line-height:1.5;font-family:'Jost',sans-serif}
 .point-row:last-child{border-bottom:none}
-
-.reco-box{background:var(--gold-pale);border:0.5px solid var(--gold);border-radius:var(--radius);padding:14px;font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:10px;font-family:'Jost',sans-serif}
-
-.disclaimer{text-align:center;font-size:10px;color:var(--muted);line-height:1.6;padding:14px;border-top:0.5px solid var(--border);font-family:'Cormorant Garamond',serif;font-style:italic}
-
+.reco-box{background:var(--gold-pale);border:0.5px solid var(--gold);border-radius:var(--radius);padding:14px;font-size:clamp(10px,2.5vw,12px);color:var(--text2);line-height:1.7;margin-bottom:10px;font-family:'Jost',sans-serif}
+.disclaimer{text-align:center;font-size:clamp(9px,2.2vw,11px);color:var(--muted);line-height:1.6;padding:14px;border-top:0.5px solid var(--border);font-family:'Cormorant Garamond',serif;font-style:italic}
 .heart-btn{background:none;border:none;cursor:pointer;font-size:20px;padding:4px;transition:transform 0.2s;flex-shrink:0}
 .heart-btn:hover{transform:scale(1.2)}
 
-/* ===================== HISTORY ===================== */
+/* HISTORY */
 .hist-item{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer}
 .hist-thumb{width:38px;height:38px;border-radius:8px;object-fit:cover;border:0.5px solid var(--border);flex-shrink:0}
 .hist-score{width:44px;height:44px;border-radius:50%;border:1px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .h-num{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;line-height:1}
 .h-den{font-size:8px;color:var(--muted);font-family:'Jost',sans-serif}
 .hist-info{flex:1;min-width:0}
-.hist-type{font-size:9px;color:var(--muted);letter-spacing:0.1em;font-family:'Jost',sans-serif;text-transform:uppercase}
-.hist-excerpt{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;font-family:'Jost',sans-serif}
-.hist-meta{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
-.hist-date{font-size:10px;color:var(--muted);font-family:'Jost',sans-serif}
-.hist-alert-pill{background:var(--danger-pale);color:var(--danger);font-size:9px;padding:1px 7px;border-radius:10px;font-family:'Jost',sans-serif}
+.hist-type{font-size:clamp(8px,2vw,10px);color:var(--muted);letter-spacing:0.1em;font-family:'Jost',sans-serif;text-transform:uppercase}
+.hist-excerpt{font-size:clamp(10px,2.5vw,12px);color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;font-family:'Jost',sans-serif}
+.hist-date{font-size:clamp(9px,2.2vw,11px);color:var(--muted);font-family:'Jost',sans-serif}
+.hist-alert-pill{background:var(--danger-pale);color:var(--danger);font-size:clamp(8px,2vw,10px);padding:1px 7px;border-radius:10px;font-family:'Jost',sans-serif}
 
-/* ===================== FAVORITES ===================== */
+/* FAVORITES */
 .fav-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.fav-filter{background:var(--surface);border:0.5px solid var(--border);border-radius:20px;padding:6px 14px;font-family:'Jost',sans-serif;font-size:11px;color:var(--text2);cursor:pointer;transition:all 0.3s ease;letter-spacing:0.04em}
+.fav-filter{background:var(--surface);border:0.5px solid var(--border);border-radius:20px;padding:6px 14px;font-family:'Jost',sans-serif;font-size:clamp(10px,2.5vw,12px);color:var(--text2);cursor:pointer;transition:all 0.3s ease;letter-spacing:0.04em}
 .fav-filter.active{background:var(--gold-pale);border:1px solid var(--gold);color:var(--gold)}
 
-/* ===================== PROFILE ===================== */
+/* PROFILE */
 .member-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center;flex:1;min-width:0;cursor:pointer;transition:all 0.3s ease}
 .member-card.selected{border:1px solid var(--gold);background:var(--gold-pale)}
 .member-card .m-avatar{width:36px;height:36px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:18px;border:0.5px solid var(--border)}
 .member-card.selected .m-avatar{border:1.5px solid var(--gold)}
-.member-card .m-name{font-family:'Jost',sans-serif;font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member-card .m-name{font-family:'Jost',sans-serif;font-size:clamp(10px,2.5vw,12px);color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .member-card.selected .m-name{font-weight:500;color:var(--text)}
-.member-card .m-age{font-family:'Jost',sans-serif;font-size:9px;color:var(--muted);margin-top:2px}
+.member-card .m-age{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);color:var(--muted);margin-top:2px}
 .add-member-card{background:transparent;border:1px dashed var(--border);border-radius:var(--radius);padding:12px;text-align:center;flex:0 0 52px;cursor:pointer;transition:all 0.3s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 .add-member-card:hover{border-color:var(--gold)}
-.add-member-plus{font-size:18px;color:var(--muted2);line-height:1}
-.add-member-lbl{font-family:'Jost',sans-serif;font-size:9px;color:var(--muted2)}
-
+.add-member-plus{font-size:18px;color:var(--muted2);line-height:1;font-family:'Jost',sans-serif}
+.add-member-lbl{font-family:'Jost',sans-serif;font-size:clamp(8px,2vw,10px);color:var(--muted2)}
 .empty-conds{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:24px 14px;text-align:center;margin-bottom:10px}
-.empty-conds-txt{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--muted);line-height:1.6}
+.empty-conds-txt{font-family:'Cormorant Garamond',serif;font-size:clamp(12px,3vw,14px);font-style:italic;color:var(--muted);line-height:1.6}
 
 /* ACCORDION */
 .cat-group{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;box-shadow:var(--shadow)}
@@ -221,140 +218,100 @@ textarea::placeholder{color:var(--muted)}
 .cat-header:hover{background:var(--surface2)}
 .cat-header-left{display:flex;align-items:center;gap:10px}
 .cat-icon{font-size:18px}
-.cat-name{font-family:'Jost',sans-serif;font-size:12px;font-weight:500;color:var(--text)}
-.cat-count{font-family:'Jost',sans-serif;font-size:9px;color:var(--muted);margin-top:2px}
+.cat-name{font-family:'Jost',sans-serif;font-size:clamp(12px,3vw,14px);font-weight:500;color:var(--text)}
+.cat-count{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);color:var(--muted);margin-top:2px}
 .cat-arrow{font-size:10px;color:var(--gold);transition:transform 0.2s}
 .cat-group.open .cat-arrow{transform:rotate(180deg)}
 .cat-body{display:none;border-top:0.5px solid var(--border);padding:10px 12px}
 .cat-group.open .cat-body{display:block}
-
 .cond-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border:0.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.2s;margin-bottom:6px}
 .cond-item:last-child{margin-bottom:0}
 .cond-item.on{border-color:var(--gold);background:var(--gold-pale)}
 .cond-left{display:flex;align-items:center;gap:10px}
 .cond-emoji{font-size:16px}
-.cond-name{font-family:'Jost',sans-serif;font-size:12px;color:var(--text)}
-
+.cond-name{font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);color:var(--text)}
 .toggle{width:36px;height:20px;background:var(--border);border-radius:10px;position:relative;transition:background 0.3s;flex-shrink:0}
 .toggle::after{content:'';position:absolute;width:14px;height:14px;background:white;border-radius:50%;top:3px;left:3px;transition:transform 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
 .cond-item.on .toggle{background:var(--gold)}
 .cond-item.on .toggle::after{transform:translateX(16px)}
-
-/* SETTINGS */
 .setting-option{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;cursor:pointer;transition:background 0.2s}
 .setting-option:hover{background:var(--surface2)}
 .setting-option.active{background:var(--gold-pale)}
 .setting-left{display:flex;align-items:center;gap:12px}
-.setting-label{font-family:'Jost',sans-serif;font-size:12px;color:var(--text)}
-.setting-sub{font-family:'Jost',sans-serif;font-size:10px;color:var(--muted);margin-top:2px}
+.setting-label{font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);color:var(--text)}
+.setting-sub{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);color:var(--muted);margin-top:2px}
 .setting-option.active .setting-label{color:var(--gold)}
 .radio-btn{width:18px;height:18px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
 .setting-option.active .radio-btn{border-color:var(--gold);background:var(--gold)}
 .radio-btn::after{content:'';width:7px;height:7px;border-radius:50%;background:white;display:none}
 .setting-option.active .radio-btn::after{display:block}
+.count-badge{background:var(--gold-pale);color:var(--gold);padding:2px 10px;border-radius:10px;font-size:clamp(9px,2.2vw,11px);font-family:'Jost',sans-serif;font-weight:500}
 
-/* MEMBER CARD IN PROFILE */
-.member-profile-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
-.member-profile-top{display:flex;align-items:center;gap:12px}
-.member-avatar-edit{width:46px;height:46px;border-radius:50%;background:var(--border);color:var(--bg);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0}
-.avatar-edit-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.3);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:12px}
-.member-avatar-edit:hover .avatar-edit-overlay{display:flex}
-.member-name-input{font-family:'Jost',sans-serif;font-size:14px;font-weight:500;color:var(--text);background:none;border:none;outline:none;width:100%;padding:0}
-.member-name-input::placeholder{color:var(--muted)}
-.member-dob-row{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
-.member-dob-label{font-family:'Jost',sans-serif;font-size:10px;color:var(--muted);letter-spacing:0.04em}
-.member-dob-input{background:var(--surface2);border:0.5px solid var(--border);border-radius:6px;padding:5px 8px;font-family:'Jost',sans-serif;font-size:11px;color:var(--text);outline:none}
-.member-dob-input:focus{border-color:var(--gold)}
-.member-age-badge{font-family:'Jost',sans-serif;font-size:10px;color:var(--gold);background:var(--gold-pale);padding:3px 8px;border-radius:10px}
-.member-delete{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px}
-.member-delete:hover{color:var(--danger)}
-.member-conds-section{margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border)}
-.member-cond-chips{display:flex;flex-wrap:wrap;gap:6px}
-.member-cond-chip{background:var(--surface2);border:0.5px solid var(--border);border-radius:20px;padding:3px 10px;font-size:10px;cursor:pointer;transition:all 0.2s;font-family:'Jost',sans-serif;color:var(--text2)}
-.member-cond-chip.active{background:var(--gold-pale);border-color:var(--gold);color:var(--gold)}
-.add-member-btn{width:100%;background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius);padding:13px;font-family:'Jost',sans-serif;font-size:11px;color:var(--muted);cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;letter-spacing:0.06em}
-.add-member-btn:hover{border-color:var(--gold);color:var(--gold)}
-
-/* COUNT BADGE */
-.count-badge{background:var(--gold-pale);color:var(--gold);padding:2px 10px;border-radius:10px;font-size:10px;font-family:'Jost',sans-serif;font-weight:500}
-
-/* ===================== OVERLAYS ===================== */
+/* OVERLAYS */
 .overlay{display:none;position:fixed;inset:0;z-index:100;background:var(--bg);flex-direction:column;animation:fadeIn 0.4s ease}
 .overlay.show{display:flex}
-
-/* MENU OVERLAY */
 .menu-overlay-header{padding:16px 20px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border2);flex-shrink:0}
 .close-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--gold);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .close-x{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);line-height:1}
-
 .menu-body{flex:1;padding:20px 24px;display:flex;flex-direction:column;justify-content:space-between;overflow-y:auto}
-.menu-section-title{font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;margin-top:16px}
+.menu-section-title{font-family:'Jost',sans-serif;font-size:clamp(8px,2vw,10px);letter-spacing:0.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;margin-top:16px}
 .menu-section-title:first-child{margin-top:0}
-.menu-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--border2);cursor:pointer;transition:opacity 0.2s}
+.menu-item{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:0.5px solid var(--border2);cursor:pointer;transition:opacity 0.2s}
 .menu-item:hover{opacity:0.7}
 .menu-item:last-child{border-bottom:none}
-.menu-item-label{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:400;color:var(--text);letter-spacing:0.01em}
+.menu-item-label{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,4.5vw,20px);font-weight:400;color:var(--text);letter-spacing:0.01em}
 .menu-arrow{font-family:'Jost',sans-serif;font-size:14px;color:var(--gold);opacity:0.7}
 .menu-divider{height:0.5px;background:var(--border2);margin:8px 0}
-.menu-api{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
-.menu-api-label{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--text)}
-.menu-api-badge{font-family:'Jost',sans-serif;font-size:9px;color:var(--gold);border:0.5px solid var(--gold);border-radius:4px;padding:3px 8px;letter-spacing:0.06em}
+.menu-api{display:flex;align-items:center;justify-content:space-between;padding:13px 0;cursor:pointer}
+.menu-api-label{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,4.5vw,20px);color:var(--text)}
+.menu-api-badge{font-family:'Jost',sans-serif;font-size:clamp(8px,2vw,10px);color:var(--gold);border:0.5px solid var(--gold);border-radius:4px;padding:3px 8px;letter-spacing:0.06em}
 .menu-footer{padding-top:16px;border-top:0.5px solid var(--border2)}
-.menu-footer-txt{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:var(--muted);text-align:center;line-height:1.6}
-
-/* INFO PAGES OVERLAY */
+.menu-footer-txt{font-family:'Cormorant Garamond',serif;font-size:clamp(11px,2.8vw,13px);font-style:italic;color:var(--muted);text-align:center;line-height:1.6}
 .info-overlay-header{padding:16px 20px 10px;display:flex;align-items:center;gap:12px;border-bottom:0.5px solid var(--border2);flex-shrink:0}
 .info-body{flex:1;padding:24px 20px;overflow-y:auto}
-.info-page-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--text);line-height:1.1;margin-bottom:10px;letter-spacing:0.01em}
+.info-page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,6.5vw,30px);font-weight:600;color:var(--text);line-height:1.1;margin-bottom:10px;letter-spacing:0.01em}
 .info-title-line{width:28px;height:1px;background:var(--gold);margin-bottom:20px}
-.info-sec-title{font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;margin-top:16px}
+.info-sec-title{font-family:'Jost',sans-serif;font-size:clamp(8px,2vw,10px);letter-spacing:0.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;margin-top:16px}
 .info-sec-title:first-of-type{margin-top:0}
-.info-text{font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--text2);line-height:1.8;text-align:justify;margin-bottom:8px}
-.info-text-italic{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--muted);line-height:1.8;text-align:justify;margin-bottom:8px}
+.info-text{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,3.2vw,15px);color:var(--text2);line-height:1.8;text-align:justify;margin-bottom:8px}
+.info-text-italic{font-family:'Cormorant Garamond',serif;font-size:clamp(12px,3vw,14px);font-style:italic;color:var(--muted);line-height:1.8;text-align:justify;margin-bottom:8px}
 .info-divider{height:0.5px;background:var(--border);margin:12px 0}
 
-/* API KEY MODAL */
+/* MODALS */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,25,23,0.5);z-index:200;align-items:flex-end;justify-content:center}
 .modal-overlay.show{display:flex}
 .modal{background:var(--bg);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:430px;animation:slideUp 0.3s ease}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .modal-handle{width:32px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 20px}
-.modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:8px;color:var(--text)}
-.modal-desc{font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px;font-family:'Jost',sans-serif}
-.api-input{width:100%;background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:13px;font-family:'Jost',sans-serif;font-size:12px;color:var(--text);outline:none;margin-bottom:8px;transition:border-color 0.3s}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,5vw,22px);font-weight:600;margin-bottom:8px;color:var(--text)}
+.modal-desc{font-size:clamp(10px,2.5vw,12px);color:var(--text2);line-height:1.7;margin-bottom:16px;font-family:'Jost',sans-serif}
+.api-input{width:100%;background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:13px;font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);color:var(--text);outline:none;margin-bottom:8px;transition:border-color 0.3s}
 .api-input:focus{border-color:var(--gold)}
 .api-input::placeholder{color:var(--muted)}
-.api-error{color:var(--danger);font-size:10px;margin-bottom:8px;display:none;font-family:'Jost',sans-serif}
+.api-error{color:var(--danger);font-size:clamp(9px,2.2vw,11px);margin-bottom:8px;display:none;font-family:'Jost',sans-serif}
 .api-error.show{display:block}
-.api-note{font-size:10px;color:var(--muted);text-align:center;margin-top:8px;font-family:'Jost',sans-serif;font-style:italic}
-
-/* AVATAR MODAL */
+.api-note{font-size:clamp(9px,2.2vw,11px);color:var(--muted);text-align:center;margin-top:8px;font-family:'Jost',sans-serif;font-style:italic}
 .avatar-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
 .avatar-opt{width:40px;height:40px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all 0.2s}
 .avatar-opt:hover,.avatar-opt.sel{border-color:var(--gold);background:var(--gold-pale)}
-
-/* BIRTHDAY MODAL */
 .birthday-modal{text-align:center;padding:10px 0}
 .bday-anim{font-size:36px;margin-bottom:16px;animation:bounce 0.8s ease infinite alternate}
 @keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-8px)}}
-.bday-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold);margin-bottom:8px}
-.bday-age{font-family:'Jost',sans-serif;font-size:12px;font-weight:500;color:var(--gold);background:var(--gold-pale);padding:5px 16px;border-radius:20px;display:inline-block;margin-bottom:12px;letter-spacing:0.06em}
-.bday-msg{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--text2);line-height:1.6;margin-bottom:8px}
-.bday-update{font-family:'Jost',sans-serif;font-size:10px;color:var(--muted);margin-bottom:20px;font-style:italic}
-
-/* EMPTY STATE */
+.bday-name{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,6vw,28px);font-weight:600;color:var(--gold);margin-bottom:8px}
+.bday-age{font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);font-weight:500;color:var(--gold);background:var(--gold-pale);padding:5px 16px;border-radius:20px;display:inline-block;margin-bottom:12px;letter-spacing:0.06em}
+.bday-msg{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,3.2vw,15px);font-style:italic;color:var(--text2);line-height:1.6;margin-bottom:8px}
+.bday-update{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);color:var(--muted);margin-bottom:20px;font-style:italic}
 .empty-state{text-align:center;padding:50px 20px}
 .empty-icon{font-size:40px;margin-bottom:14px}
-.empty-text{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:var(--muted);line-height:1.7}
+.empty-text{font-family:'Cormorant Garamond',serif;font-size:clamp(13px,3.2vw,15px);font-style:italic;color:var(--muted);line-height:1.7}
 
-/* PAGE TITLES */
-.page-heading{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:4px}
-.page-sub{font-family:'Jost',sans-serif;font-size:11px;color:var(--muted);margin-bottom:20px;font-style:italic}
+/* SVG ICONS inline */
+.svg-food{display:block}
+.svg-cosm{display:block}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div>
     <div class="logo">Eti<span class="logo-q">Q</span>uette</div>
@@ -369,8 +326,41 @@ textarea::placeholder{color:var(--muted)}
   </button>
 </div>
 
-<!-- PAGE: ANALIZĂ -->
-<div class="page active" id="page-home">
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="greeting-time" id="greeting-time">Bună ziua</div>
+  <div class="greeting-name" id="greeting-name">Carol</div>
+  <div class="greeting-line"></div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Scanări</div>
+      <div class="kpi-value" id="kpi-scans">0</div>
+      <div class="kpi-sub">săptămâna aceasta</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Scor mediu</div>
+      <div class="kpi-value" id="kpi-avg">—</div>
+      <div class="kpi-sub">din 10</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Alerte</div>
+      <div class="kpi-value danger" id="kpi-alerts">0</div>
+      <div class="kpi-sub">produse cu risc</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Favorite</div>
+      <div class="kpi-value" id="kpi-fav">0</div>
+      <div class="kpi-sub">produse salvate</div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:6px">Ultima scanare</div>
+  <div id="last-scan-wrap"></div>
+</div>
+
+<!-- ANALIZĂ -->
+<div class="page" id="page-home">
   <div style="margin-bottom:20px">
     <div class="page-heading">Analizează<br>produsul tău</div>
     <div class="page-sub">Ingrediente + profilul familiei = scor personalizat</div>
@@ -388,21 +378,47 @@ textarea::placeholder{color:var(--muted)}
       <div class="cond-bar-value" id="cond-summary">Nicio afecțiune selectată</div>
       <div class="pills" id="cond-pills"></div>
     </div>
-    <button class="btn-secondary" style="width:auto;padding:7px 12px;font-size:10px;letter-spacing:0.1em" onclick="openMenu()">Editează</button>
+    <button class="btn-secondary" style="width:auto;padding:7px 12px;font-size:clamp(9px,2.2vw,11px)" onclick="openMenu()">Editează</button>
   </div>
 
   <div class="section-label">Tip produs</div>
   <div class="type-grid">
     <button class="type-btn active" id="btn-food" onclick="selectType('food')">
-      <span class="type-emoji">🍎</span><span class="type-lbl">Alimentar</span>
+      <div class="type-icon">
+        <svg class="svg-food" width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <path d="M18 8 C18 8 20 4 24 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M18 8 C14 8 9 12 9 19 C9 26 13 31 18 31 C23 31 27 26 27 19 C27 12 22 8 18 8Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" fill="none"/>
+          <path d="M12 17 C13 14 16 13 18 13" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+        </svg>
+      </div>
+      <span class="type-lbl">Alimentar</span>
     </button>
     <button class="type-btn" id="btn-cosm" onclick="selectType('cosmetic')">
-      <span class="type-emoji">💄</span><span class="type-lbl">Cosmetic</span>
+      <div class="type-icon">
+        <svg class="svg-cosm" width="36" height="36" viewBox="0 0 60 60" fill="none">
+          <rect x="14" y="26" width="24" height="26" rx="3" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <rect x="17" y="32" width="18" height="12" rx="1.5" stroke="currentColor" stroke-width="0.8" opacity="0.35" fill="none"/>
+          <rect x="20" y="18" width="12" height="10" rx="2" stroke="currentColor" stroke-width="1.2" fill="none"/>
+          <path d="M32 22 L42 22 L42 16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="38" y="11" width="8" height="6" rx="2" stroke="currentColor" stroke-width="1.2" fill="none"/>
+          <line x1="46" y1="13" x2="50" y2="11" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" opacity="0.5"/>
+          <line x1="46" y1="14" x2="51" y2="14" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" opacity="0.5"/>
+          <line x1="46" y1="15" x2="50" y2="17" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" opacity="0.5"/>
+        </svg>
+      </div>
+      <span class="type-lbl">Cosmetic</span>
     </button>
   </div>
 
   <div class="section-label">Lista de ingrediente</div>
-  <button class="camera-btn" onclick="openCamera()">📷 Fotografiază ingredientele</button>
+  <button class="camera-btn" onclick="openCamera()">
+    <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+      <rect x="1" y="4" width="16" height="12" rx="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/>
+      <circle cx="9" cy="10" r="3" stroke="currentColor" stroke-width="1.2" fill="none"/>
+      <path d="M6 4 L7.5 2 L10.5 2 L12 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    Fotografiază ingredientele
+  </button>
   <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
 
   <div class="photo-wrap" id="photo-wrap">
@@ -420,7 +436,7 @@ textarea::placeholder{color:var(--muted)}
       <span class="ing-collapse-arrow" id="ing-collapse-arrow">▼ Vezi</span>
     </div>
     <div class="ing-collapse-body" id="ing-collapse-body">
-      <textarea id="ing-textarea" style="margin-top:0" placeholder="Ingredientele citite din poză..."></textarea>
+      <textarea id="ing-textarea" placeholder="Ingredientele citite din poză..."></textarea>
     </div>
   </div>
 
@@ -432,34 +448,34 @@ textarea::placeholder{color:var(--muted)}
   <div style="margin-top:12px">
     <button class="btn-primary" id="analyze-btn" onclick="doAnalyze()">Analizează</button>
   </div>
-
   <div class="error-msg" id="error-msg"></div>
   <div class="loading-wrap" id="loading"><div class="spinner"></div><p>analizând ingredientele...</p></div>
   <div class="results-wrap" id="results"></div>
 </div>
 
-<!-- PAGE: ISTORIC -->
+<!-- ISTORIC -->
 <div class="page" id="page-history">
   <div class="page-heading">Istoricul<br>scanărilor</div>
   <div class="page-sub">Ultimele 50 de produse analizate</div>
   <div id="history-list"></div>
 </div>
 
-<!-- PAGE: FAVORITE -->
+<!-- FAVORITE -->
 <div class="page" id="page-favorites">
   <div class="page-heading">Produse<br>Favorite</div>
   <div class="page-sub">Produsele tale salvate</div>
   <div class="fav-filters">
     <button class="fav-filter active" id="fav-filter-all" onclick="setFavFilter('all')">Toate</button>
-    <button class="fav-filter" id="fav-filter-food" onclick="setFavFilter('food')">🍎 Alimentare</button>
-    <button class="fav-filter" id="fav-filter-cosmetic" onclick="setFavFilter('cosmetic')">💄 Cosmetice</button>
+    <button class="fav-filter" id="fav-filter-food" onclick="setFavFilter('food')">Alimentare</button>
+    <button class="fav-filter" id="fav-filter-cosmetic" onclick="setFavFilter('cosmetic')">Cosmetice</button>
   </div>
   <div id="favorites-list"></div>
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- BOTTOM NAV — 4 tabs -->
 <div class="bottom-nav">
-  <button class="nav-btn active" id="nav-home" onclick="goTo('home')"><span class="nav-label">Analiză</span><div class="nav-bar"></div></button>
+  <button class="nav-btn active" id="nav-dashboard" onclick="goTo('dashboard')"><span class="nav-label">Acasă</span><div class="nav-bar"></div></button>
+  <div class="nav-oval-wrap"><button class="nav-oval default" id="nav-oval" onclick="goTo('home')">Analiză</button></div>
   <button class="nav-btn" id="nav-history" onclick="goTo('history')"><span class="nav-label">Istoric</span><div class="nav-bar"></div></button>
   <button class="nav-btn" id="nav-favorites" onclick="goTo('favorites')"><span class="nav-label">Favorite</span><div class="nav-bar"></div></button>
 </div>
@@ -476,41 +492,18 @@ textarea::placeholder{color:var(--muted)}
   <div class="menu-body">
     <div>
       <div class="menu-section-title">Contul meu</div>
-      <div class="menu-item" onclick="menuGoTo('profile')">
-        <div class="menu-item-label">Profil</div>
-        <div class="menu-arrow">›</div>
-      </div>
+      <div class="menu-item" onclick="menuGoTo('profile')"><div class="menu-item-label">Profil</div><div class="menu-arrow">›</div></div>
       <div class="menu-divider"></div>
       <div class="menu-section-title">Informații</div>
-      <div class="menu-item" onclick="menuGoTo('about')">
-        <div class="menu-item-label">Despre EtiQuette</div>
-        <div class="menu-arrow">›</div>
-      </div>
-      <div class="menu-item" onclick="menuGoTo('terms')">
-        <div class="menu-item-label">Termeni & Condiții</div>
-        <div class="menu-arrow">›</div>
-      </div>
-      <div class="menu-item" onclick="menuGoTo('privacy')">
-        <div class="menu-item-label">Confidențialitate</div>
-        <div class="menu-arrow">›</div>
-      </div>
-      <div class="menu-item" onclick="menuGoTo('disclaimer')">
-        <div class="menu-item-label">Disclaimer Medical</div>
-        <div class="menu-arrow">›</div>
-      </div>
-      <div class="menu-item" onclick="menuGoTo('guide')">
-        <div class="menu-item-label">Ghid de Utilizare</div>
-        <div class="menu-arrow">›</div>
-      </div>
+      <div class="menu-item" onclick="menuGoTo('about')"><div class="menu-item-label">Despre EtiQuette</div><div class="menu-arrow">›</div></div>
+      <div class="menu-item" onclick="menuGoTo('terms')"><div class="menu-item-label">Termeni & Condiții</div><div class="menu-arrow">›</div></div>
+      <div class="menu-item" onclick="menuGoTo('privacy')"><div class="menu-item-label">Confidențialitate</div><div class="menu-arrow">›</div></div>
+      <div class="menu-item" onclick="menuGoTo('disclaimer')"><div class="menu-item-label">Disclaimer Medical</div><div class="menu-arrow">›</div></div>
+      <div class="menu-item" onclick="menuGoTo('guide')"><div class="menu-item-label">Ghid de Utilizare</div><div class="menu-arrow">›</div></div>
       <div class="menu-divider"></div>
-      <div class="menu-api" onclick="closeMenu();showApiModal()">
-        <div class="menu-api-label">Cheie API</div>
-        <div class="menu-api-badge">Configurează</div>
-      </div>
+      <div class="menu-api" onclick="closeMenu();showApiModal()"><div class="menu-api-label">Cheie API</div><div class="menu-api-badge">Configurează</div></div>
     </div>
-    <div class="menu-footer">
-      <div class="menu-footer-txt">EtiQuette nu înlocuiește sfatul medical profesionist</div>
-    </div>
+    <div class="menu-footer"><div class="menu-footer-txt">EtiQuette nu înlocuiește sfatul medical profesionist</div></div>
   </div>
 </div>
 
@@ -518,60 +511,36 @@ textarea::placeholder{color:var(--muted)}
 <div class="overlay" id="profile-overlay">
   <div class="info-overlay-header">
     <button class="close-btn" onclick="closeInfoOverlay('profile-overlay')"><div class="close-x">‹</div></button>
-    <div>
-      <div class="logo">Eti<span class="logo-q">Q</span>uette</div>
-      <div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div>
-    </div>
+    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
   </div>
   <div class="info-body" style="padding:20px">
     <div class="section-label">Membri familie</div>
     <div style="display:flex;gap:8px;margin-bottom:20px" id="profile-members-row"></div>
-
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
       <div class="section-label" style="margin:0" id="conds-section-label">Afecțiunile mele</div>
       <span class="count-badge" id="count-badge">0 active</span>
     </div>
-
-    <div id="empty-conds-wrap" class="empty-conds">
-      <div class="empty-conds-txt">Selectează un membru pentru<br>a vizualiza și edita afecțiunile</div>
-    </div>
-
+    <div id="empty-conds-wrap" class="empty-conds"><div class="empty-conds-txt">Selectează un membru pentru<br>a vizualiza și edita afecțiunile</div></div>
     <div id="cat-groups" style="display:none"></div>
-
     <div style="margin-top:16px">
       <div class="section-label">Scanare implicită</div>
       <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)">
-        <div class="setting-option" id="set-all" onclick="setDefaultScan('all')">
-          <div class="setting-left"><div><div class="setting-label">Toți membrii</div><div class="setting-sub">Scanare pentru întreaga familie</div></div></div>
-          <div class="radio-btn"></div>
-        </div>
+        <div class="setting-option" id="set-all" onclick="setDefaultScan('all')"><div class="setting-left"><div><div class="setting-label">Toți membrii</div><div class="setting-sub">Scanare pentru întreaga familie</div></div></div><div class="radio-btn"></div></div>
         <div style="height:0.5px;background:var(--border)"></div>
-        <div class="setting-option" id="set-self" onclick="setDefaultScan('self')">
-          <div class="setting-left"><div><div class="setting-label">Doar eu</div><div class="setting-sub">Profilul tău personal</div></div></div>
-          <div class="radio-btn"></div>
-        </div>
+        <div class="setting-option" id="set-self" onclick="setDefaultScan('self')"><div class="setting-left"><div><div class="setting-label">Doar eu</div><div class="setting-sub">Profilul tău personal</div></div></div><div class="radio-btn"></div></div>
         <div style="height:0.5px;background:var(--border)"></div>
-        <div class="setting-option" id="set-manual" onclick="setDefaultScan('manual')">
-          <div class="setting-left"><div><div class="setting-label">Selectez manual</div><div class="setting-sub">Alegi de fiecare dată</div></div></div>
-          <div class="radio-btn"></div>
-        </div>
+        <div class="setting-option" id="set-manual" onclick="setDefaultScan('manual')"><div class="setting-left"><div><div class="setting-label">Selectez manual</div><div class="setting-sub">Alegi de fiecare dată</div></div></div><div class="radio-btn"></div></div>
       </div>
     </div>
   </div>
-  <div style="padding:10px 20px 30px">
-    <button class="btn-primary" onclick="saveProfile()">Salvează</button>
-  </div>
+  <div style="padding:10px 20px 30px"><button class="btn-primary" onclick="saveProfile()">Salvează</button></div>
 </div>
 
 <!-- INFO OVERLAYS -->
 <div class="overlay" id="about-overlay">
-  <div class="info-overlay-header">
-    <button class="close-btn" onclick="closeInfoOverlay('about-overlay')"><div class="close-x">‹</div></button>
-    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
-  </div>
+  <div class="info-overlay-header"><button class="close-btn" onclick="closeInfoOverlay('about-overlay')"><div class="close-x">‹</div></button><div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div></div>
   <div class="info-body">
-    <div class="info-page-title">Despre<br>EtiQuette</div>
-    <div class="info-title-line"></div>
+    <div class="info-page-title">Despre<br>EtiQuette</div><div class="info-title-line"></div>
     <div class="info-sec-title">Ce este EtiQuette?</div>
     <div class="info-text">EtiQuette este o aplicație care analizează ingredientele produselor alimentare și cosmetice, oferind un scor de la 1 la 10 bazat pe calitatea și siguranța ingredientelor. Algoritmul ține cont de ordinea ingredientelor pe etichetă, de afecțiunile declarate și de vârsta membrilor familiei.</div>
     <div class="info-divider"></div>
@@ -584,21 +553,17 @@ textarea::placeholder{color:var(--muted)}
 </div>
 
 <div class="overlay" id="terms-overlay">
-  <div class="info-overlay-header">
-    <button class="close-btn" onclick="closeInfoOverlay('terms-overlay')"><div class="close-x">‹</div></button>
-    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
-  </div>
+  <div class="info-overlay-header"><button class="close-btn" onclick="closeInfoOverlay('terms-overlay')"><div class="close-x">‹</div></button><div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div></div>
   <div class="info-body">
-    <div class="info-page-title">Termeni &<br>Condiții</div>
-    <div class="info-title-line"></div>
+    <div class="info-page-title">Termeni &<br>Condiții</div><div class="info-title-line"></div>
     <div class="info-sec-title">1. Acceptarea termenilor</div>
-    <div class="info-text">Prin utilizarea aplicației EtiQuette, acceptați în totalitate prezenții Termeni și Condiții. Dacă nu sunteți de acord cu acești termeni, vă rugăm să nu utilizați aplicația.</div>
+    <div class="info-text">Prin utilizarea aplicației EtiQuette, acceptați în totalitate prezenții Termeni și Condiții. Dacă nu sunteți de acord, vă rugăm să nu utilizați aplicația.</div>
     <div class="info-divider"></div>
     <div class="info-sec-title">2. Descrierea serviciului</div>
     <div class="info-text">EtiQuette oferă informații despre ingredientele produselor alimentare și cosmetice în scop educațional și informativ. Aplicația nu oferă sfaturi medicale, nutriționale sau cosmetologice profesionale.</div>
     <div class="info-divider"></div>
     <div class="info-sec-title">3. Limitarea răspunderii</div>
-    <div class="info-text">EtiQuette nu poate fi trasă la răspundere pentru deciziile luate de utilizatori pe baza informațiilor furnizate. Informațiile sunt furnizate fără garanții de acuratețe completă.</div>
+    <div class="info-text">EtiQuette nu poate fi trasă la răspundere pentru deciziile luate pe baza informațiilor furnizate. Informațiile sunt furnizate fără garanții de acuratețe completă.</div>
     <div class="info-divider"></div>
     <div class="info-sec-title">4. Proprietate intelectuală</div>
     <div class="info-text-italic">Toate drepturile asupra aplicației EtiQuette, inclusiv design, cod și conținut, sunt proprietatea exclusivă a dezvoltatorilor.</div>
@@ -606,15 +571,11 @@ textarea::placeholder{color:var(--muted)}
 </div>
 
 <div class="overlay" id="privacy-overlay">
-  <div class="info-overlay-header">
-    <button class="close-btn" onclick="closeInfoOverlay('privacy-overlay')"><div class="close-x">‹</div></button>
-    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
-  </div>
+  <div class="info-overlay-header"><button class="close-btn" onclick="closeInfoOverlay('privacy-overlay')"><div class="close-x">‹</div></button><div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div></div>
   <div class="info-body">
-    <div class="info-page-title">Politică de<br>Confidențialitate</div>
-    <div class="info-title-line"></div>
+    <div class="info-page-title">Politică de<br>Confidențialitate</div><div class="info-title-line"></div>
     <div class="info-sec-title">Date colectate</div>
-    <div class="info-text">EtiQuette stochează local pe dispozitivul dvs. profilul familiei (nume, date de naștere, afecțiuni), istoricul scanărilor și produsele favorite. Aceste date nu sunt transmise pe niciun server extern.</div>
+    <div class="info-text">EtiQuette stochează local pe dispozitivul dvs. profilul familiei, istoricul scanărilor și produsele favorite. Aceste date nu sunt transmise pe niciun server extern.</div>
     <div class="info-divider"></div>
     <div class="info-sec-title">GDPR</div>
     <div class="info-text">Conform Regulamentului General privind Protecția Datelor, aveți dreptul de a accesa, modifica sau șterge datele personale stocate. Puteți șterge toate datele prin dezinstalarea aplicației.</div>
@@ -625,47 +586,39 @@ textarea::placeholder{color:var(--muted)}
 </div>
 
 <div class="overlay" id="disclaimer-overlay">
-  <div class="info-overlay-header">
-    <button class="close-btn" onclick="closeInfoOverlay('disclaimer-overlay')"><div class="close-x">‹</div></button>
-    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
-  </div>
+  <div class="info-overlay-header"><button class="close-btn" onclick="closeInfoOverlay('disclaimer-overlay')"><div class="close-x">‹</div></button><div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div></div>
   <div class="info-body">
-    <div class="info-page-title">Disclaimer<br>Medical</div>
-    <div class="info-title-line"></div>
+    <div class="info-page-title">Disclaimer<br>Medical</div><div class="info-title-line"></div>
     <div class="info-sec-title">Important</div>
     <div class="info-text">EtiQuette este o aplicație informativă și educațională. Informațiile furnizate nu constituie sfat medical, nutrițional sau cosmetologic profesionist.</div>
     <div class="info-divider"></div>
     <div class="info-sec-title">Consultați un specialist</div>
-    <div class="info-text">Deciziile privind sănătatea, alimentația sau îngrijirea personală trebuie luate întotdeauna în consultare cu un medic sau specialist calificat. Acest lucru este deosebit de important pentru persoanele cu afecțiuni cronice, femei însărcinate sau care alăptează, și copii.</div>
+    <div class="info-text">Deciziile privind sănătatea trebuie luate întotdeauna în consultare cu un medic sau specialist calificat. Acest lucru este deosebit de important pentru persoanele cu afecțiuni cronice, femei însărcinate sau care alăptează, și copii.</div>
     <div class="info-divider"></div>
     <div class="info-sec-title">Alergii severe</div>
-    <div class="info-text-italic">Nu vă bazați exclusiv pe această aplicație pentru gestionarea alergiilor severe sau afecțiunilor cronice. Consultați imediat un medic la orice semn de reacție alergică.</div>
+    <div class="info-text-italic">Nu vă bazați exclusiv pe această aplicație pentru gestionarea alergiilor severe. Consultați imediat un medic la orice semn de reacție alergică.</div>
   </div>
 </div>
 
 <div class="overlay" id="guide-overlay">
-  <div class="info-overlay-header">
-    <button class="close-btn" onclick="closeInfoOverlay('guide-overlay')"><div class="close-x">‹</div></button>
-    <div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div>
-  </div>
+  <div class="info-overlay-header"><button class="close-btn" onclick="closeInfoOverlay('guide-overlay')"><div class="close-x">‹</div></button><div><div class="logo">Eti<span class="logo-q">Q</span>uette</div><div class="logo-tagline">ajutorul tău pentru alegeri sănătoase</div></div></div>
   <div class="info-body">
-    <div class="info-page-title">Ghid de<br>Utilizare</div>
-    <div class="info-title-line"></div>
+    <div class="info-page-title">Ghid de<br>Utilizare</div><div class="info-title-line"></div>
     <div class="info-sec-title">Cum scanezi un produs</div>
-    <div class="info-text">Selectează tipul de produs (Alimentar sau Cosmetic), apasă "Fotografiază ingredientele" și fă o poză clară listei de ingrediente de pe ambalaj. Ingredientele sunt citite automat și analiza pornește imediat.</div>
+    <div class="info-text">Selectează tipul de produs, apasă "Fotografiază ingredientele" și fă o poză clară listei de ingrediente. Ingredientele sunt citite automat și analiza pornește imediat.</div>
     <div class="info-divider"></div>
     <div class="info-sec-title">Sfaturi pentru o poză bună</div>
-    <div class="info-text">Asigură-te că textul este bine iluminat și în focus. Fotografiază de aproape, astfel încât lista de ingrediente să ocupe cea mai mare parte a pozei. Evită reflexiile și umbrele.</div>
+    <div class="info-text">Asigură-te că textul este bine iluminat și în focus. Fotografiază de aproape, astfel încât lista să ocupe cea mai mare parte a pozei. Evită reflexiile și umbrele.</div>
     <div class="info-divider"></div>
     <div class="info-sec-title">Profilul familiei</div>
-    <div class="info-text">Adaugă membrii familiei cu data de naștere și afecțiunile lor din meniu. La scanare, selectează pentru cine analizezi — aplicația va ține cont de vârstă și afecțiuni automat.</div>
+    <div class="info-text">Adaugă membrii familiei cu data de naștere și afecțiunile lor. La scanare, selectează pentru cine analizezi — aplicația ține cont de vârstă și afecțiuni automat.</div>
     <div class="info-divider"></div>
     <div class="info-sec-title">Favorite vs Istoric</div>
-    <div class="info-text-italic">Istoricul păstrează ultimele 50 de scanări. Produsele pe care vrei să le regăsești oricând le adaugi la Favorite apăsând ❤️ după analiză.</div>
+    <div class="info-text-italic">Istoricul păstrează ultimele 50 de scanări. Produsele preferate le adaugi la Favorite apăsând ❤️ după analiză.</div>
   </div>
 </div>
 
-<!-- API KEY MODAL -->
+<!-- API MODAL -->
 <div class="modal-overlay" id="api-overlay">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -704,21 +657,16 @@ textarea::placeholder{color:var(--muted)}
 </div>
 
 <script>
-// ============================================================
-// CONSTANTS
-// ============================================================
-var AVATARS = ['👦','👧','👨','👩','👴','👵','🧒','🧑','👶','🧔','👱','🧕','🧑‍🦰','🧑‍🦱','🧑‍🦳','🧑‍🦲','😀','😎','🤓','🥰'];
-
-var AGE_GROUPS = [
-  {max:0.5,label:'0-6 luni',foodKeys:['sugar','sucrose','glucose','fructose','salt','sodium','honey','miere','nitrite','zahar','sare','sweetener','colorant'],cosKeys:['fragrance','parfum','alcohol','sls','sles','parabens','phenoxyethanol','methylisothiazolinone','formaldehyde']},
-  {max:1,label:'6-12 luni',foodKeys:['honey','miere','salt','sodium','sugar','sucrose','zahar','sare','nitrite','sweetener','artificial','colorant'],cosKeys:['fragrance','parfum','alcohol denat','sls','sles','parabens','phenoxyethanol']},
+var AVATARS=['👦','👧','👨','👩','👴','👵','🧒','🧑','👶','🧔','👱','🧕','🧑‍🦰','🧑‍🦱','🧑‍🦳','🧑‍🦲','😀','😎','🤓','🥰'];
+var AGE_GROUPS=[
+  {max:0.5,label:'0-6 luni',foodKeys:['sugar','sucrose','glucose','fructose','salt','sodium','honey','miere','nitrite','zahar','sare','sweetener','colorant'],cosKeys:['fragrance','parfum','alcohol','sls','sles','parabens','phenoxyethanol']},
+  {max:1,label:'6-12 luni',foodKeys:['honey','miere','salt','sodium','sugar','sucrose','zahar','sare','nitrite','sweetener','artificial','colorant'],cosKeys:['fragrance','parfum','alcohol denat','sls','sles','parabens']},
   {max:3,label:'1-3 ani',foodKeys:['salt','sodium','sugar','sucrose','zahar','sare','artificial','sweetener','caffeine','cafeina','colorant'],cosKeys:['fragrance','parfum','alcohol denat','sls','parabens']},
   {max:12,label:'3-12 ani',foodKeys:['caffeine','cafeina','e102','e110','e122','e124','e129'],cosKeys:['fragrance','parfum','alcohol denat','parabens']},
   {max:18,label:'12-18 ani',foodKeys:[],cosKeys:[]},
   {max:999,label:'Adult',foodKeys:[],cosKeys:[]}
 ];
-
-var CONDITION_CATEGORIES = [
+var CONDITION_CATEGORIES=[
   {id:'allergies',icon:'🤧',name:'Alergii & Intoleranțe',conditions:[
     {id:'gluten',icon:'🌾',name:'Intoleranță Gluten',keys:['wheat','gluten','triticum','barley','rye','spelt','kamut','malt','semolina','orz','secara','grau','hordeum','triticale','bulgur','durum']},
     {id:'lactoza',icon:'🥛',name:'Intoleranță Lactoză',keys:['lactose','milk','lactis','whey','casein','lactalbumin','cream','butter','lapte','zer','cazeina','lactoza']},
@@ -759,9 +707,7 @@ var CONDITION_CATEGORIES = [
 
 function getAllConditions(){var a=[];CONDITION_CATEGORIES.forEach(function(c){c.conditions.forEach(function(x){a.push(x);});});return a;}
 
-// ============================================================
 // STATE
-// ============================================================
 var productType='food';
 var activeConditions=new Set();
 var members=[];
@@ -791,24 +737,71 @@ function saveMembers(){try{localStorage.setItem('eq_members',JSON.stringify(memb
 function getKey(){return localStorage.getItem('eq_key')||null;}
 function storeKey(k){localStorage.setItem('eq_key',k);}
 
-// ============================================================
 // AGE UTILS
-// ============================================================
 function calcAgeMonths(dob){if(!dob)return null;var d=new Date(dob),n=new Date();return(n.getFullYear()-d.getFullYear())*12+(n.getMonth()-d.getMonth());}
 function getAgeLabel(dob){if(!dob)return null;var m=calcAgeMonths(dob);if(m<1)return'Nou-născut';if(m<12)return m+' luni';var y=Math.floor(m/12),r=m%12;if(r===0)return y+(y===1?' an':' ani');return y+(y===1?' an':' ani')+' și '+r+(r===1?' lună':' luni');}
 function getAgeGroup(dob){if(!dob)return AGE_GROUPS[AGE_GROUPS.length-1];var y=calcAgeMonths(dob)/12;for(var i=0;i<AGE_GROUPS.length;i++){if(y<=AGE_GROUPS[i].max)return AGE_GROUPS[i];}return AGE_GROUPS[AGE_GROUPS.length-1];}
 function getAgeWarnings(dob,type){var g=getAgeGroup(dob);return type==='food'?g.foodKeys:g.cosKeys;}
 
-// ============================================================
+// GREETING
+function updateGreeting(){
+  var h=new Date().getHours();
+  var greet=h>=5&&h<12?'Bună dimineața':h>=12&&h<18?'Bună ziua':h>=18&&h<22?'Bună seara':'Noapte bună';
+  document.getElementById('greeting-time').textContent=greet;
+  var name=members.length>0&&members[0].name?members[0].name:'';
+  document.getElementById('greeting-name').textContent=name||'EtiQuette';
+}
+
+// DASHBOARD KPIs
+function updateDashboard(){
+  updateGreeting();
+  var now=new Date();
+  var weekStart=new Date(now);
+  weekStart.setDate(now.getDate()-now.getDay());
+  weekStart.setHours(0,0,0,0);
+  var weekScans=scanHistory.filter(function(h){
+    try{var d=new Date(h.dateRaw);return d>=weekStart;}catch(e){return false;}
+  });
+  document.getElementById('kpi-scans').textContent=weekScans.length||scanHistory.filter(function(){return true;}).length;
+  if(scanHistory.length>0){
+    var avg=scanHistory.reduce(function(s,h){return s+(h.score||0);},0)/scanHistory.length;
+    document.getElementById('kpi-avg').textContent=avg.toFixed(1);
+  } else {
+    document.getElementById('kpi-avg').textContent='—';
+  }
+  var alerts=scanHistory.reduce(function(s,h){return s+(h.alerts||0);},0);
+  document.getElementById('kpi-alerts').textContent=alerts;
+  document.getElementById('kpi-fav').textContent=favorites.length;
+  renderLastScan();
+}
+
+function renderLastScan(){
+  var wrap=document.getElementById('last-scan-wrap');
+  if(scanHistory.length===0){
+    wrap.innerHTML='<div class="empty-state" style="padding:24px 0"><div class="empty-text">Nicio scanare încă.<br>Apasă Analiză pentru a începe!</div></div>';
+    return;
+  }
+  var h=scanHistory[0];
+  var c=scoreColor(h.score);
+  wrap.innerHTML='<div class="last-scan-card" onclick="goTo(\'history\')">'
+    +(h.thumb?'<img src="'+h.thumb+'" style="width:44px;height:44px;border-radius:8px;object-fit:cover;border:0.5px solid var(--border);flex-shrink:0" alt="">':'')
+    +'<div class="ls-score c-'+c+'"><div class="ls-num c-'+c+'">'+h.score+'</div><div class="ls-den">/10</div></div>'
+    +'<div class="ls-info">'
+    +'<div class="ls-type">'+(h.type==='food'?'Alimentar':'Cosmetic')+'</div>'
+    +'<div class="ls-excerpt">'+h.excerpt+'...</div>'
+    +'<div class="ls-date">'+h.date+'</div>'
+    +'</div>'
+    +'<div class="ls-arrow">›</div>'
+    +'</div>';
+}
+
 // BIRTHDAY
-// ============================================================
 function checkBirthdays(){
   var today=new Date(),todayMD=(today.getMonth()+1)+'-'+today.getDate(),yr=today.getFullYear();
   var key='eq_bday_'+yr,shown=[];
   try{shown=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
   for(var i=0;i<members.length;i++){
-    var m=members[i];
-    if(!m.dob||shown.includes(m.id))continue;
+    var m=members[i];if(!m.dob||shown.includes(m.id))continue;
     var d=new Date(m.dob),md=(d.getMonth()+1)+'-'+d.getDate();
     if(md===todayMD){
       var ag=getAgeLabel(m.dob),gr=getAgeGroup(m.dob);
@@ -817,46 +810,50 @@ function checkBirthdays(){
       document.getElementById('bday-msg').textContent='EtiQuette îți urează o zi minunată plină de produse cu ingrediente curate!';
       document.getElementById('bday-update').textContent=gr.label!=='Adult'?'Recomandările s-au actualizat pentru grupa: '+gr.label+'.':'';
       document.getElementById('birthday-overlay').classList.add('show');
-      shown.push(m.id);
-      try{localStorage.setItem(key,JSON.stringify(shown));}catch(e){}
+      shown.push(m.id);try{localStorage.setItem(key,JSON.stringify(shown));}catch(e){}
       break;
     }
   }
 }
 function closeBirthday(){document.getElementById('birthday-overlay').classList.remove('show');}
 
-// ============================================================
 // NAVIGATION
-// ============================================================
 function goTo(page){
-  ['home','history','favorites'].forEach(function(p){
+  ['dashboard','home','history','favorites'].forEach(function(p){
     document.getElementById('page-'+p).classList.toggle('active',p===page);
-    document.getElementById('nav-'+p).classList.toggle('active',p===page);
   });
+  // nav buttons
+  ['dashboard','history','favorites'].forEach(function(p){
+    var btn=document.getElementById('nav-'+p);
+    if(btn)btn.classList.toggle('active',p===page);
+  });
+  // oval color
+  var oval=document.getElementById('nav-oval');
+  if(oval){
+    oval.className='nav-oval';
+    if(page==='home')oval.classList.add('on-analyze');
+    else oval.classList.add('on-dashboard');
+  }
   if(page==='history')renderHistory();
   if(page==='favorites')renderFavorites();
   if(page==='home')renderMemberSelector();
+  if(page==='dashboard')updateDashboard();
 }
 
-// ============================================================
-// MENU & OVERLAYS
-// ============================================================
+// MENU
 function openMenu(){document.getElementById('menu-overlay').classList.add('show');}
 function closeMenu(){document.getElementById('menu-overlay').classList.remove('show');}
-
 function menuGoTo(page){
   closeMenu();
   setTimeout(function(){
-    if(page==='profile'){openProfileOverlay();}
-    else{document.getElementById(page+'-overlay').classList.add('show');}
+    if(page==='profile')openProfileOverlay();
+    else document.getElementById(page+'-overlay').classList.add('show');
   },50);
 }
-
 function closeInfoOverlay(id){
   document.getElementById(id).classList.remove('show');
   setTimeout(function(){openMenu();},50);
 }
-
 function openProfileOverlay(){
   selectedProfileMemberId=null;
   renderProfileMembers();
@@ -869,18 +866,14 @@ function openProfileOverlay(){
   document.getElementById('profile-overlay').classList.add('show');
 }
 
-// ============================================================
 // TYPE
-// ============================================================
 function selectType(t){
   productType=t;
   document.getElementById('btn-food').classList.toggle('active',t==='food');
   document.getElementById('btn-cosm').classList.toggle('active',t==='cosmetic');
 }
 
-// ============================================================
-// MEMBER SELECTOR (home)
-// ============================================================
+// MEMBER SELECTOR
 function renderMemberSelector(){
   var sel=document.getElementById('member-selector');
   var bar=document.getElementById('conditions-bar');
@@ -891,259 +884,121 @@ function renderMemberSelector(){
   var html='<button class="member-chip chip-all '+(allActive?'active':'')+'" onclick="toggleMemberSelect(\'__all__\')">👨‍👩‍👧 Toți</button>';
   html+='<button class="member-chip '+(selfActive?'active':'')+'" onclick="toggleMemberSelect(\'__self__\')">'
     +'<div class="chip-avatar">👤</div> Eu'
-    +(selfActive?'<span class="chip-x" onclick="removeMemberSelect(\'__self__\',event)">✕</span>':'')
-    +'</button>';
+    +(selfActive?'<span class="chip-x" onclick="removeMemberSelect(\'__self__\',event)">✕</span>':'')+'</button>';
   members.forEach(function(m){
     var isActive=selectedMembers.includes(m.id)||allActive;
     html+='<button class="member-chip '+(isActive?'active':'')+'" onclick="toggleMemberSelect(\''+m.id+'\')">'
       +'<div class="chip-avatar">'+m.avatar+'</div> '+(m.name||'Membru')
-      +(isActive&&!allActive?'<span class="chip-x" onclick="removeMemberSelect(\''+m.id+'\',event)">✕</span>':'')
-      +'</button>';
+      +(isActive&&!allActive?'<span class="chip-x" onclick="removeMemberSelect(\''+m.id+'\',event)">✕</span>':'')+'</button>';
   });
   document.getElementById('member-chips').innerHTML=html;
 }
-
 function toggleMemberSelect(id){
   if(id==='__all__'){selectedMembers=['__all__'];}
-  else{
-    selectedMembers=selectedMembers.filter(function(s){return s!=='__all__';});
-    var i=selectedMembers.indexOf(id);
-    if(i>-1)selectedMembers.splice(i,1);else selectedMembers.push(id);
-    if(selectedMembers.length===0)selectedMembers=['__self__'];
-  }
+  else{selectedMembers=selectedMembers.filter(function(s){return s!=='__all__';});var i=selectedMembers.indexOf(id);if(i>-1)selectedMembers.splice(i,1);else selectedMembers.push(id);if(selectedMembers.length===0)selectedMembers=['__self__'];}
   renderMemberSelector();
 }
+function removeMemberSelect(id,e){e.stopPropagation();selectedMembers=selectedMembers.filter(function(s){return s!==id;});if(selectedMembers.length===0)selectedMembers=['__self__'];renderMemberSelector();}
 
-function removeMemberSelect(id,e){
-  e.stopPropagation();
-  selectedMembers=selectedMembers.filter(function(s){return s!==id;});
-  if(selectedMembers.length===0)selectedMembers=['__self__'];
-  renderMemberSelector();
-}
-
-// ============================================================
 // PROFILE MEMBERS
-// ============================================================
 function renderProfileMembers(){
   var row=document.getElementById('profile-members-row');
   var html='';
   members.forEach(function(m){
-    var age=m.dob?getAgeLabel(m.dob):'';
+    var age=m.dob?getAgeLabel(m.dob):null;
     html+='<div class="member-card '+(selectedProfileMemberId===m.id?'selected':'')+'" onclick="selectProfileMember(\''+m.id+'\')">'
       +'<div class="m-avatar">'+m.avatar+'</div>'
       +'<div class="m-name">'+(m.name||'Membru')+'</div>'
-      +(age?'<div class="m-age">'+age+'</div>':'')
-      +'</div>';
+      +(age?'<div class="m-age">'+age+'</div>':'')+'</div>';
   });
-  html+='<div class="add-member-card" onclick="addMember()">'
-    +'<div class="add-member-plus">+</div>'
-    +'<div class="add-member-lbl">Adaugă</div>'
-    +'</div>';
+  html+='<div class="add-member-card" onclick="addMember()"><div class="add-member-plus">+</div><div class="add-member-lbl">Adaugă</div></div>';
   row.innerHTML=html;
 }
-
 function selectProfileMember(id){
   selectedProfileMemberId=id;
-  var m=members.find(function(x){return x.id===id;});
-  if(!m)return;
+  var m=members.find(function(x){return x.id===id;});if(!m)return;
   renderProfileMembers();
   document.getElementById('conds-section-label').textContent='Afecțiunile '+(m.name||'membrului');
   document.getElementById('empty-conds-wrap').style.display='none';
   document.getElementById('cat-groups').style.display='block';
-  renderCatGroups();
-  updateCountBadge();
+  renderCatGroups();updateCountBadge();
 }
-
 function addMember(){
   var id='m_'+Date.now();
   members.push({id:id,name:'',dob:'',avatar:'👤',conditions:[]});
-  saveMembers();
-  renderProfileMembers();
+  saveMembers();renderProfileMembers();
 }
-
-function updateMemberField(id,field,val){
-  members.forEach(function(m){if(m.id===id)m[field]=val;});
-  if(field==='dob')renderProfileMembers();
-}
-
 function deleteMember(id){
   members=members.filter(function(m){return m.id!==id;});
   saveMembers();
-  if(selectedProfileMemberId===id){
-    selectedProfileMemberId=null;
-    document.getElementById('empty-conds-wrap').style.display='block';
-    document.getElementById('cat-groups').style.display='none';
-    document.getElementById('conds-section-label').textContent='Afecțiunile mele';
-  }
-  renderProfileMembers();
-  renderMemberSelector();
+  if(selectedProfileMemberId===id){selectedProfileMemberId=null;document.getElementById('empty-conds-wrap').style.display='block';document.getElementById('cat-groups').style.display='none';document.getElementById('conds-section-label').textContent='Afecțiunile mele';}
+  renderProfileMembers();renderMemberSelector();
 }
-
 function toggleMemberCond(memberId,condId){
-  members.forEach(function(m){
-    if(m.id===memberId){
-      if(!m.conditions)m.conditions=[];
-      var i=m.conditions.indexOf(condId);
-      if(i>-1)m.conditions.splice(i,1);else m.conditions.push(condId);
-    }
-  });
+  members.forEach(function(m){if(m.id===memberId){if(!m.conditions)m.conditions=[];var i=m.conditions.indexOf(condId);if(i>-1)m.conditions.splice(i,1);else m.conditions.push(condId);}});
   renderCatGroups();
 }
-
 function openAvatarModal(memberId){
   editingAvatarId=memberId;
   var m=members.find(function(x){return x.id===memberId;});
-  document.getElementById('avatar-grid').innerHTML=AVATARS.map(function(a){
-    return '<div class="avatar-opt '+(m&&m.avatar===a?'sel':'')+'" onclick="selectAvatar(\''+a+'\')">'+a+'</div>';
-  }).join('');
+  document.getElementById('avatar-grid').innerHTML=AVATARS.map(function(a){return '<div class="avatar-opt '+(m&&m.avatar===a?'sel':'')+'" onclick="selectAvatar(\''+a+'\')">'+a+'</div>';}).join('');
   document.getElementById('avatar-overlay').classList.add('show');
 }
-
-function selectAvatar(a){
-  members.forEach(function(m){if(m.id===editingAvatarId)m.avatar=a;});
-  document.querySelectorAll('.avatar-opt').forEach(function(o){o.classList.remove('sel');});
-  event.target.classList.add('sel');
-  renderProfileMembers();
-}
-
+function selectAvatar(a){members.forEach(function(m){if(m.id===editingAvatarId)m.avatar=a;});document.querySelectorAll('.avatar-opt').forEach(function(o){o.classList.remove('sel');});event.target.classList.add('sel');renderProfileMembers();}
 function closeAvatarModal(){document.getElementById('avatar-overlay').classList.remove('show');}
 function handleAvatarOverlay(e){if(e.target===document.getElementById('avatar-overlay'))closeAvatarModal();}
 
-// ============================================================
 // CONDITIONS
-// ============================================================
 function getActiveConds(){
-  if(selectedProfileMemberId){
-    var m=members.find(function(x){return x.id===selectedProfileMemberId;});
-    return m?new Set(m.conditions||[]):new Set();
-  }
+  if(selectedProfileMemberId){var m=members.find(function(x){return x.id===selectedProfileMemberId;});return m?new Set(m.conditions||[]):new Set();}
   return activeConditions;
 }
-
 function toggleCond(id){
-  if(selectedProfileMemberId){
-    toggleMemberCond(selectedProfileMemberId,id);
-  } else {
-    if(activeConditions.has(id))activeConditions.delete(id);else activeConditions.add(id);
-    saveConditions();
-  }
-  renderCatGroups();
-  updateCondBar();
-  updateCountBadge();
+  if(selectedProfileMemberId){toggleMemberCond(selectedProfileMemberId,id);}
+  else{if(activeConditions.has(id))activeConditions.delete(id);else activeConditions.add(id);saveConditions();}
+  renderCatGroups();updateCondBar();updateCountBadge();
 }
-
 function renderCatGroups(){
-  var activeConds=getActiveConds();
-  var html='';
+  var activeConds=getActiveConds();var html='';
   CONDITION_CATEGORIES.forEach(function(cat){
-    var activeInCat=cat.conditions.filter(function(c){return activeConds.has(c.id);}).length;
+    var n=cat.conditions.filter(function(c){return activeConds.has(c.id);}).length;
     html+='<div class="cat-group" id="cat-'+cat.id+'">'
       +'<div class="cat-header" onclick="toggleCat(\''+cat.id+'\')">'
         +'<div class="cat-header-left"><span class="cat-icon">'+cat.icon+'</span>'
-          +'<div><div class="cat-name">'+cat.name+'</div>'
-          +'<div class="cat-count">'+(activeInCat>0?activeInCat+' active':'Niciuna activă')+'</div></div></div>'
+          +'<div><div class="cat-name">'+cat.name+'</div><div class="cat-count">'+(n>0?n+' active':'Niciuna activă')+'</div></div></div>'
         +'<span class="cat-arrow">▼</span></div>'
       +'<div class="cat-body">';
     cat.conditions.forEach(function(c){
       html+='<div class="cond-item '+(activeConds.has(c.id)?'on':'')+'" onclick="toggleCond(\''+c.id+'\')">'
-        +'<div class="cond-left"><span class="cond-emoji">'+c.icon+'</span>'
-          +'<div class="cond-name">'+c.name+'</div></div>'
+        +'<div class="cond-left"><span class="cond-emoji">'+c.icon+'</span><div class="cond-name">'+c.name+'</div></div>'
         +'<div class="toggle"></div></div>';
     });
     html+='</div></div>';
   });
-  var el=document.getElementById('cat-groups');
-  if(el)el.innerHTML=html;
+  var el=document.getElementById('cat-groups');if(el)el.innerHTML=html;
   updateCountBadge();
 }
-
-function toggleCat(id){
-  var el=document.getElementById('cat-'+id);
-  if(el)el.classList.toggle('open');
-}
-
-function updateCountBadge(){
-  var activeConds=getActiveConds();
-  var b=document.getElementById('count-badge');
-  if(b)b.textContent=activeConds.size+' active';
-}
-
-function saveProfile(){
-  saveConditions();
-  saveMembers();
-  updateCondBar();
-  renderMemberSelector();
-  document.getElementById('profile-overlay').classList.remove('show');
-  setTimeout(function(){openMenu();},50);
-}
-
+function toggleCat(id){var el=document.getElementById('cat-'+id);if(el)el.classList.toggle('open');}
+function updateCountBadge(){var a=getActiveConds();var b=document.getElementById('count-badge');if(b)b.textContent=a.size+' active';}
+function saveProfile(){saveConditions();saveMembers();updateCondBar();renderMemberSelector();document.getElementById('profile-overlay').classList.remove('show');setTimeout(function(){openMenu();},50);}
 function updateCondBar(){
-  var all=getAllConditions();
-  var active=all.filter(function(c){return activeConditions.has(c.id);});
+  var all=getAllConditions();var active=all.filter(function(c){return activeConditions.has(c.id);});
   document.getElementById('cond-summary').textContent=active.length===0?'Nicio afecțiune selectată':active.length+(active.length===1?' afecțiune activă':' afecțiuni active');
   document.getElementById('cond-pills').innerHTML=active.slice(0,4).map(function(c){return '<div class="pill">'+c.icon+' '+c.name.split(' ')[0]+'</div>';}).join('')+(active.length>4?'<div class="pill">+'+(active.length-4)+'</div>':'');
 }
 
-// ============================================================
 // DEFAULT SCAN
-// ============================================================
-function setDefaultScan(v){
-  defaultScan=v;
-  try{localStorage.setItem('eq_dscan',v);}catch(e){}
-  if(v==='all')selectedMembers=['__all__'];
-  else if(v==='self')selectedMembers=['__self__'];
-  renderDefaultSetting();
-  renderMemberSelector();
-}
+function setDefaultScan(v){defaultScan=v;try{localStorage.setItem('eq_dscan',v);}catch(e){}if(v==='all')selectedMembers=['__all__'];else if(v==='self')selectedMembers=['__self__'];renderDefaultSetting();renderMemberSelector();}
+function renderDefaultSetting(){['all','self','manual'].forEach(function(v){var el=document.getElementById('set-'+v);if(el)el.classList.toggle('active',defaultScan===v);});}
 
-function renderDefaultSetting(){
-  ['all','self','manual'].forEach(function(v){
-    var el=document.getElementById('set-'+v);
-    if(el)el.classList.toggle('active',defaultScan===v);
-  });
-}
-
-// ============================================================
 // API KEY
-// ============================================================
-function showApiModal(){
-  document.getElementById('api-input').value='';
-  document.getElementById('api-error').classList.remove('show');
-  document.getElementById('api-overlay').classList.add('show');
-}
+function showApiModal(){document.getElementById('api-input').value='';document.getElementById('api-error').classList.remove('show');document.getElementById('api-overlay').classList.add('show');}
+function saveApiKey(){var val=document.getElementById('api-input').value.trim();if(!val.startsWith('sk-ant')){document.getElementById('api-error').classList.add('show');return;}storeKey(val);document.getElementById('api-overlay').classList.remove('show');}
 
-function saveApiKey(){
-  var val=document.getElementById('api-input').value.trim();
-  if(!val.startsWith('sk-ant')){document.getElementById('api-error').classList.add('show');return;}
-  storeKey(val);
-  document.getElementById('api-overlay').classList.remove('show');
-}
-
-// ============================================================
-// CAMERA & OCR
-// ============================================================
+// CAMERA
 function openCamera(){if(!getKey()){showApiModal();return;}document.getElementById('file-input').click();}
-
-function clearPhoto(){
-  photoMode=false;
-  document.getElementById('photo-wrap').style.display='none';
-  document.getElementById('file-input').value='';
-  document.getElementById('photo-img').src='';
-  document.getElementById('ing-collapse-wrap').style.display='none';
-  document.getElementById('ing-manual-wrap').style.display='block';
-  document.getElementById('ing-textarea-manual').value='';
-  document.getElementById('results').classList.remove('show');
-  document.getElementById('results').innerHTML='';
-}
-
-function toggleIngCollapse(){
-  var b=document.getElementById('ing-collapse-body');
-  var a=document.getElementById('ing-collapse-arrow');
-  var open=b.style.display!=='none';
-  b.style.display=open?'none':'block';
-  a.textContent=open?'▼ Vezi':'▲ Ascunde';
-}
-
+function clearPhoto(){photoMode=false;document.getElementById('photo-wrap').style.display='none';document.getElementById('file-input').value='';document.getElementById('photo-img').src='';document.getElementById('ing-collapse-wrap').style.display='none';document.getElementById('ing-manual-wrap').style.display='block';document.getElementById('ing-textarea-manual').value='';document.getElementById('results').classList.remove('show');document.getElementById('results').innerHTML='';}
+function toggleIngCollapse(){var b=document.getElementById('ing-collapse-body');var a=document.getElementById('ing-collapse-arrow');var open=b.style.display!=='none';b.style.display=open?'none':'block';a.textContent=open?'▼ Vezi':'▲ Ascunde';}
 function handlePhoto(e){
   var file=e.target.files[0];if(!file)return;
   var reader=new FileReader();
@@ -1155,152 +1010,81 @@ function handlePhoto(e){
     document.getElementById('error-msg').classList.remove('show');
     document.getElementById('results').classList.remove('show');
     document.getElementById('results').innerHTML='';
-
-    fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
-        {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-        {type:'text',text:'Uită-te cu atenție la această imagine de pe un ambalaj. Găsește lista de ingrediente — apare după: Ingredients, Ingrediente, Inhaltsstoffe, INCI, Composition, Ingrédients. Returnează DOAR ingredientele separate prin virgule, fără alt text. Dacă nu găsești, returnează: NU_AM_GASIT'}
-      ]}]})
-    })
+    fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mime,data:b64}},{type:'text',text:'Găsește lista de ingrediente de pe ambalaj — apare după: Ingredients, Ingrediente, Inhaltsstoffe, INCI. Returnează DOAR ingredientele separate prin virgule, fără alt text. Dacă nu găsești, returnează: NU_AM_GASIT'}]}]})})
     .then(function(r){return r.json();})
     .then(function(d){
       document.getElementById('ocr-loading').classList.remove('show');
       var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
-      if(!text||text==='NU_AM_GASIT'||text.length<5){
-        showError('Nu am putut citi ingredientele. Încearcă o poză mai apropiată sau scrie manual.');
-        document.getElementById('ing-manual-wrap').style.display='block';
-      } else {
-        photoMode=true;
-        document.getElementById('ing-textarea').value=text;
-        document.getElementById('ing-manual-wrap').style.display='none';
-        document.getElementById('ing-collapse-wrap').style.display='block';
-        document.getElementById('ing-collapse-label').textContent=text.split(',').length+' ingrediente găsite';
-        setTimeout(function(){doAnalyze();},300);
-      }
+      if(!text||text==='NU_AM_GASIT'||text.length<5){showError('Nu am putut citi ingredientele. Încearcă o poză mai apropiată sau scrie manual.');document.getElementById('ing-manual-wrap').style.display='block';}
+      else{photoMode=true;document.getElementById('ing-textarea').value=text;document.getElementById('ing-manual-wrap').style.display='none';document.getElementById('ing-collapse-wrap').style.display='block';document.getElementById('ing-collapse-label').textContent=text.split(',').length+' ingrediente găsite';setTimeout(function(){doAnalyze();},300);}
     })
-    .catch(function(){
-      document.getElementById('ocr-loading').classList.remove('show');
-      showError('Eroare la procesarea pozei. Scrie ingredientele manual.');
-    });
+    .catch(function(){document.getElementById('ocr-loading').classList.remove('show');showError('Eroare la procesarea pozei. Scrie ingredientele manual.');});
   };
   reader.readAsDataURL(file);
 }
 
-// ============================================================
 // ANALYZE
-// ============================================================
 function doAnalyze(){
   if(!getKey()){showApiModal();return;}
   var ing=photoMode?document.getElementById('ing-textarea').value.trim():document.getElementById('ing-textarea-manual').value.trim();
   if(ing.length<5){showError('Te rog introdu o listă de ingrediente.');return;}
-
   var all=getAllConditions();
   var foodCats=['allergies','chronic','lifestyle'],cosCats=['cosmetic-skin','cosmetic-special','lifestyle'];
   var relCats=productType==='food'?foodCats:cosCats;
-
-  function isRel(id){
-    for(var i=0;i<CONDITION_CATEGORIES.length;i++){
-      if(CONDITION_CATEGORIES[i].conditions.find(function(c){return c.id===id;}))
-        return relCats.indexOf(CONDITION_CATEGORIES[i].id)>-1;
-    }
-    return true;
-  }
-
+  function isRel(id){for(var i=0;i<CONDITION_CATEGORIES.length;i++){if(CONDITION_CATEGORIES[i].conditions.find(function(c){return c.id===id;}))return relCats.indexOf(CONDITION_CATEGORIES[i].id)>-1;}return true;}
   var filteredAll=all.filter(function(c){return isRel(c.id);});
   var contexts=[];
-
   if(selectedMembers.includes('__all__')||selectedMembers.includes('__self__')){
     var selfActive=filteredAll.filter(function(c){return activeConditions.has(c.id);});
-    var ctx='Eu';
-    if(selfActive.length>0)ctx+=' — Afecțiuni: '+selfActive.map(function(c){return c.name;}).join(', ');
-    contexts.push(ctx);
+    var ctx='Eu';if(selfActive.length>0)ctx+=' — Afecțiuni: '+selfActive.map(function(c){return c.name;}).join(', ');contexts.push(ctx);
   }
-
   var targetMembers=selectedMembers.includes('__all__')?members:members.filter(function(m){return selectedMembers.includes(m.id);});
   targetMembers.forEach(function(m){
-    var age=m.dob?getAgeLabel(m.dob):null;
-    var gr=m.dob?getAgeGroup(m.dob):null;
-    var warn=m.dob?getAgeWarnings(m.dob,productType):[];
+    var age=m.dob?getAgeLabel(m.dob):null;var gr=m.dob?getAgeGroup(m.dob):null;var warn=m.dob?getAgeWarnings(m.dob,productType):[];
     var mConds=(m.conditions||[]).filter(function(id){return isRel(id);}).map(function(id){var f=filteredAll.find(function(c){return c.id===id;});return f?f.name:id;});
     var ctx=(m.name||'Membru')+(age?' ('+age+(gr?', grupa '+gr.label:'')+')':'');
     if(mConds.length>0)ctx+=' — Afecțiuni: '+mConds.join(', ');
     if(warn.length>0)ctx+=' — ATENȚIE VÂRSTĂ: evită '+warn.slice(0,5).join(', ');
     contexts.push(ctx);
   });
-
   var condsText=contexts.length>0?contexts.join(' | '):'Nicio afecțiune declarată.';
   var typeLabel=productType==='food'?'alimentare':'cosmetice';
-
   document.getElementById('analyze-btn').disabled=true;
   document.getElementById('loading').classList.add('show');
   document.getElementById('results').classList.remove('show');
   document.getElementById('results').innerHTML='';
   document.getElementById('error-msg').classList.remove('show');
-
   var prompt='Ești expert în analiza ingredientelor pentru produse '+typeLabel+'. Profilul: '+condsText+'\n\nIngrediente: "'+ing+'"\n\nReturnează DOAR JSON valid:\n{"score":<1-10>,"verdict":"<Excelent/Bun/Acceptabil/Slab/Foarte Slab>","summary":"<2-3 propoziții în română>","personal_alerts":[{"person":"<Eu sau nume>","condition":"<afecțiune>","severity":"<danger/warn>","ingredient":"<ingredient>","explanation":"<în română>"}],"ingredients":[{"name":"<ingredient>","rating":"<good/medium/bad>","desc":"<scurt în română>","risk":"<null sau risc în română>"}],"positives":["<pozitiv>"],"negatives":["<negativ>"],"recommendation":"<sfat final în română>"}';
-
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
-  })
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})})
   .then(function(r){return r.json();})
   .then(function(d){
     var text=(d.content||[]).map(function(i){return i.text||'';}).join('');
     var parsed;
-    try{
-      var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
-      var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
-      if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
-      parsed=JSON.parse(clean);
-    }catch(err){throw new Error('Răspuns invalid. Încearcă din nou.');}
+    try{var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();var s=clean.indexOf('{'),en=clean.lastIndexOf('}');if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);parsed=JSON.parse(clean);}
+    catch(err){throw new Error('Răspuns invalid. Încearcă din nou.');}
     renderResults(parsed,ing);
   })
   .catch(function(err){showError(err.message||'Eroare. Verifică cheia API.');})
-  .finally(function(){
-    document.getElementById('analyze-btn').disabled=false;
-    document.getElementById('loading').classList.remove('show');
-  });
+  .finally(function(){document.getElementById('analyze-btn').disabled=false;document.getElementById('loading').classList.remove('show');});
 }
 
-// ============================================================
-// RENDER RESULTS
-// ============================================================
+// RESULTS
 function scoreColor(s){return s>=7?'good':s>=4?'medium':'bad';}
-
 function renderResults(d,rawIng){
   currentAnalysisData=d;
   var s=d.score||5,c=scoreColor(s);
-  var aHTML=(d.personal_alerts||[]).map(function(a){
-    return '<div class="alert-card '+a.severity+'">'
-      +'<div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div>'
-      +'<div><div class="alert-title">'+(a.person?'Risc pentru '+a.person:'Atenție')+'</div>'
-      +'<div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';
-  }).join('');
-
-  var iHTML=(d.ingredients||[]).slice(0,14).map(function(i){
-    var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';
-    var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';
-    return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div>'
-      +'<div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div>'
-      +(i.risk&&i.risk!=='null'?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')
-      +'</div></div>';
-  }).join('');
-
+  var aHTML=(d.personal_alerts||[]).map(function(a){return '<div class="alert-card '+a.severity+'"><div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div><div><div class="alert-title">'+(a.person?'Risc pentru '+a.person:'Atenție')+'</div><div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';}).join('');
+  var iHTML=(d.ingredients||[]).slice(0,14).map(function(i){var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div><div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div>'+(i.risk&&i.risk!=='null'?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')+'</div></div>';}).join('');
   var posHTML=(d.positives||[]).map(function(p){return '<div class="point-row"><span>✅</span><span>'+p+'</span></div>';}).join('');
   var negHTML=(d.negatives||[]).map(function(n){return '<div class="point-row"><span>⚠️</span><span>'+n+'</span></div>';}).join('');
   var ac=(d.personal_alerts||[]).length;
   var ex=rawIng.substring(0,60).replace(/'/g,'').replace(/\n/g,' ');
   var thumb=document.getElementById('photo-img').src||'';
-
   document.getElementById('results').innerHTML=
     aHTML
     +'<div class="score-card"><div class="score-circle c-'+c+'"><div class="score-num c-'+c+'">'+s+'</div><div class="score-den">/ 10</div></div>'
     +'<div><div class="score-verdict c-'+c+'">'+(d.verdict||'')+'</div><div class="score-summary">'+(d.summary||'')+'</div></div></div>'
-    +'<div class="bar-card"><div class="bar-labels"><span>Slab</span><span>Mediu</span><span>Excelent</span></div>'
-    +'<div class="bar-track"><div class="bar-fill fill-'+c+'" id="bar-fill"></div></div></div>'
+    +'<div class="bar-card"><div class="bar-labels"><span>Slab</span><span>Mediu</span><span>Excelent</span></div><div class="bar-track"><div class="bar-fill fill-'+c+'" id="bar-fill"></div></div></div>'
     +(iHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:12px">Analiza ingredientelor</div>'+iHTML+'</div>':'')
     +(posHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte forte</div>'+posHTML+'</div>':'')
     +(negHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte slabe</div>'+negHTML+'</div>':'')
@@ -1310,62 +1094,53 @@ function renderResults(d,rawIng){
     +'<button class="heart-btn" onclick="toggleFavorite('+s+',\''+productType+'\',\''+ex+'\','+ac+')">'+(isFavorite(ex,productType)?'❤️':'🤍')+'</button>'
     +'</div>'
     +'<div class="disclaimer">EtiQuette nu înlocuiește sfatul medical profesionist.</div>';
-
   document.getElementById('results').classList.add('show');
   setTimeout(function(){var f=document.getElementById('bar-fill');if(f)f.style.width=(s/10*100)+'%';},100);
+  updateDashboard();
 }
 
-// ============================================================
 // HISTORY
-// ============================================================
 function saveToHistory(score,type,excerpt,alerts){
   var thumb=document.getElementById('photo-img').src||'';
+  var now=new Date();
   scanHistory.unshift({score:score,type:type,excerpt:excerpt,alerts:alerts,
     thumb:thumb&&thumb.length>100?thumb:'',
     fullData:currentAnalysisData,
-    date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});
+    dateRaw:now.toISOString(),
+    date:now.toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});
   if(scanHistory.length>50)scanHistory=scanHistory.slice(0,50);
   try{localStorage.setItem('eq_hist',JSON.stringify(scanHistory));}catch(e){}
+  updateDashboard();
   alert('✅ Salvat în istoric!');
 }
-
 function toggleHistItem(idx){
-  var b=document.getElementById('hb-'+idx),a=document.getElementById('ha-'+idx);
-  if(!b)return;
-  var open=b.style.display!=='none';
-  b.style.display=open?'none':'block';
-  if(a)a.textContent=open?'▼':'▲';
+  var b=document.getElementById('hb-'+idx),a=document.getElementById('ha-'+idx);if(!b)return;
+  var open=b.style.display!=='none';b.style.display=open?'none':'block';if(a)a.textContent=open?'▼':'▲';
   if(!open){setTimeout(function(){var f=document.getElementById('hbar-'+idx);if(f)f.style.width=(scanHistory[idx].score/10*100)+'%';},100);}
 }
-
 function renderHistory(){
   var el=document.getElementById('history-list');
   if(scanHistory.length===0){el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nicio scanare salvată încă.<br>Analizează primul tău produs!</div></div>';return;}
   el.innerHTML=scanHistory.map(function(h,idx){
-    var c=scoreColor(h.score),d=h.fullData;
-    var hrt=isFavorite(h.excerpt,h.type)?'❤️':'🤍';
+    var c=scoreColor(h.score),d=h.fullData,hrt=isFavorite(h.excerpt,h.type)?'❤️':'🤍';
     var exp='';
     if(d){
       var aH=(d.personal_alerts||[]).map(function(a){return '<div class="alert-card '+a.severity+'" style="margin-bottom:8px"><div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div><div><div class="alert-title">'+(a.person?'Risc pentru '+a.person:'Atenție')+'</div><div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';}).join('');
       var iH=(d.ingredients||[]).slice(0,8).map(function(i){var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div><div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div></div></div>';}).join('');
-      exp='<div style="padding:14px">'+aH
-        +'<div class="bar-card" style="margin-bottom:10px"><div class="bar-labels"><span>Slab</span><span>Mediu</span><span>Excelent</span></div><div class="bar-track"><div class="bar-fill fill-'+c+'" id="hbar-'+idx+'" style="width:0"></div></div></div>'
-        +(d.summary?'<div style="font-family:\'Jost\',sans-serif;font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px">'+d.summary+'</div>':'')
+      exp='<div style="padding:14px">'+aH+'<div class="bar-card" style="margin-bottom:10px"><div class="bar-labels"><span>Slab</span><span>Mediu</span><span>Excelent</span></div><div class="bar-track"><div class="bar-fill fill-'+c+'" id="hbar-'+idx+'" style="width:0"></div></div></div>'
+        +(d.summary?'<div style="font-family:\'Jost\',sans-serif;font-size:clamp(10px,2.5vw,12px);color:var(--text2);line-height:1.6;margin-bottom:10px">'+d.summary+'</div>':'')
         +(iH?'<div class="section-card" style="margin-bottom:10px"><div class="section-label" style="margin-bottom:10px">Ingrediente</div>'+iH+'</div>':'')
         +(d.recommendation?'<div class="reco-box">'+d.recommendation+'</div>':'')
-        +'<div style="margin-top:10px;display:flex;gap:8px">'
-        +'<button class="heart-btn" onclick="toggleFavorite('+h.score+',\''+h.type+'\',\''+h.excerpt+'\','+h.alerts+')" style="font-size:18px">'+hrt+' Favorite</button>'
-        +'</div></div>';
-    } else {
-      exp='<div style="padding:14px;font-family:\'Jost\',sans-serif;font-size:11px;color:var(--muted);font-style:italic">Detalii complete nu sunt disponibile pentru această scanare.</div>';
-    }
+        +'<div style="margin-top:10px"><button class="heart-btn" onclick="toggleFavorite('+h.score+',\''+h.type+'\',\''+h.excerpt+'\','+h.alerts+')" style="font-size:18px">'+hrt+' Favorite</button></div>'
+        +'</div>';
+    } else {exp='<div style="padding:14px;font-family:\'Jost\',sans-serif;font-size:clamp(10px,2.5vw,12px);color:var(--muted);font-style:italic">Detalii complete nu sunt disponibile.</div>';}
     return '<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden">'
       +'<div class="hist-item" onclick="toggleHistItem('+idx+')">'
       +(h.thumb?'<img class="hist-thumb" src="'+h.thumb+'" alt="">':'')
       +'<div class="hist-score c-'+c+'"><div class="h-num c-'+c+'">'+h.score+'</div><div class="h-den">/10</div></div>'
       +'<div class="hist-info"><div class="hist-type">'+(h.type==='food'?'Alimentar':'Cosmetic')+'</div>'
       +'<div class="hist-excerpt">'+h.excerpt+'...</div>'
-      +'<div class="hist-meta"><span class="hist-date">'+h.date+'</span>'+(h.alerts>0?'<span class="hist-alert-pill">'+h.alerts+' alertă</span>':'')+'</div></div>'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span class="hist-date">'+h.date+'</span>'+(h.alerts>0?'<span class="hist-alert-pill">'+h.alerts+' alertă</span>':'')+'</div></div>'
       +'<span id="ha-'+idx+'" style="font-size:11px;color:var(--muted);flex-shrink:0;padding:4px;font-family:\'Jost\',sans-serif">▼</span>'
       +'</div>'
       +'<div id="hb-'+idx+'" style="display:none;border-top:0.5px solid var(--border)">'+exp+'</div>'
@@ -1373,26 +1148,17 @@ function renderHistory(){
   }).join('');
 }
 
-// ============================================================
 // FAVORITES
-// ============================================================
 function toggleFavorite(score,type,excerpt,alerts){
   var i=favorites.findIndex(function(f){return f.excerpt===excerpt&&f.type===type;});
   if(i>-1){favorites.splice(i,1);alert('💔 Eliminat din favorite');}
   else{favorites.unshift({score:score,type:type,excerpt:excerpt,alerts:alerts,date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});alert('❤️ Adăugat la favorite!');}
   try{localStorage.setItem('eq_fav',JSON.stringify(favorites));}catch(e){}
+  updateDashboard();
 }
-
 function isFavorite(excerpt,type){return favorites.some(function(f){return f.excerpt===excerpt&&f.type===type;});}
-
-function removeFavorite(idx){favorites.splice(idx,1);try{localStorage.setItem('eq_fav',JSON.stringify(favorites));}catch(e){}renderFavorites();}
-
-function setFavFilter(f){
-  favFilter=f;
-  ['all','food','cosmetic'].forEach(function(v){document.getElementById('fav-filter-'+v).classList.toggle('active',v===f);});
-  renderFavorites();
-}
-
+function removeFavorite(idx){favorites.splice(idx,1);try{localStorage.setItem('eq_fav',JSON.stringify(favorites));}catch(e){}renderFavorites();updateDashboard();}
+function setFavFilter(f){favFilter=f;['all','food','cosmetic'].forEach(function(v){document.getElementById('fav-filter-'+v).classList.toggle('active',v===f);});renderFavorites();}
 function renderFavorites(){
   var el=document.getElementById('favorites-list');
   var list=favFilter==='all'?favorites:favorites.filter(function(f){return f.type===favFilter;});
@@ -1409,16 +1175,12 @@ function renderFavorites(){
   }).join('');
 }
 
-// ============================================================
-// UTILS
-// ============================================================
 function showError(msg){var el=document.getElementById('error-msg');el.textContent='⚠️ '+msg;el.classList.add('show');}
 
-// ============================================================
 // INIT
-// ============================================================
 loadState();
 updateCondBar();
+updateDashboard();
 renderHistory();
 renderFavorites();
 renderMemberSelector();
