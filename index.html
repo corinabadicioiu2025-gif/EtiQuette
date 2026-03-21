@@ -413,15 +413,48 @@ textarea::placeholder{color:var(--muted)}
   </div>
 
   <div class="section-label">Lista de ingrediente</div>
-  <button class="camera-btn" onclick="openCamera()">
-    <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
-      <rect x="1" y="4" width="16" height="12" rx="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/>
-      <circle cx="9" cy="10" r="3" stroke="currentColor" stroke-width="1.2" fill="none"/>
-      <path d="M6 4 L7.5 2 L10.5 2 L12 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </svg>
-    Fotografiază ingredientele
-  </button>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <button class="camera-btn" style="margin-bottom:0" onclick="openCameraProduct()">
+      <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+        <rect x="1" y="3" width="16" height="12" rx="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        <rect x="4" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1" fill="none" opacity="0.5"/>
+        <line x1="9" y1="1" x2="9" y2="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Față produs
+    </button>
+    <button class="camera-btn" style="margin-bottom:0" onclick="openCamera()">
+      <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+        <rect x="1" y="4" width="16" height="12" rx="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        <circle cx="9" cy="10" r="3" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        <path d="M6 4 L7.5 2 L10.5 2 L12 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      Ingrediente
+    </button>
+  </div>
+
   <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
+  <input type="file" id="file-input-product" accept="image/*" capture="environment" style="display:none" onchange="handleProductPhoto(event)">
+
+  <!-- Product search status -->
+  <div id="product-search-wrap" style="display:none;margin-bottom:10px">
+    <div id="product-searching" style="display:none;align-items:center;gap:8px;background:var(--gold-pale);border:1px solid var(--gold);border-radius:var(--radius);padding:12px 14px">
+      <div class="spinner" style="width:16px;height:16px;border-width:1.5px;margin:0;flex-shrink:0"></div>
+      <div>
+        <div style="font-family:'Jost',sans-serif;font-size:14px;color:var(--gold);font-weight:500">Identific produsul...</div>
+        <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--muted);margin-top:2px">Caut în baza de date</div>
+      </div>
+    </div>
+    <div id="product-found" style="display:none;background:var(--good-pale);border:0.5px solid var(--good);border-radius:var(--radius);padding:12px 14px">
+      <div style="font-family:'Jost',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--good);margin-bottom:4px">Produs identificat</div>
+      <div style="font-family:'Jost',sans-serif;font-size:15px;font-weight:500;color:var(--text)" id="product-name-found"></div>
+      <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--text2);margin-top:2px" id="product-brand-found"></div>
+    </div>
+    <div id="product-not-found" style="display:none;background:var(--warn-pale);border:0.5px solid var(--warn);border-radius:var(--radius);padding:12px 14px">
+      <div style="font-family:'Jost',sans-serif;font-size:14px;font-weight:500;color:var(--warn);margin-bottom:4px">Produs negăsit în baza de date</div>
+      <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--text2);line-height:1.5">Fotografiază lista de ingrediente de pe ambalaj pentru a continua analiza.</div>
+    </div>
+  </div>
 
   <div class="photo-wrap" id="photo-wrap">
     <img id="photo-img" src="" alt="">
@@ -1030,7 +1063,121 @@ function saveApiKey(){var val=document.getElementById('api-input').value.trim();
 
 // CAMERA
 function openCamera(){if(!getKey()){showApiModal();return;}document.getElementById('file-input').click();}
-function clearPhoto(){photoMode=false;document.getElementById('photo-wrap').style.display='none';document.getElementById('file-input').value='';document.getElementById('photo-img').src='';document.getElementById('ing-collapse-wrap').style.display='none';document.getElementById('ing-manual-wrap').style.display='block';document.getElementById('ing-textarea-manual').value='';document.getElementById('results').classList.remove('show');document.getElementById('results').innerHTML='';}
+function openCameraProduct(){if(!getKey()){showApiModal();return;}document.getElementById('file-input-product').click();}
+
+function handleProductPhoto(e){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var full=ev.target.result,b64=full.split(',')[1],mime=file.type||'image/jpeg';
+    // Show product image
+    document.getElementById('photo-img').src=full;
+    document.getElementById('photo-wrap').style.display='block';
+    document.getElementById('error-msg').classList.remove('show');
+    document.getElementById('results').classList.remove('show');
+    document.getElementById('results').innerHTML='';
+    // Show searching state
+    document.getElementById('product-search-wrap').style.display='block';
+    document.getElementById('product-searching').style.display='flex';
+    document.getElementById('product-found').style.display='none';
+    document.getElementById('product-not-found').style.display='none';
+    document.getElementById('ing-manual-wrap').style.display='none';
+    document.getElementById('ing-collapse-wrap').style.display='none';
+
+    // Step 1: Claude identifies product name + brand
+    fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+        {type:'text',text:'Uită-te la această imagine a unui produs. Identifică numele produsului și brandul. Returnează DOAR JSON: {"name":"<nume produs>","brand":"<brand>","query":"<brand> <nume> ingrediente"} — fără alt text. Dacă nu poți identifica produsul, returnează: {"name":null,"brand":null,"query":null}'}
+      ]}]})
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
+      var product;
+      try{
+        var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
+        var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
+        if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
+        product=JSON.parse(clean);
+      }catch(err){product=null;}
+
+      if(!product||!product.name){
+        showProductNotFound();return;
+      }
+
+      // Step 2: Search Open Food Facts
+      var searchQuery=encodeURIComponent((product.brand||'')+' '+(product.name||''));
+      return fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+searchQuery+'&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,ingredients_text_ro')
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var products=(data.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
+        if(products.length===0){
+          // Try Open Beauty Facts for cosmetics
+          if(productType==='cosmetic'){
+            return fetch('https://world.openbeautyfacts.org/cgi/search.pl?search_terms='+searchQuery+'&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text')
+            .then(function(r){return r.json();})
+            .then(function(bdata){
+              var bproducts=(bdata.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
+              if(bproducts.length===0){showProductNotFound(product);return;}
+              showProductFound(bproducts[0],product);
+            });
+          }
+          showProductNotFound(product);return;
+        }
+        showProductFound(products[0],product);
+      });
+    })
+    .catch(function(){
+      document.getElementById('product-searching').style.display='none';
+      showProductNotFound();
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function showProductFound(offProduct, identified){
+  document.getElementById('product-searching').style.display='none';
+  var name=offProduct.product_name||identified.name||'Produs identificat';
+  var brand=offProduct.brands||identified.brand||'';
+  var ingredients=offProduct.ingredients_text_ro||offProduct.ingredients_text||'';
+  // Clean ingredients
+  ingredients=ingredients.replace(/_/g,'').replace(/\*/g,'').trim();
+  document.getElementById('product-name-found').textContent=name;
+  document.getElementById('product-brand-found').textContent=brand;
+  document.getElementById('product-found').style.display='block';
+  // Put ingredients in textarea and auto-analyze
+  photoMode=true;
+  document.getElementById('ing-textarea').value=ingredients;
+  document.getElementById('ing-collapse-wrap').style.display='block';
+  document.getElementById('ing-collapse-label').textContent=ingredients.split(',').length+' ingrediente găsite';
+  setTimeout(function(){doAnalyze();},400);
+}
+
+function showProductNotFound(identified){
+  document.getElementById('product-searching').style.display='none';
+  document.getElementById('product-not-found').style.display='block';
+  document.getElementById('ing-manual-wrap').style.display='block';
+}
+function clearPhoto(){
+  photoMode=false;
+  document.getElementById('photo-wrap').style.display='none';
+  document.getElementById('file-input').value='';
+  document.getElementById('file-input-product').value='';
+  document.getElementById('photo-img').src='';
+  document.getElementById('ing-collapse-wrap').style.display='none';
+  document.getElementById('ing-manual-wrap').style.display='block';
+  document.getElementById('ing-textarea-manual').value='';
+  document.getElementById('ing-textarea').value='';
+  document.getElementById('product-search-wrap').style.display='none';
+  document.getElementById('product-searching').style.display='none';
+  document.getElementById('product-found').style.display='none';
+  document.getElementById('product-not-found').style.display='none';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').innerHTML='';
+}
 function toggleIngCollapse(){var b=document.getElementById('ing-collapse-body');var a=document.getElementById('ing-collapse-arrow');var open=b.style.display!=='none';b.style.display=open?'none':'block';a.textContent=open?'▼ Vezi':'▲ Ascunde';}
 function handlePhoto(e){
   var file=e.target.files[0];if(!file)return;
