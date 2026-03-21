@@ -10,12 +10,12 @@
 :root{
   --bg:#FAF8F5;--surface:#FFFFFF;--surface2:#F5F1EB;
   --border:#EDE5D8;--border2:#E8E0D0;
-  --gold:#C9A96E;--gold-pale:#FDF9F3;
+  --gold:#A67C3E;--gold-pale:#FDF6EC;
   --text:#1C1917;--text2:#5C5449;--muted:#B8AD9E;--muted2:#C4B99A;
   --danger:#C0392B;--danger-pale:#FADBD8;
   --warn:#E67E22;--warn-pale:#FDEBD0;
   --good:#2D6A4F;--good-pale:#D5F5E3;
-  --medium:#C9A96E;--medium-pale:#FDF9F3;
+  --medium:#A67C3E;--medium-pale:#FDF6EC;
   --radius:10px;--shadow:0 1px 12px rgba(28,25,23,0.06)
 }
 body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-size:clamp(13px,3.5vw,16px);min-height:100vh;max-width:430px;margin:0 auto;overflow-x:hidden}
@@ -61,26 +61,26 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-s
 .card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;box-shadow:var(--shadow)}
 
 /* DASHBOARD */
-.greeting-time{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.greeting-time{font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
 .greeting-name{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,7.5vw,36px);font-weight:600;color:var(--text);line-height:1.1}
 .greeting-line{width:24px;height:1px;background:var(--gold);margin-top:8px;margin-bottom:20px}
 .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .kpi-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
 .kpi-card.accent{background:var(--gold-pale);border-color:var(--gold)}
-.kpi-label{font-family:'Jost',sans-serif;font-size:clamp(8px,2vw,10px);letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.kpi-value{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,8vw,40px);font-weight:600;color:var(--text);line-height:1}
+.kpi-label{font-family:'Jost',sans-serif;font-size:clamp(10px,2.5vw,12px);letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.kpi-value{font-family:'Jost',sans-serif;font-size:clamp(34px,9vw,44px);font-weight:500;color:var(--text);line-height:1}
 .kpi-card.accent .kpi-value{color:var(--gold)}
 .kpi-value.danger{color:var(--danger)}
-.kpi-sub{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);color:var(--muted);margin-top:4px;font-style:italic}
+.kpi-sub{font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);color:var(--muted);margin-top:6px;font-style:italic}
 .last-scan-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);cursor:pointer;transition:border-color 0.2s}
 .last-scan-card:hover{border-color:var(--gold)}
 .ls-score{width:44px;height:44px;border-radius:50%;border:1px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.ls-num{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;line-height:1}
+.ls-num{font-family:'Jost',sans-serif;font-size:18px;font-weight:500;line-height:1}
 .ls-den{font-family:'Jost',sans-serif;font-size:8px;color:var(--muted)}
 .ls-info{flex:1;min-width:0}
-.ls-type{font-family:'Jost',sans-serif;font-size:clamp(8px,2vw,10px);letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
-.ls-excerpt{font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;font-weight:500}
-.ls-date{font-family:'Jost',sans-serif;font-size:clamp(9px,2.2vw,11px);color:var(--muted);margin-top:2px}
+.ls-type{font-family:'Jost',sans-serif;font-size:clamp(10px,2.5vw,12px);letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+.ls-excerpt{font-family:'Jost',sans-serif;font-size:clamp(12px,3vw,14px);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;font-weight:500}
+.ls-date{font-family:'Jost',sans-serif;font-size:clamp(11px,2.8vw,13px);color:var(--muted);margin-top:2px}
 .ls-arrow{font-size:14px;color:var(--gold);opacity:0.7;flex-shrink:0}
 
 /* TYPE SELECTOR */
@@ -152,8 +152,8 @@ textarea::placeholder{color:var(--muted)}
 .alert-card.warn .alert-title{color:var(--warn)}
 .alert-text{font-size:clamp(10px,2.5vw,12px);color:var(--text2);line-height:1.6;font-family:'Jost',sans-serif}
 .score-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:18px;margin-bottom:10px;box-shadow:var(--shadow)}
-.score-circle{width:76px;height:76px;border-radius:50%;border:1px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.score-num{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,7vw,36px);font-weight:600;line-height:1}
+.score-circle{width:80px;height:80px;border-radius:50%;border:1.5px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-num{font-family:'Jost',sans-serif;font-size:clamp(32px,8vw,40px);font-weight:500;line-height:1}
 .score-den{font-size:clamp(9px,2.2vw,11px);color:var(--muted);font-family:'Jost',sans-serif}
 .score-verdict{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,4.5vw,20px);font-weight:600;margin-bottom:4px}
 .score-summary{font-size:clamp(10px,2.5vw,12px);color:var(--text2);line-height:1.6;font-family:'Jost',sans-serif}
@@ -184,7 +184,7 @@ textarea::placeholder{color:var(--muted)}
 .hist-item{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer}
 .hist-thumb{width:38px;height:38px;border-radius:8px;object-fit:cover;border:0.5px solid var(--border);flex-shrink:0}
 .hist-score{width:44px;height:44px;border-radius:50%;border:1px solid;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.h-num{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;line-height:1}
+.h-num{font-family:'Jost',sans-serif;font-size:18px;font-weight:500;line-height:1}
 .h-den{font-size:8px;color:var(--muted);font-family:'Jost',sans-serif}
 .hist-info{flex:1;min-width:0}
 .hist-type{font-size:clamp(8px,2vw,10px);color:var(--muted);letter-spacing:0.1em;font-family:'Jost',sans-serif;text-transform:uppercase}
@@ -765,9 +765,16 @@ function updateDashboard(){
   document.getElementById('kpi-scans').textContent=weekScans.length||scanHistory.filter(function(){return true;}).length;
   if(scanHistory.length>0){
     var avg=scanHistory.reduce(function(s,h){return s+(h.score||0);},0)/scanHistory.length;
-    document.getElementById('kpi-avg').textContent=avg.toFixed(1);
+    var avgRounded=Math.round(avg*10)/10;
+    var avgEl=document.getElementById('kpi-avg');
+    avgEl.textContent=avgRounded.toFixed(1).replace('.',',');
+    avgEl.className='kpi-value';
+    if(avg>=7)avgEl.style.color='var(--good)';
+    else if(avg>=4)avgEl.style.color='var(--medium)';
+    else avgEl.style.color='var(--danger)';
   } else {
     document.getElementById('kpi-avg').textContent='—';
+    document.getElementById('kpi-avg').style.color='';
   }
   var alerts=scanHistory.reduce(function(s,h){return s+(h.alerts||0);},0);
   document.getElementById('kpi-alerts').textContent=alerts;
@@ -1073,11 +1080,16 @@ function scoreColor(s){return s>=7?'good':s>=4?'medium':'bad';}
 function renderResults(d,rawIng){
   currentAnalysisData=d;
   var s=d.score||5,c=scoreColor(s);
-  var aHTML=(d.personal_alerts||[]).map(function(a){return '<div class="alert-card '+a.severity+'"><div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div><div><div class="alert-title">'+(a.person?'Risc pentru '+a.person:'Atenție')+'</div><div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';}).join('');
+
+  // Filter alerts — only show if user has active conditions or member has conditions
+  var hasActiveProfile = activeConditions.size > 0 || members.some(function(m){return m.conditions&&m.conditions.length>0;});
+  var filteredAlerts = hasActiveProfile ? (d.personal_alerts||[]) : [];
+
+  var aHTML=filteredAlerts.map(function(a){return '<div class="alert-card '+a.severity+'"><div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div><div><div class="alert-title">'+(a.person?'Risc pentru '+a.person:'Atenție')+'</div><div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';}).join('');
   var iHTML=(d.ingredients||[]).slice(0,14).map(function(i){var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div><div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div>'+(i.risk&&i.risk!=='null'?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')+'</div></div>';}).join('');
   var posHTML=(d.positives||[]).map(function(p){return '<div class="point-row"><span>✅</span><span>'+p+'</span></div>';}).join('');
   var negHTML=(d.negatives||[]).map(function(n){return '<div class="point-row"><span>⚠️</span><span>'+n+'</span></div>';}).join('');
-  var ac=(d.personal_alerts||[]).length;
+  var ac=filteredAlerts.length;
   var ex=rawIng.substring(0,60).replace(/'/g,'').replace(/\n/g,' ');
   var thumb=document.getElementById('photo-img').src||'';
   document.getElementById('results').innerHTML=
