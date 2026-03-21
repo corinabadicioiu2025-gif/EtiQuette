@@ -867,9 +867,16 @@ function openProfileOverlay(){
   renderCatGroups();
   updateCountBadge();
   renderDefaultSetting();
-  document.getElementById('empty-conds-wrap').style.display='block';
-  document.getElementById('cat-groups').style.display='none';
-  document.getElementById('conds-section-label').textContent='Afecțiunile mele';
+  // Dacă nu există membri, afecțiunile sunt direct vizibile (profilul propriu)
+  if(members.length===0){
+    document.getElementById('empty-conds-wrap').style.display='none';
+    document.getElementById('cat-groups').style.display='block';
+    document.getElementById('conds-section-label').textContent='Afecțiunile mele';
+  } else {
+    document.getElementById('empty-conds-wrap').style.display='block';
+    document.getElementById('cat-groups').style.display='none';
+    document.getElementById('conds-section-label').textContent='Afecțiunile mele';
+  }
   document.getElementById('profile-overlay').classList.add('show');
 }
 
@@ -938,7 +945,18 @@ function addMember(){
 function deleteMember(id){
   members=members.filter(function(m){return m.id!==id;});
   saveMembers();
-  if(selectedProfileMemberId===id){selectedProfileMemberId=null;document.getElementById('empty-conds-wrap').style.display='block';document.getElementById('cat-groups').style.display='none';document.getElementById('conds-section-label').textContent='Afecțiunile mele';}
+  if(selectedProfileMemberId===id){
+    selectedProfileMemberId=null;
+    if(members.length===0){
+      document.getElementById('empty-conds-wrap').style.display='none';
+      document.getElementById('cat-groups').style.display='block';
+      document.getElementById('conds-section-label').textContent='Afecțiunile mele';
+    } else {
+      document.getElementById('empty-conds-wrap').style.display='block';
+      document.getElementById('cat-groups').style.display='none';
+      document.getElementById('conds-section-label').textContent='Afecțiunile mele';
+    }
+  }
   renderProfileMembers();renderMemberSelector();
 }
 function toggleMemberCond(memberId,condId){
