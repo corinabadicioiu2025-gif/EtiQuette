@@ -1255,6 +1255,9 @@ function searchProductInDB(b64, mime, fullImg){
       var p=products[0];
       var ing=p.ingredients_text.replace(/_/g,'').replace(/\*/g,'').trim();
       scanData.ingredients=ing;
+      // DEBUG TEMPORAR — afișăm textul brut din OFF
+      console.log('OFF ingredients raw:', ing);
+      document.getElementById('product-brand-found').textContent=(p.brands||'')+'  |  RAW: '+ing.substring(0,200);
       if(p.nutriments){
         scanData.nutrition={
           energy_kj:p.nutriments['energy-kj_100g']||null,
