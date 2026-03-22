@@ -114,6 +114,9 @@ body{background:var(--bg);color:var(--text);font-family:'Jost',sans-serif;font-s
 /* CAMERA */
 .camera-btn{width:100%;background:var(--surface);border:1px dashed var(--gold);border-radius:var(--radius);padding:14px;font-family:'Jost',sans-serif;font-size:15px;color:var(--gold);cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;letter-spacing:0.06em}
 .camera-btn:hover{background:var(--gold-pale);border-style:solid}
+.step-dot{width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0;transition:all 0.3s}
+.step-dot.active{background:var(--gold)}
+.step-dot.done{background:var(--good)}
 .photo-wrap{display:none;margin-bottom:10px;position:relative}
 .photo-wrap img{width:100%;border-radius:var(--radius);border:0.5px solid var(--border);max-height:160px;object-fit:cover;display:block}
 .photo-close{position:absolute;top:8px;right:8px;background:rgba(28,25,23,0.5);color:var(--bg);border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
@@ -412,77 +415,109 @@ textarea::placeholder{color:var(--muted)}
     </button>
   </div>
 
-  <div class="section-label">Lista de ingrediente</div>
+  <div class="section-label">Scanează produsul</div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-    <button class="camera-btn" style="margin-bottom:0" onclick="openCameraProduct()">
-      <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
-        <rect x="1" y="3" width="16" height="12" rx="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/>
-        <rect x="4" y="6" width="10" height="7" rx="1.5" stroke="currentColor" stroke-width="1" fill="none" opacity="0.5"/>
-        <line x1="9" y1="1" x2="9" y2="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
-      Față produs
-    </button>
-    <button class="camera-btn" style="margin-bottom:0" onclick="openCamera()">
+  <!-- STEP INDICATOR -->
+  <div id="scan-steps" style="display:flex;gap:6px;margin-bottom:14px;align-items:center">
+    <div class="step-dot active" id="step-1-dot"></div>
+    <div style="flex:1;height:1px;background:var(--border)" id="step-line-1"></div>
+    <div class="step-dot" id="step-2-dot"></div>
+    <div style="flex:1;height:1px;background:var(--border)" id="step-line-2"></div>
+    <div class="step-dot" id="step-3-dot"></div>
+  </div>
+
+  <!-- STEP CARDS -->
+  <div id="step-1-wrap">
+    <div style="font-family:'Jost',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Pasul 1 din 3 — Ingrediente</div>
+    <button class="camera-btn" onclick="openCameraStep(1)">
       <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
         <rect x="1" y="4" width="16" height="12" rx="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/>
         <circle cx="9" cy="10" r="3" stroke="currentColor" stroke-width="1.2" fill="none"/>
         <path d="M6 4 L7.5 2 L10.5 2 L12 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
-      Ingrediente
+      Fotografiază lista de ingrediente
     </button>
+    <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--muted);font-style:italic;text-align:center">Spatele ambalajului — lista completă de ingrediente</div>
   </div>
 
-  <input type="file" id="file-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
-  <input type="file" id="file-input-product" accept="image/*" capture="environment" style="display:none" onchange="handleProductPhoto(event)">
+  <div id="step-2-wrap" style="display:none">
+    <div style="font-family:'Jost',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Pasul 2 din 3 — Tabel nutrițional</div>
+    <button class="camera-btn" onclick="openCameraStep(2)">
+      <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+        <rect x="1" y="2" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        <line x1="1" y1="6" x2="17" y2="6" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+        <line x1="7" y1="6" x2="7" y2="16" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+        <line x1="1" y1="10" x2="17" y2="10" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+        <line x1="1" y1="13" x2="17" y2="13" stroke="currentColor" stroke-width="0.8" opacity="0.3"/>
+      </svg>
+      Fotografiază tabelul nutrițional
+    </button>
+    <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--muted);font-style:italic;text-align:center">Tabelul cu valori per 100g — calorii, zaharuri, grăsimi etc.</div>
+  </div>
 
-  <!-- Product search status -->
-  <div id="product-search-wrap" style="display:none;margin-bottom:10px">
-    <div id="product-searching" style="display:none;align-items:center;gap:8px;background:var(--gold-pale);border:1px solid var(--gold);border-radius:var(--radius);padding:12px 14px">
-      <div class="spinner" style="width:16px;height:16px;border-width:1.5px;margin:0;flex-shrink:0"></div>
-      <div>
-        <div style="font-family:'Jost',sans-serif;font-size:14px;color:var(--gold);font-weight:500">Identific produsul...</div>
-        <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--muted);margin-top:2px">Caut în baza de date</div>
+  <div id="step-3-wrap" style="display:none">
+    <div style="font-family:'Jost',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Pasul 3 din 3 — Față produs</div>
+    <button class="camera-btn" onclick="openCameraStep(3)">
+      <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+        <rect x="1" y="3" width="16" height="12" rx="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        <rect x="4" y="6" width="10" height="6" rx="1.5" stroke="currentColor" stroke-width="1" fill="none" opacity="0.5"/>
+        <line x1="9" y1="1" x2="9" y2="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Fotografiază fața produsului
+    </button>
+    <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--muted);font-style:italic;text-align:center">Ajuți comunitatea EtiQuette să construiască o bază de date 🌟</div>
+  </div>
+
+  <!-- PHOTO PREVIEWS -->
+  <div id="photos-preview" style="display:none;margin-top:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div style="position:relative">
+        <img id="preview-1" src="" style="width:100%;height:70px;object-fit:cover;border-radius:8px;border:0.5px solid var(--border);display:none">
+        <div id="preview-1-empty" style="width:100%;height:70px;border-radius:8px;border:1.5px solid var(--gold);background:var(--gold-pale);display:flex;align-items:center;justify-content:center">
+          <div style="font-size:20px">📋</div>
+        </div>
+        <div id="check-1" style="display:none;position:absolute;top:4px;right:4px;width:18px;height:18px;background:var(--good);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:white">✓</div>
+        <div style="font-family:'Jost',sans-serif;font-size:10px;color:var(--muted);text-align:center;margin-top:4px">Ingrediente</div>
+      </div>
+      <div style="position:relative">
+        <img id="preview-2" src="" style="width:100%;height:70px;object-fit:cover;border-radius:8px;border:0.5px solid var(--border);display:none">
+        <div id="preview-2-empty" style="width:100%;height:70px;border-radius:8px;border:1px dashed var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center">
+          <div style="font-size:20px;opacity:0.4">📊</div>
+        </div>
+        <div id="check-2" style="display:none;position:absolute;top:4px;right:4px;width:18px;height:18px;background:var(--good);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:white">✓</div>
+        <div style="font-family:'Jost',sans-serif;font-size:10px;color:var(--muted);text-align:center;margin-top:4px">Nutrițional</div>
+      </div>
+      <div style="position:relative">
+        <img id="preview-3" src="" style="width:100%;height:70px;object-fit:cover;border-radius:8px;border:0.5px solid var(--border);display:none">
+        <div id="preview-3-empty" style="width:100%;height:70px;border-radius:8px;border:1px dashed var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center">
+          <div style="font-size:20px;opacity:0.4">📦</div>
+        </div>
+        <div id="check-3" style="display:none;position:absolute;top:4px;right:4px;width:18px;height:18px;background:var(--good);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:white">✓</div>
+        <div style="font-family:'Jost',sans-serif;font-size:10px;color:var(--muted);text-align:center;margin-top:4px">Față produs</div>
       </div>
     </div>
-    <div id="product-found" style="display:none;background:var(--good-pale);border:0.5px solid var(--good);border-radius:var(--radius);padding:12px 14px">
-      <div style="font-family:'Jost',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--good);margin-bottom:4px">Produs identificat</div>
-      <div style="font-family:'Jost',sans-serif;font-size:15px;font-weight:500;color:var(--text)" id="product-name-found"></div>
-      <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--text2);margin-top:2px" id="product-brand-found"></div>
-    </div>
-    <div id="product-not-found" style="display:none;background:var(--warn-pale);border:0.5px solid var(--warn);border-radius:var(--radius);padding:12px 14px">
-      <div style="font-family:'Jost',sans-serif;font-size:14px;font-weight:500;color:var(--warn);margin-bottom:4px">Produs negăsit în baza de date</div>
-      <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--text2);line-height:1.5">Fotografiază lista de ingrediente de pe ambalaj pentru a continua analiza.</div>
-    </div>
+    <button class="btn-primary" id="analyze-btn" onclick="doAnalyze()" style="display:none">Analizează</button>
   </div>
 
-  <div class="photo-wrap" id="photo-wrap">
-    <img id="photo-img" src="" alt="">
-    <button class="photo-close" onclick="clearPhoto()">✕</button>
-    <div class="ocr-loading" id="ocr-loading">
-      <div class="spinner" style="width:16px;height:16px;border-width:1.5px;margin:0"></div>
-      <span>Citesc ingredientele din poză...</span>
-    </div>
-  </div>
+  <!-- HIDDEN FILE INPUTS -->
+  <input type="file" id="file-input-1" accept="image/*" capture="environment" style="display:none" onchange="handleStepPhoto(event,1)">
+  <input type="file" id="file-input-2" accept="image/*" capture="environment" style="display:none" onchange="handleStepPhoto(event,2)">
+  <input type="file" id="file-input-3" accept="image/*" capture="environment" style="display:none" onchange="handleStepPhoto(event,3)">
 
-  <div class="ing-collapse-wrap" id="ing-collapse-wrap">
+  <!-- HIDDEN PRODUCT SCAN (față produs direct) -->
+  <input type="file" id="file-input-product" accept="image/*" capture="environment" style="display:none" onchange="handleProductPhoto(event)">
+
+  <!-- COLLAPSE ingredient text -->
+  <div class="ing-collapse-wrap" id="ing-collapse-wrap" style="display:none">
     <div class="ing-collapse-header" onclick="toggleIngCollapse()">
       <span class="ing-collapse-label" id="ing-collapse-label">Ingrediente găsite</span>
       <span class="ing-collapse-arrow" id="ing-collapse-arrow">▼ Vezi</span>
     </div>
     <div class="ing-collapse-body" id="ing-collapse-body">
-      <textarea id="ing-textarea" placeholder="Ingredientele citite din poză..."></textarea>
+      <textarea id="ing-textarea" placeholder="Ingredientele citite din poză..." style="height:80px"></textarea>
     </div>
   </div>
 
-  <div id="ing-manual-wrap">
-    <div class="divider"><span>sau scrie manual</span></div>
-    <textarea id="ing-textarea-manual" placeholder="Lipește sau scrie lista de ingrediente...&#10;&#10;Ex: Apă, zahăr, acid citric (E330)..."></textarea>
-  </div>
-
-  <div style="margin-top:12px">
-    <button class="btn-primary" id="analyze-btn" onclick="doAnalyze()">Analizează</button>
-  </div>
   <div class="error-msg" id="error-msg"></div>
   <div class="loading-wrap" id="loading"><div class="spinner"></div><p>analizând ingredientele...</p></div>
   <div class="results-wrap" id="results"></div>
@@ -597,11 +632,19 @@ textarea::placeholder{color:var(--muted)}
     <div class="info-sec-title">2. Descrierea serviciului</div>
     <div class="info-text">EtiQuette oferă informații despre ingredientele produselor alimentare și cosmetice în scop educațional și informativ. Aplicația nu oferă sfaturi medicale, nutriționale sau cosmetologice profesionale.</div>
     <div class="info-divider"></div>
-    <div class="info-sec-title">3. Limitarea răspunderii</div>
-    <div class="info-text">EtiQuette nu poate fi trasă la răspundere pentru deciziile luate pe baza informațiilor furnizate. Informațiile sunt furnizate fără garanții de acuratețe completă.</div>
+    <div class="info-sec-title">3. Metodologia de scoring — Produse Alimentare</div>
+    <div class="info-text">EtiQuette utilizează două scoruri independente și transparente pentru produsele alimentare.</div>
+    <div class="info-text"><strong>Scorul "Compatibil cu tine" (1-10)</strong> reflectă compatibilitatea produsului cu profilul personal declarat, incluzând alergii, intoleranțe, afecțiuni cronice, preferințe alimentare și vârsta membrilor familiei. Produsele care conțin ingrediente incompatibile cu alergiile, intoleranțele sau preferințele de tip lifestyle declarate (vegan, halal, kosher) primesc automat scorul minim de 1, indiferent de cantitate sau poziție. Produsele cu ingrediente problematice pentru afecțiunile cronice sunt penalizate gradual în funcție de poziția ingredientului în lista de ingrediente.</div>
+    <div class="info-text"><strong>Scorul "Nutrițional" (0-100)</strong> evaluează calitatea nutrițională generală și este calculat din trei componente: calitatea nutrițională (60%), bazată pe metodologia oficială Nutri-Score dezvoltată de Santé Publique France (2017); calitatea aditivilor (30%), bazată pe clasificările Autorității Europene pentru Siguranța Alimentară (EFSA); și un bonus pentru certificarea organică (până la 5%).</div>
     <div class="info-divider"></div>
-    <div class="info-sec-title">4. Proprietate intelectuală</div>
-    <div class="info-text-italic">Toate drepturile asupra aplicației EtiQuette, inclusiv design, cod și conținut, sunt proprietatea exclusivă a dezvoltatorilor.</div>
+    <div class="info-sec-title">4. Date și confidențialitate</div>
+    <div class="info-text">Fotografiile și datele produselor scanate sunt trimise anonim către serverele EtiQuette cu scopul de a construi o bază de date de produse românești. Datele personale (profil, afecțiuni) sunt stocate exclusiv local pe dispozitivul dvs.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">5. Limitarea răspunderii</div>
+    <div class="info-text">Scorurile EtiQuette sunt estimări orientative bazate pe date publice și nu constituie evaluări medicale sau nutriționale profesioniste. EtiQuette nu este afiliat cu Yuka, Nutri-Score, Open Food Facts sau orice altă platformă. Utilizatorul este responsabil pentru verificarea informațiilor în cazul alergiilor severe.</div>
+    <div class="info-divider"></div>
+    <div class="info-sec-title">6. Surse științifice</div>
+    <div class="info-text-italic">Nutri-Score — Santé Publique France, 2017. Aditivi — EFSA, reevaluări 2023. Coloranți azoici — McCann et al., 2007. Nitrați/nitriți — IARC Group 2A. Aspartam — IARC Group 2B, 2023. Vârstă — OMS și ESPGHAN recomandări.</div>
   </div>
 </div>
 
@@ -751,7 +794,7 @@ var scanHistory=[];
 var favorites=[];
 var favFilter='all';
 var defaultScan='all';
-var photoMode=false;
+
 var editingAvatarId=null;
 var currentAnalysisData=null;
 var selectedProfileMemberId=null;
@@ -1062,10 +1105,525 @@ function showApiModal(){document.getElementById('api-input').value='';document.g
 function saveApiKey(){var val=document.getElementById('api-input').value.trim();if(!val.startsWith('sk-ant')){document.getElementById('api-error').classList.add('show');return;}storeKey(val);document.getElementById('api-overlay').classList.remove('show');}
 
 // CAMERA
-function openCamera(){if(!getKey()){showApiModal();return;}document.getElementById('file-input').click();}
+// ============================================================
+// SCAN STATE
+// ============================================================
+var scanData = {
+  step: 1,
+  ingredients: '',
+  nutrition: null,  // {energy, fat, saturatedFat, carbs, sugars, fiber, protein, sodium, fruitsPercent}
+  productPhoto: null,
+  photos: {1: null, 2: null, 3: null}
+};
+
+function resetScan(){
+  scanData = {step:1, ingredients:'', nutrition:null, productPhoto:null, photos:{1:null,2:null,3:null}};
+  document.getElementById('step-1-wrap').style.display='block';
+  document.getElementById('step-2-wrap').style.display='none';
+  document.getElementById('step-3-wrap').style.display='none';
+  document.getElementById('photos-preview').style.display='none';
+  document.getElementById('analyze-btn').style.display='none';
+  document.getElementById('ing-collapse-wrap').style.display='none';
+  document.getElementById('error-msg').classList.remove('show');
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').innerHTML='';
+  [1,2,3].forEach(function(i){
+    document.getElementById('step-'+i+'-dot').className='step-dot'+(i===1?' active':'');
+    document.getElementById('preview-'+i).style.display='none';
+    document.getElementById('preview-'+i+'-empty').style.display='flex';
+    document.getElementById('check-'+i).style.display='none';
+  });
+}
+
+function openCameraStep(step){
+  if(!getKey()){showApiModal();return;}
+  document.getElementById('file-input-'+step).click();
+}
+
+function handleStepPhoto(e, step){
+  var file=e.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var full=ev.target.result;
+    var b64=full.split(',')[1];
+    var mime=file.type||'image/jpeg';
+    scanData.photos[step]=full;
+
+    // Update preview
+    document.getElementById('photos-preview').style.display='block';
+    document.getElementById('preview-'+step).src=full;
+    document.getElementById('preview-'+step).style.display='block';
+    document.getElementById('preview-'+step+'-empty').style.display='none';
+    document.getElementById('check-'+step).style.display='flex';
+    document.getElementById('step-'+step+'-dot').className='step-dot done';
+
+    if(step===1){
+      // OCR ingredients
+      document.getElementById('step-1-wrap').style.display='none';
+      document.getElementById('step-2-wrap').style.display='block';
+      document.getElementById('step-2-dot').className='step-dot active';
+      extractIngredients(b64, mime);
+    } else if(step===2){
+      // Extract nutrition table
+      document.getElementById('step-2-wrap').style.display='none';
+      document.getElementById('step-3-wrap').style.display='block';
+      document.getElementById('step-3-dot').className='step-dot active';
+      extractNutrition(b64, mime);
+    } else if(step===3){
+      // Product photo — ready to analyze
+      scanData.productPhoto=full;
+      document.getElementById('step-3-wrap').style.display='none';
+      document.getElementById('analyze-btn').style.display='flex';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function extractIngredients(b64, mime){
+  showStepLoading('Citesc ingredientele...');
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+      {type:'text',text:'Găsește lista de ingrediente de pe ambalaj — apare după: Ingredients, Ingrediente, Inhaltsstoffe, INCI. Returnează DOAR ingredientele separate prin virgule, fără alt text. Dacă nu găsești, returnează: NU_AM_GASIT'}
+    ]}]})
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    hideStepLoading();
+    var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
+    if(!text||text==='NU_AM_GASIT'||text.length<5){
+      showError('Nu am putut citi ingredientele. Încearcă o poză mai apropiată.');
+      document.getElementById('step-1-wrap').style.display='block';
+      document.getElementById('step-2-wrap').style.display='none';
+    } else {
+      scanData.ingredients=text;
+      document.getElementById('ing-textarea').value=text;
+      document.getElementById('ing-collapse-wrap').style.display='block';
+      document.getElementById('ing-collapse-label').textContent=text.split(',').length+' ingrediente găsite';
+    }
+  })
+  .catch(function(){hideStepLoading();showError('Eroare la citirea ingredientelor. Încearcă din nou.');});
+}
+
+function extractNutrition(b64, mime){
+  showStepLoading('Citesc tabelul nutrițional...');
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+      {type:'text',text:'Extrage valorile nutriționale per 100g din acest tabel. Returnează DOAR JSON: {"energy_kj":null,"fat":null,"saturated_fat":null,"carbohydrates":null,"sugars":null,"fiber":null,"protein":null,"sodium":null,"fruits_percent":null} — toate valorile sunt numere sau null dacă nu găsești. Sodiu în mg, restul în g, energie în kj.'}
+    ]}]})
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    hideStepLoading();
+    var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
+    try{
+      var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
+      var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
+      if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
+      scanData.nutrition=JSON.parse(clean);
+    }catch(e){scanData.nutrition=null;}
+  })
+  .catch(function(){hideStepLoading();scanData.nutrition=null;});
+}
+
+var stepLoadingEl=null;
+function showStepLoading(msg){
+  var existing=document.getElementById('step-loading');
+  if(existing)existing.remove();
+  var el=document.createElement('div');
+  el.id='step-loading';
+  el.style.cssText='display:flex;align-items:center;gap:8px;background:var(--gold-pale);border:0.5px solid var(--gold);border-radius:var(--radius);padding:10px 14px;margin-top:8px;font-family:\'Jost\',sans-serif;font-size:13px;color:var(--gold)';
+  el.innerHTML='<div class="spinner" style="width:14px;height:14px;border-width:1.5px;margin:0;flex-shrink:0"></div>'+msg;
+  document.getElementById('photos-preview').after(el);
+}
+function hideStepLoading(){var el=document.getElementById('step-loading');if(el)el.remove();}
+
+function toggleIngCollapse(){
+  var b=document.getElementById('ing-collapse-body');
+  var a=document.getElementById('ing-collapse-arrow');
+  var open=b.style.display!=='none';
+  b.style.display=open?'none':'block';
+  a.textContent=open?'▼ Vezi':'▲ Ascunde';
+}
+
+// ============================================================
+// PRODUCT PHOTO (față produs direct — Open Food Facts)
+// ============================================================
 function openCameraProduct(){if(!getKey()){showApiModal();return;}document.getElementById('file-input-product').click();}
 
 function handleProductPhoto(e){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var full=ev.target.result,b64=full.split(',')[1],mime=file.type||'image/jpeg';
+    fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+        {type:'text',text:'Identifică produsul din imagine. Returnează DOAR JSON: {"name":"<nume>","brand":"<brand>"} sau {"name":null,"brand":null} dacă nu poți identifica.'}
+      ]}]})
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
+      var product;
+      try{var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();product=JSON.parse(clean.substring(clean.indexOf('{'),clean.lastIndexOf('}')+1));}
+      catch(e){product=null;}
+      if(!product||!product.name) return;
+      var q=encodeURIComponent((product.brand||'')+' '+product.name);
+      return fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=3&fields=product_name,brands,ingredients_text,nutriments,labels,nova_group,nutriscore_grade')
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var products=(data.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
+        if(products.length>0){
+          var p=products[0];
+          scanData.ingredients=p.ingredients_text.replace(/_/g,'').replace(/\*/g,'').trim();
+          if(p.nutriments){
+            scanData.nutrition={
+              energy_kj:p.nutriments['energy-kj_100g']||null,
+              fat:p.nutriments['fat_100g']||null,
+              saturated_fat:p.nutriments['saturated-fat_100g']||null,
+              carbohydrates:p.nutriments['carbohydrates_100g']||null,
+              sugars:p.nutriments['sugars_100g']||null,
+              fiber:p.nutriments['fiber_100g']||null,
+              protein:p.nutriments['proteins_100g']||null,
+              sodium:p.nutriments['sodium_100g']?p.nutriments['sodium_100g']*1000:null,
+              fruits_percent:p.nutriments['fruits-vegetables-nuts_100g']||0,
+              isOrganic:(p.labels||'').toLowerCase().includes('organic')||(p.labels||'').toLowerCase().includes('bio')
+            };
+          }
+          doAnalyze();
+        }
+      });
+    })
+    .catch(function(){});
+  };
+  reader.readAsDataURL(file);
+}
+
+// ============================================================
+// ALGORITM SCORING
+// ============================================================
+
+// ADITIVI
+var ADITIVI_RISC_RIDICAT=['e102','e104','e110','e122','e124','e129','e131','e132','e133','e210','e211','e212','e213','e214','e215','e216','e217','e218','e219','e249','e250','e251','e252','e320','e321','e407','e621','e951','e952','e954','e955','e962','tartrazina','tartrazine','sunset yellow','azorubine','ponceau','allura red','benzoat','nitrit','nitrat','aspartam','aspartame','sucraloze','sucraloza','caragenan','carrageenan','glutamat','monosodium glutamate','bha','bht'];
+var ADITIVI_RISC_LIMITAT=['e200','e201','e202','e203','e270','e282','e412','e410','e415','e420','e421','e433','e435','e436','e440','e450','e451','e452','e471','e472a','e472b','e472c','e472d','e472e','e472f','e953','e965','e966','e967','e968','sorbitol','manitol','xilitor','xylitol','maltitol','polisorbat','xantan','guar','carboxymethyl','aroma artificiala','artificial flavour','artificial flavor','arome artificiale'];
+
+// COMPATIBILITATE — chei per afecțiune (alergii + intoleranțe = deal-breaker)
+var ALLERGY_KEYS={
+  gluten:['wheat','gluten','triticum','barley','rye','spelt','kamut','malt','semolina','orz','secara','grau','hordeum','triticale','bulgur','durum'],
+  lactoza:['lactose','milk','lactis','whey','casein','lactalbumin','cream','butter','lapte','zer','cazeina','lactoza','laptelui','smantana','unt'],
+  arahide:['peanut','arachide','arachis','groundnut','arahida'],
+  soia:['soy','soya','soia','tofu','miso','edamame','glycine max'],
+  nuci:['almond','walnut','hazelnut','cashew','pistachio','nuca','migdale','alune','nucilor','migdalelor'],
+  oua:['egg','albumin','ovalbumin','lysozyme','ou','oua','oualor','melange'],
+  peste:['fish','salmon','tuna','cod','anchovy','peste','somon','ton','hering','sardine'],
+  'fructe-mare':['shrimp','prawn','crab','lobster','shellfish','crustacean','creveti','midii','scoici','calamar'],
+  susan:['sesame','tahini','susan','sesamum'],
+  vegan:['gelatine','gelatin','gelatina','carmine','cochineal','e120','casein','whey','albumin','isinglass','lanolin','beeswax','cera alba','keratin','collagen','silk','honey','miere','tallow','lard','seu','untura'],
+  halal:['pork','lard','gelatin','alcohol','ethanol','carmine','cochineal','e120','porc','gelatina','alcool','porc','suncă','bacon','ham'],
+  kosher:['pork','shellfish','lard','gelatin','porc','gelatina','creveti','midii']
+};
+
+// Afecțiuni cronice — penalizare graduală
+var CHRONIC_KEYS={
+  diabet:['sugar','sucrose','glucose','fructose','dextrose','maltose','syrup','corn syrup','high-fructose','maltodextrin','zahar','glucoza','sirop','honey','miere','dextrin','caramel','sorbitol','xylitol','zahăr','sirop de glucoză'],
+  hipertensiune:['sodium','salt','sare','msg','monosodium glutamate','sodium chloride','sodium nitrite','sodium benzoate','disodium','natriu','bicarbonate','sare iodată'],
+  colesterol:['hydrogenated','partially hydrogenated','trans fat','palm oil','palmier','lard','tallow','shortening','ulei de palmier','grăsimi hidrogenate'],
+  ibs:['fructose','lactose','sorbitol','mannitol','xylitol','inulin','wheat','rye','fructoză','lactoză'],
+  reflux:['citric acid','acetic acid','vinegar','caffeine','alcohol','menthol','peppermint','acid citric','otet','cafeina','oțet','cafea'],
+  guta:['fructose','high-fructose corn syrup','fructoza','sirop de fructoza']
+};
+
+// Afecțiuni care sunt deal-breaker (tratate ca alergii)
+var ALLERGY_CONDITIONS=['gluten','lactoza','arahide','soia','nuci','oua','peste','fructe-mare','susan','vegan','halal','kosher'];
+var CHRONIC_CONDITIONS=['diabet','hipertensiune','colesterol','ibs','reflux','guta'];
+
+function calcCompatibility(ingredients, activeConditions, members, selectedMembers, productType){
+  var ingLower=ingredients.toLowerCase();
+  var ingList=ingredients.split(',').map(function(s){return s.trim().toLowerCase();});
+
+  function getPozitie(key){
+    for(var i=0;i<ingList.length;i++){
+      if(ingList[i].includes(key)) return i+1;
+    }
+    return 999;
+  }
+
+  function containsKey(keys){
+    return keys.some(function(k){return ingLower.includes(k.toLowerCase());});
+  }
+
+  function getMatchedKey(keys){
+    for(var i=0;i<keys.length;i++){
+      if(ingLower.includes(keys[i].toLowerCase())) return keys[i];
+    }
+    return null;
+  }
+
+  var alerts=[];
+  var score=10;
+  var isIncompatible=false;
+
+  // Check user's own conditions
+  activeConditions.forEach(function(condId){
+    if(ALLERGY_CONDITIONS.includes(condId)){
+      var keys=ALLERGY_KEYS[condId]||[];
+      if(containsKey(keys)){
+        isIncompatible=true;
+        var matched=getMatchedKey(keys);
+        alerts.push({severity:'danger',person:'Tu',condition:condId,ingredient:matched,explanation:'Produs nerecomandat — conține '+matched});
+      }
+    } else if(CHRONIC_CONDITIONS.includes(condId)){
+      var keys=CHRONIC_KEYS[condId]||[];
+      keys.forEach(function(key){
+        if(ingLower.includes(key.toLowerCase())){
+          var poz=getPozitie(key);
+          var pen=poz<=3?3:poz<=6?2:1;
+          score-=pen;
+          alerts.push({severity:poz<=3?'danger':'warn',person:'Tu',condition:condId,ingredient:key,explanation:(poz<=3?'Ingredient dominant (poziția '+poz+')':'Prezent în produs (poziția '+poz+')')});
+        }
+      });
+    }
+  });
+
+  // Check selected members
+  var targetMembers=selectedMembers.includes('__all__')?members:members.filter(function(m){return selectedMembers.includes(m.id);});
+  targetMembers.forEach(function(m){
+    (m.conditions||[]).forEach(function(condId){
+      if(ALLERGY_CONDITIONS.includes(condId)){
+        var keys=ALLERGY_KEYS[condId]||[];
+        if(containsKey(keys)){
+          isIncompatible=true;
+          var matched=getMatchedKey(keys);
+          alerts.push({severity:'danger',person:m.name||'Membru',condition:condId,ingredient:matched,explanation:'Produs nerecomandat pentru '+(m.name||'acest membru')+' — conține '+matched});
+        }
+      } else if(CHRONIC_CONDITIONS.includes(condId)){
+        var keys=CHRONIC_KEYS[condId]||[];
+        keys.forEach(function(key){
+          if(ingLower.includes(key.toLowerCase())){
+            var poz=getPozitie(key);
+            var pen=poz<=3?3:poz<=6?2:1;
+            score-=pen;
+            alerts.push({severity:poz<=3?'danger':'warn',person:m.name||'Membru',condition:condId,ingredient:key,explanation:'Atenție pentru '+(m.name||'acest membru')+' — poziția '+poz+' în ingrediente'});
+          }
+        });
+      }
+    });
+
+    // Vârstă
+    if(m.dob){
+      var ageWarnings=getAgeWarnings(m.dob, productType);
+      ageWarnings.forEach(function(key){
+        if(ingLower.includes(key)){
+          alerts.push({severity:'warn',person:m.name||'Membru',condition:'varsta',ingredient:key,explanation:'Nerecomandat pentru '+(m.name||'acest membru')+' ('+getAgeLabel(m.dob)+') — conține '+key});
+        }
+      });
+    }
+  });
+
+  if(isIncompatible) score=1;
+  else score=Math.max(2, Math.min(10, score));
+
+  return {score:score, isIncompatible:isIncompatible, alerts:alerts};
+}
+
+function calcNutritional(nutrition, ingredients){
+  var ingLower=(ingredients||'').toLowerCase();
+  var total=0;
+
+  // COMPONENTA A — Calitate nutrițională (0-60)
+  var scoreNutritie=30; // neutru dacă nu avem date
+  if(nutrition){
+    var N=0,P=0;
+    // Energie
+    var en=nutrition.energy_kj||0;
+    if(en<=335)N+=0;else if(en<=670)N+=1;else if(en<=1005)N+=2;else if(en<=1340)N+=3;else if(en<=1675)N+=4;else N+=5;
+    // Zaharuri
+    var su=nutrition.sugars||0;
+    if(su<=4.5)N+=0;else if(su<=9)N+=1;else if(su<=13.5)N+=2;else if(su<=18)N+=3;else if(su<=22.5)N+=4;else N+=5;
+    // Grăsimi saturate
+    var sf=nutrition.saturated_fat||0;
+    if(sf<=1)N+=0;else if(sf<=2)N+=1;else if(sf<=3)N+=2;else if(sf<=4)N+=3;else if(sf<=5)N+=4;else N+=5;
+    // Sodiu mg
+    var so=nutrition.sodium||0;
+    if(so<=90)N+=0;else if(so<=180)N+=1;else if(so<=270)N+=2;else if(so<=360)N+=3;else if(so<=450)N+=4;else N+=5;
+    // Fibre
+    var fi=nutrition.fiber||0;
+    if(fi>4.7)P+=5;else if(fi>3.7)P+=4;else if(fi>2.8)P+=3;else if(fi>1.9)P+=2;else if(fi>0.9)P+=1;
+    // Proteine
+    var pr=nutrition.protein||0;
+    if(pr>8)P+=5;else if(pr>6.4)P+=4;else if(pr>4.8)P+=3;else if(pr>3.2)P+=2;else if(pr>1.6)P+=1;
+    // Fructe/legume %
+    var fr=nutrition.fruits_percent||0;
+    if(fr>80)P+=5;else if(fr>60)P+=3;else if(fr>40)P+=1;
+    var NSbrut=N-P;
+    if(NSbrut<=-1)scoreNutritie=60;
+    else if(NSbrut<=2)scoreNutritie=48;
+    else if(NSbrut<=10)scoreNutritie=36;
+    else if(NSbrut<=18)scoreNutritie=20;
+    else scoreNutritie=0;
+  }
+  total+=scoreNutritie;
+
+  // COMPONENTA B — Aditivi (0-30)
+  var scoreAditivi=30;
+  ADITIVI_RISC_RIDICAT.forEach(function(a){if(ingLower.includes(a)){scoreAditivi-=8;}});
+  ADITIVI_RISC_LIMITAT.forEach(function(a){if(ingLower.includes(a)){scoreAditivi-=3;}});
+  scoreAditivi=Math.max(0,scoreAditivi);
+  total+=scoreAditivi;
+
+  // COMPONENTA C — Organic (0-5)
+  var isOrganic=(nutrition&&nutrition.isOrganic)||ingLower.includes('bio')||ingLower.includes('organic')||ingLower.includes('ecologic');
+  if(isOrganic)total+=5;
+
+  total=Math.min(100,Math.max(0,total));
+
+  var label,color;
+  if(total>=75){label='Excelent';color='good';}
+  else if(total>=50){label='Bun';color='medium';}
+  else if(total>=25){label='Mediocru';color='warn';}
+  else{label='Slab';color='bad';}
+
+  return{score:total,label:label,color:color,scoreNutritie:scoreNutritie,scoreAditivi:scoreAditivi,isOrganic:isOrganic,hasNutrition:!!nutrition};
+}
+
+// ============================================================
+// ANALYZE
+// ============================================================
+function doAnalyze(){
+  if(!getKey()){showApiModal();return;}
+  var ing=scanData.ingredients||document.getElementById('ing-textarea').value.trim();
+  if(!ing||ing.length<5){showError('Ingredientele nu au fost citite. Reia scanarea.');return;}
+
+  document.getElementById('analyze-btn').disabled=true;
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('results').innerHTML='';
+  document.getElementById('error-msg').classList.remove('show');
+
+  // Calculăm scorurile algoritmice
+  var compatResult=calcCompatibility(ing, activeConditions, members, selectedMembers, productType);
+  var nutritResult=calcNutritional(scanData.nutrition, ing);
+
+  // Claude pentru explicații și analiza detaliată a ingredientelor
+  var typeLabel=productType==='food'?'alimentare':'cosmetice';
+  var prompt='Ești expert în ingrediente '+typeLabel+'. Analizează această listă de ingrediente și returnează DOAR JSON:\n{"summary":"<2-3 propoziții despre calitatea generală a produsului în română>","ingredients":[{"name":"<ingredient>","rating":"<good/medium/bad>","desc":"<explicație scurtă în română>","risk":"<null sau risc specific>"}],"positives":["<aspect pozitiv>"],"negatives":["<aspect negativ>"],"recommendation":"<sfat final în română>"}\n\nIngrediente: "'+ing+'"';
+
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    var text=(d.content||[]).map(function(i){return i.text||'';}).join('');
+    var detail;
+    try{
+      var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
+      var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
+      if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
+      detail=JSON.parse(clean);
+    }catch(e){detail={summary:'',ingredients:[],positives:[],negatives:[],recommendation:''};}
+    renderResults(compatResult, nutritResult, detail, ing);
+  })
+  .catch(function(err){showError(err.message||'Eroare. Verifică cheia API.');})
+  .finally(function(){
+    document.getElementById('analyze-btn').disabled=false;
+    document.getElementById('loading').classList.remove('show');
+  });
+}
+
+// ============================================================
+// RENDER RESULTS — 2 scoruri
+// ============================================================
+function scoreColor(s){return s>=7?'good':s>=4?'medium':'bad';}
+function nutritColor(c){return c==='good'?'var(--good)':c==='medium'?'var(--medium)':c==='warn'?'var(--warn)':'var(--danger)';}
+
+function renderResults(compat, nutrit, detail, rawIng){
+  currentAnalysisData={compat:compat, nutrit:nutrit, detail:detail};
+  var compatC=scoreColor(compat.score);
+
+  // Alerts HTML
+  var alertsHTML=compat.alerts.map(function(a){
+    return '<div class="alert-card '+a.severity+'">'
+      +'<div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div>'
+      +'<div><div class="alert-title">'+(a.person?a.person+' — ':'')+a.ingredient+'</div>'
+      +'<div class="alert-text">'+a.explanation+'</div></div></div>';
+  }).join('');
+
+  // 2 score cards
+  var scoresHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'
+    // Compatibil cu tine
+    +'<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center">'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Pentru tine</div>'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:40px;font-weight:500;color:var(--'+compatC+');line-height:1">'+compat.score+'</div>'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:11px;color:var(--muted)">/10</div>'
+      +(compat.isIncompatible?'<div style="font-family:\'Jost\',sans-serif;font-size:11px;color:var(--danger);margin-top:6px;font-weight:500">⛔ Nerecomandat</div>':'')
+    +'</div>'
+    // Nutrițional
+    +'<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center">'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Nutrițional'+(nutrit.hasNutrition?'':' *')+'</div>'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:40px;font-weight:500;color:'+nutritColor(nutrit.color)+';line-height:1">'+nutrit.score+'</div>'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:11px;color:var(--muted)">/100</div>'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:11px;color:'+nutritColor(nutrit.color)+';margin-top:6px;font-weight:500">'+nutrit.label+'</div>'
+    +'</div>'
+  +'</div>';
+
+  // Nutritional breakdown
+  var nutritBreakHTML='<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px">'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px">'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:12px;color:var(--text2)">🥗 Calitate nutrițională</div>'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:12px;font-weight:500;color:var(--text)">'+nutrit.scoreNutritie+'/60'+(nutrit.hasNutrition?'':'*')+'</div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px">'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:12px;color:var(--text2)">🧪 Aditivi</div>'
+      +'<div style="font-family:\'Jost\',sans-serif;font-size:12px;font-weight:500;color:var(--text)">'+nutrit.scoreAditivi+'/30</div>'
+    +'</div>'
+    +(nutrit.isOrganic?'<div style="display:flex;justify-content:space-between"><div style="font-family:\'Jost\',sans-serif;font-size:12px;color:var(--text2)">🌿 Certificare bio</div><div style="font-family:\'Jost\',sans-serif;font-size:12px;font-weight:500;color:var(--good)">+5</div></div>':'')
+    +(!nutrit.hasNutrition?'<div style="font-family:\'Jost\',sans-serif;font-size:11px;color:var(--muted);font-style:italic;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border)">* Fotografiați tabelul nutrițional pentru scor complet</div>':'')
+  +'</div>';
+
+  // Ingredient analysis
+  var ingHTML=(detail.ingredients||[]).slice(0,14).map(function(i){
+    var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';
+    var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';
+    return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div>'
+      +'<div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div>'
+      +(i.risk&&i.risk!=='null'?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')
+      +'</div></div>';
+  }).join('');
+
+  var posHTML=(detail.positives||[]).map(function(p){return '<div class="point-row"><span>✅</span><span>'+p+'</span></div>';}).join('');
+  var negHTML=(detail.negatives||[]).map(function(n){return '<div class="point-row"><span>⚠️</span><span>'+n+'</span></div>';}).join('');
+  var ex=rawIng.substring(0,60).replace(/'/g,'').replace(/\n/g,' ');
+  var ac=compat.alerts.filter(function(a){return a.severity==='danger';}).length;
+
+  document.getElementById('results').innerHTML=
+    alertsHTML
+    +scoresHTML
+    +nutritBreakHTML
+    +(detail.summary?'<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;font-family:\'Jost\',sans-serif;font-size:14px;color:var(--text2);line-height:1.6">'+detail.summary+'</div>':'')
+    +(ingHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:12px">Analiza ingredientelor</div>'+ingHTML+'</div>':'')
+    +(posHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte forte</div>'+posHTML+'</div>':'')
+    +(negHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte slabe</div>'+negHTML+'</div>':'')
+    +(detail.recommendation?'<div class="reco-box">'+detail.recommendation+'</div>':'')
+    +'<div style="margin-top:12px;display:flex;gap:8px">'
+    +'<button class="btn-primary" style="flex:1" onclick="saveToHistory('+compat.score+','+nutrit.score+',\''+productType+'\',\''+ex+'\','+ac+')">Salvează în Istoric</button>'
+    +'<button class="heart-btn" onclick="toggleFavorite('+compat.score+','+nutrit.score+',\''+productType+'\',\''+ex+'\','+ac+')">'+(isFavorite(ex,productType)?'❤️':'🤍')+'</button>'
+    +'</div>'
+    +'<div class="disclaimer">EtiQuette nu înlocuiește sfatul medical profesionist. Metodologie: etiquette.app/metodologie</div>';
+
+  document.getElementById('results').classList.add('show');
+  updateDashboard();
+  resetScan(); // reset pentru următoarea scanare
+}
   var file=e.target.files[0];if(!file)return;
   var reader=new FileReader();
   reader.onload=function(ev){
@@ -1138,166 +1696,6 @@ function handleProductPhoto(e){
   reader.readAsDataURL(file);
 }
 
-function showProductFound(offProduct, identified){
-  document.getElementById('product-searching').style.display='none';
-  var name=offProduct.product_name||identified.name||'Produs identificat';
-  var brand=offProduct.brands||identified.brand||'';
-  var ingredients=offProduct.ingredients_text_ro||offProduct.ingredients_text||'';
-  // Clean ingredients
-  ingredients=ingredients.replace(/_/g,'').replace(/\*/g,'').trim();
-  document.getElementById('product-name-found').textContent=name;
-  document.getElementById('product-brand-found').textContent=brand;
-  document.getElementById('product-found').style.display='block';
-  // Put ingredients in textarea and auto-analyze
-  photoMode=true;
-  document.getElementById('ing-textarea').value=ingredients;
-  document.getElementById('ing-collapse-wrap').style.display='block';
-  document.getElementById('ing-collapse-label').textContent=ingredients.split(',').length+' ingrediente găsite';
-  setTimeout(function(){doAnalyze();},400);
-}
-
-function showProductNotFound(identified){
-  document.getElementById('product-searching').style.display='none';
-  document.getElementById('product-not-found').style.display='block';
-  document.getElementById('ing-manual-wrap').style.display='block';
-}
-function clearPhoto(){
-  photoMode=false;
-  document.getElementById('photo-wrap').style.display='none';
-  document.getElementById('file-input').value='';
-  document.getElementById('file-input-product').value='';
-  document.getElementById('photo-img').src='';
-  document.getElementById('ing-collapse-wrap').style.display='none';
-  document.getElementById('ing-manual-wrap').style.display='block';
-  document.getElementById('ing-textarea-manual').value='';
-  document.getElementById('ing-textarea').value='';
-  document.getElementById('product-search-wrap').style.display='none';
-  document.getElementById('product-searching').style.display='none';
-  document.getElementById('product-found').style.display='none';
-  document.getElementById('product-not-found').style.display='none';
-  document.getElementById('results').classList.remove('show');
-  document.getElementById('results').innerHTML='';
-}
-function toggleIngCollapse(){var b=document.getElementById('ing-collapse-body');var a=document.getElementById('ing-collapse-arrow');var open=b.style.display!=='none';b.style.display=open?'none':'block';a.textContent=open?'▼ Vezi':'▲ Ascunde';}
-function handlePhoto(e){
-  var file=e.target.files[0];if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var full=ev.target.result,b64=full.split(',')[1],mime=file.type||'image/jpeg';
-    document.getElementById('photo-img').src=full;
-    document.getElementById('photo-wrap').style.display='block';
-    document.getElementById('ocr-loading').classList.add('show');
-    document.getElementById('error-msg').classList.remove('show');
-    document.getElementById('results').classList.remove('show');
-    document.getElementById('results').innerHTML='';
-    fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mime,data:b64}},{type:'text',text:'Găsește lista de ingrediente de pe ambalaj — apare după: Ingredients, Ingrediente, Inhaltsstoffe, INCI. Returnează DOAR ingredientele separate prin virgule, fără alt text. Dacă nu găsești, returnează: NU_AM_GASIT'}]}]})})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      document.getElementById('ocr-loading').classList.remove('show');
-      var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
-      if(!text||text==='NU_AM_GASIT'||text.length<5){showError('Nu am putut citi ingredientele. Încearcă o poză mai apropiată sau scrie manual.');document.getElementById('ing-manual-wrap').style.display='block';}
-      else{photoMode=true;document.getElementById('ing-textarea').value=text;document.getElementById('ing-manual-wrap').style.display='none';document.getElementById('ing-collapse-wrap').style.display='block';document.getElementById('ing-collapse-label').textContent=text.split(',').length+' ingrediente găsite';setTimeout(function(){doAnalyze();},300);}
-    })
-    .catch(function(){document.getElementById('ocr-loading').classList.remove('show');showError('Eroare la procesarea pozei. Scrie ingredientele manual.');});
-  };
-  reader.readAsDataURL(file);
-}
-
-// ANALYZE
-function doAnalyze(){
-  if(!getKey()){showApiModal();return;}
-  var ing=photoMode?document.getElementById('ing-textarea').value.trim():document.getElementById('ing-textarea-manual').value.trim();
-  if(ing.length<5){showError('Te rog introdu o listă de ingrediente.');return;}
-  var all=getAllConditions();
-  var foodCats=['allergies','chronic','lifestyle'],cosCats=['cosmetic-skin','cosmetic-special','lifestyle'];
-  var relCats=productType==='food'?foodCats:cosCats;
-  function isRel(id){for(var i=0;i<CONDITION_CATEGORIES.length;i++){if(CONDITION_CATEGORIES[i].conditions.find(function(c){return c.id===id;}))return relCats.indexOf(CONDITION_CATEGORIES[i].id)>-1;}return true;}
-  var filteredAll=all.filter(function(c){return isRel(c.id);});
-  var contexts=[];
-  if(selectedMembers.includes('__all__')||selectedMembers.includes('__self__')){
-    var selfActive=filteredAll.filter(function(c){return activeConditions.has(c.id);});
-    var ctx='Eu';if(selfActive.length>0)ctx+=' — Afecțiuni: '+selfActive.map(function(c){return c.name;}).join(', ');contexts.push(ctx);
-  }
-  var targetMembers=selectedMembers.includes('__all__')?members:members.filter(function(m){return selectedMembers.includes(m.id);});
-  targetMembers.forEach(function(m){
-    var age=m.dob?getAgeLabel(m.dob):null;var gr=m.dob?getAgeGroup(m.dob):null;var warn=m.dob?getAgeWarnings(m.dob,productType):[];
-    var mConds=(m.conditions||[]).filter(function(id){return isRel(id);}).map(function(id){var f=filteredAll.find(function(c){return c.id===id;});return f?f.name:id;});
-    var ctx=(m.name||'Membru')+(age?' ('+age+(gr?', grupa '+gr.label:'')+')':'');
-    if(mConds.length>0)ctx+=' — Afecțiuni: '+mConds.join(', ');
-    if(warn.length>0)ctx+=' — ATENȚIE VÂRSTĂ: evită '+warn.slice(0,5).join(', ');
-    contexts.push(ctx);
-  });
-  var condsText=contexts.length>0?contexts.join(' | '):'Nicio afecțiune declarată.';
-  var typeLabel=productType==='food'?'alimentare':'cosmetice';
-  document.getElementById('analyze-btn').disabled=true;
-  document.getElementById('loading').classList.add('show');
-  document.getElementById('results').classList.remove('show');
-  document.getElementById('results').innerHTML='';
-  document.getElementById('error-msg').classList.remove('show');
-  var prompt='Ești expert în analiza ingredientelor pentru produse '+typeLabel+'. Profilul: '+condsText+'\n\nIngrediente: "'+ing+'"\n\nReturnează DOAR JSON valid:\n{"score":<1-10>,"verdict":"<Excelent/Bun/Acceptabil/Slab/Foarte Slab>","summary":"<2-3 propoziții în română>","personal_alerts":[{"person":"<Eu sau nume>","condition":"<afecțiune>","severity":"<danger/warn>","ingredient":"<ingredient>","explanation":"<în română>"}],"ingredients":[{"name":"<ingredient>","rating":"<good/medium/bad>","desc":"<scurt în română>","risk":"<null sau risc în română>"}],"positives":["<pozitiv>"],"negatives":["<negativ>"],"recommendation":"<sfat final în română>"}';
-  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})})
-  .then(function(r){return r.json();})
-  .then(function(d){
-    var text=(d.content||[]).map(function(i){return i.text||'';}).join('');
-    var parsed;
-    try{var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();var s=clean.indexOf('{'),en=clean.lastIndexOf('}');if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);parsed=JSON.parse(clean);}
-    catch(err){throw new Error('Răspuns invalid. Încearcă din nou.');}
-    renderResults(parsed,ing);
-  })
-  .catch(function(err){showError(err.message||'Eroare. Verifică cheia API.');})
-  .finally(function(){document.getElementById('analyze-btn').disabled=false;document.getElementById('loading').classList.remove('show');});
-}
-
-// RESULTS
-function scoreColor(s){return s>=7?'good':s>=4?'medium':'bad';}
-function renderResults(d,rawIng){
-  currentAnalysisData=d;
-  var s=d.score||5,c=scoreColor(s);
-
-  // Filter alerts — only show if user has active conditions or member has conditions
-  var hasActiveProfile = activeConditions.size > 0 || members.some(function(m){return m.conditions&&m.conditions.length>0;});
-  var filteredAlerts = hasActiveProfile ? (d.personal_alerts||[]) : [];
-
-  var aHTML=filteredAlerts.map(function(a){return '<div class="alert-card '+a.severity+'"><div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div><div><div class="alert-title">'+(a.person?'Risc pentru '+a.person:'Atenție')+'</div><div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';}).join('');
-  var iHTML=(d.ingredients||[]).slice(0,14).map(function(i){var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div><div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div>'+(i.risk&&i.risk!=='null'?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')+'</div></div>';}).join('');
-  var posHTML=(d.positives||[]).map(function(p){return '<div class="point-row"><span>✅</span><span>'+p+'</span></div>';}).join('');
-  var negHTML=(d.negatives||[]).map(function(n){return '<div class="point-row"><span>⚠️</span><span>'+n+'</span></div>';}).join('');
-  var ac=filteredAlerts.length;
-  var ex=rawIng.substring(0,60).replace(/'/g,'').replace(/\n/g,' ');
-  var thumb=document.getElementById('photo-img').src||'';
-  document.getElementById('results').innerHTML=
-    aHTML
-    +'<div class="score-card"><div class="score-circle c-'+c+'"><div class="score-num c-'+c+'">'+s+'</div><div class="score-den">/ 10</div></div>'
-    +'<div><div class="score-verdict c-'+c+'">'+(d.verdict||'')+'</div><div class="score-summary">'+(d.summary||'')+'</div></div></div>'
-    +'<div class="bar-card"><div class="bar-labels"><span>Slab</span><span>Mediu</span><span>Excelent</span></div><div class="bar-track"><div class="bar-fill fill-'+c+'" id="bar-fill"></div></div></div>'
-    +(iHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:12px">Analiza ingredientelor</div>'+iHTML+'</div>':'')
-    +(posHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte forte</div>'+posHTML+'</div>':'')
-    +(negHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte slabe</div>'+negHTML+'</div>':'')
-    +(d.recommendation?'<div class="reco-box">'+d.recommendation+'</div>':'')
-    +'<div style="margin-top:12px;display:flex;gap:8px">'
-    +'<button class="btn-primary" style="flex:1" onclick="saveToHistory('+s+',\''+productType+'\',\''+ex+'\','+ac+')">Salvează în Istoric</button>'
-    +'<button class="heart-btn" onclick="toggleFavorite('+s+',\''+productType+'\',\''+ex+'\','+ac+')">'+(isFavorite(ex,productType)?'❤️':'🤍')+'</button>'
-    +'</div>'
-    +'<div class="disclaimer">EtiQuette nu înlocuiește sfatul medical profesionist.</div>';
-  document.getElementById('results').classList.add('show');
-  setTimeout(function(){var f=document.getElementById('bar-fill');if(f)f.style.width=(s/10*100)+'%';},100);
-  updateDashboard();
-}
-
-// HISTORY
-function saveToHistory(score,type,excerpt,alerts){
-  var thumb=document.getElementById('photo-img').src||'';
-  var now=new Date();
-  scanHistory.unshift({score:score,type:type,excerpt:excerpt,alerts:alerts,
-    thumb:thumb&&thumb.length>100?thumb:'',
-    fullData:currentAnalysisData,
-    dateRaw:now.toISOString(),
-    date:now.toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});
-  if(scanHistory.length>50)scanHistory=scanHistory.slice(0,50);
-  try{localStorage.setItem('eq_hist',JSON.stringify(scanHistory));}catch(e){}
-  updateDashboard();
-  alert('✅ Salvat în istoric!');
-}
 function toggleHistItem(idx){
   var b=document.getElementById('hb-'+idx),a=document.getElementById('ha-'+idx);if(!b)return;
   var open=b.style.display!=='none';b.style.display=open?'none':'block';if(a)a.textContent=open?'▼':'▲';
@@ -1334,10 +1732,10 @@ function renderHistory(){
 }
 
 // FAVORITES
-function toggleFavorite(score,type,excerpt,alerts){
+function toggleFavorite(compatScore,nutritScore,type,excerpt,alerts){
   var i=favorites.findIndex(function(f){return f.excerpt===excerpt&&f.type===type;});
   if(i>-1){favorites.splice(i,1);alert('💔 Eliminat din favorite');}
-  else{favorites.unshift({score:score,type:type,excerpt:excerpt,alerts:alerts,date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});alert('❤️ Adăugat la favorite!');}
+  else{favorites.unshift({compatScore:compatScore,nutritScore:nutritScore,score:compatScore,type:type,excerpt:excerpt,alerts:alerts,date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});alert('❤️ Adăugat la favorite!');}
   try{localStorage.setItem('eq_fav',JSON.stringify(favorites));}catch(e){}
   updateDashboard();
 }
@@ -1370,6 +1768,7 @@ renderHistory();
 renderFavorites();
 renderMemberSelector();
 renderDefaultSetting();
+resetScan();
 if(!getKey())showApiModal();
 setTimeout(checkBirthdays,1000);
 </script>
