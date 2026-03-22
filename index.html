@@ -1624,78 +1624,6 @@ function renderResults(compat, nutrit, detail, rawIng){
   updateDashboard();
   resetScan(); // reset pentru următoarea scanare
 }
-  var file=e.target.files[0];if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var full=ev.target.result,b64=full.split(',')[1],mime=file.type||'image/jpeg';
-    // Show product image
-    document.getElementById('photo-img').src=full;
-    document.getElementById('photo-wrap').style.display='block';
-    document.getElementById('error-msg').classList.remove('show');
-    document.getElementById('results').classList.remove('show');
-    document.getElementById('results').innerHTML='';
-    // Show searching state
-    document.getElementById('product-search-wrap').style.display='block';
-    document.getElementById('product-searching').style.display='flex';
-    document.getElementById('product-found').style.display='none';
-    document.getElementById('product-not-found').style.display='none';
-    document.getElementById('ing-manual-wrap').style.display='none';
-    document.getElementById('ing-collapse-wrap').style.display='none';
-
-    // Step 1: Claude identifies product name + brand
-    fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:[
-        {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-        {type:'text',text:'Uită-te la această imagine a unui produs. Identifică numele produsului și brandul. Returnează DOAR JSON: {"name":"<nume produs>","brand":"<brand>","query":"<brand> <nume> ingrediente"} — fără alt text. Dacă nu poți identifica produsul, returnează: {"name":null,"brand":null,"query":null}'}
-      ]}]})
-    })
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
-      var product;
-      try{
-        var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
-        var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
-        if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
-        product=JSON.parse(clean);
-      }catch(err){product=null;}
-
-      if(!product||!product.name){
-        showProductNotFound();return;
-      }
-
-      // Step 2: Search Open Food Facts
-      var searchQuery=encodeURIComponent((product.brand||'')+' '+(product.name||''));
-      return fetch('https://world.openfoodfacts.org/cgi/search.pl?search_terms='+searchQuery+'&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,ingredients_text_ro')
-      .then(function(r){return r.json();})
-      .then(function(data){
-        var products=(data.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
-        if(products.length===0){
-          // Try Open Beauty Facts for cosmetics
-          if(productType==='cosmetic'){
-            return fetch('https://world.openbeautyfacts.org/cgi/search.pl?search_terms='+searchQuery+'&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text')
-            .then(function(r){return r.json();})
-            .then(function(bdata){
-              var bproducts=(bdata.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
-              if(bproducts.length===0){showProductNotFound(product);return;}
-              showProductFound(bproducts[0],product);
-            });
-          }
-          showProductNotFound(product);return;
-        }
-        showProductFound(products[0],product);
-      });
-    })
-    .catch(function(){
-      document.getElementById('product-searching').style.display='none';
-      showProductNotFound();
-    });
-  };
-  reader.readAsDataURL(file);
-}
-
 function toggleHistItem(idx){
   var b=document.getElementById('hb-'+idx),a=document.getElementById('ha-'+idx);if(!b)return;
   var open=b.style.display!=='none';b.style.display=open?'none':'block';if(a)a.textContent=open?'▼':'▲';
@@ -1705,26 +1633,40 @@ function renderHistory(){
   var el=document.getElementById('history-list');
   if(scanHistory.length===0){el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nicio scanare salvată încă.<br>Analizează primul tău produs!</div></div>';return;}
   el.innerHTML=scanHistory.map(function(h,idx){
-    var c=scoreColor(h.score),d=h.fullData,hrt=isFavorite(h.excerpt,h.type)?'❤️':'🤍';
+    var compatScore=h.compatScore||h.score||5;
+    var nutritScore=h.nutritScore||null;
+    var c=scoreColor(compatScore);
+    var d=h.fullData;
+    var hrt=isFavorite(h.excerpt,h.type)?'❤️':'🤍';
     var exp='';
     if(d){
-      var aH=(d.personal_alerts||[]).map(function(a){return '<div class="alert-card '+a.severity+'" style="margin-bottom:8px"><div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div><div><div class="alert-title">'+(a.person?'Risc pentru '+a.person:'Atenție')+'</div><div class="alert-text"><strong>'+a.ingredient+'</strong> — '+a.explanation+'</div></div></div>';}).join('');
-      var iH=(d.ingredients||[]).slice(0,8).map(function(i){var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div><div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div></div></div>';}).join('');
-      exp='<div style="padding:14px">'+aH+'<div class="bar-card" style="margin-bottom:10px"><div class="bar-labels"><span>Slab</span><span>Mediu</span><span>Excelent</span></div><div class="bar-track"><div class="bar-fill fill-'+c+'" id="hbar-'+idx+'" style="width:0"></div></div></div>'
-        +(d.summary?'<div style="font-family:\'Jost\',sans-serif;font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:10px">'+d.summary+'</div>':'')
-        +(iH?'<div class="section-card" style="margin-bottom:10px"><div class="section-label" style="margin-bottom:10px">Ingrediente</div>'+iH+'</div>':'')
-        +(d.recommendation?'<div class="reco-box">'+d.recommendation+'</div>':'')
-        +'<div style="margin-top:10px"><button class="heart-btn" onclick="toggleFavorite('+h.score+',\''+h.type+'\',\''+h.excerpt+'\','+h.alerts+')" style="font-size:18px">'+hrt+' Favorite</button></div>'
+      // Alerts from new structure
+      var alerts=[];
+      if(d.compat&&d.compat.alerts) alerts=d.compat.alerts;
+      var aH=alerts.map(function(a){return '<div class="alert-card '+a.severity+'" style="margin-bottom:8px"><div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div><div><div class="alert-title">'+(a.person?a.person+' — ':'')+a.ingredient+'</div><div class="alert-text">'+a.explanation+'</div></div></div>';}).join('');
+      // Ingredients from detail
+      var detail=d.detail||{};
+      var iH=(detail.ingredients||[]).slice(0,8).map(function(i){var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div><div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div></div></div>';}).join('');
+      // 2 scores mini
+      var scoresRow='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+        +'<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-family:\'Jost\',sans-serif;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Pentru tine</div><div style="font-family:\'Jost\',sans-serif;font-size:26px;font-weight:500;color:var(--'+c+')">'+compatScore+'</div><div style="font-family:\'Jost\',sans-serif;font-size:10px;color:var(--muted)">/10</div></div>'
+        +(nutritScore!==null?'<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:10px;text-align:center"><div style="font-family:\'Jost\',sans-serif;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Nutrițional</div><div style="font-family:\'Jost\',sans-serif;font-size:26px;font-weight:500;color:var(--text)">'+nutritScore+'</div><div style="font-family:\'Jost\',sans-serif;font-size:10px;color:var(--muted)">/100</div></div>':'')
         +'</div>';
-    } else {exp='<div style="padding:14px;font-family:\'Jost\',sans-serif;font-size:14px;color:var(--muted);font-style:italic">Detalii complete nu sunt disponibile.</div>';}
+      exp='<div style="padding:14px">'+aH+scoresRow
+        +(detail.summary?'<div style="font-family:\'Jost\',sans-serif;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px">'+detail.summary+'</div>':'')
+        +(iH?'<div class="section-card" style="margin-bottom:10px"><div class="section-label" style="margin-bottom:10px">Ingrediente</div>'+iH+'</div>':'')
+        +(detail.recommendation?'<div class="reco-box">'+detail.recommendation+'</div>':'')
+        +'<div style="margin-top:10px"><button class="heart-btn" onclick="toggleFavorite('+compatScore+','+(nutritScore||'null')+',\''+h.type+'\',\''+h.excerpt+'\','+h.alerts+')" style="font-size:18px">'+hrt+' Favorite</button></div>'
+        +'</div>';
+    } else {exp='<div style="padding:14px;font-family:\'Jost\',sans-serif;font-size:13px;color:var(--muted);font-style:italic">Detalii complete nu sunt disponibile.</div>';}
     return '<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden">'
       +'<div class="hist-item" onclick="toggleHistItem('+idx+')">'
       +(h.thumb?'<img class="hist-thumb" src="'+h.thumb+'" alt="">':'')
-      +'<div class="hist-score c-'+c+'"><div class="h-num c-'+c+'">'+h.score+'</div><div class="h-den">/10</div></div>'
+      +'<div class="hist-score c-'+c+'"><div class="h-num c-'+c+'">'+compatScore+'</div><div class="h-den">/10</div></div>'
       +'<div class="hist-info"><div class="hist-type">'+(h.type==='food'?'Alimentar':'Cosmetic')+'</div>'
       +'<div class="hist-excerpt">'+h.excerpt+'...</div>'
       +'<div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span class="hist-date">'+h.date+'</span>'+(h.alerts>0?'<span class="hist-alert-pill">'+h.alerts+' alertă</span>':'')+'</div></div>'
-      +'<span id="ha-'+idx+'" style="font-size:11px;color:var(--muted);flex-shrink:0;padding:4px;font-family:\'Jost\',sans-serif">▼</span>'
+      +'<span id="ha-'+idx+'" style="font-size:11px;color:var(--muted);flex-shrink:0;padding:4px">▼</span>'
       +'</div>'
       +'<div id="hb-'+idx+'" style="display:none;border-top:0.5px solid var(--border)">'+exp+'</div>'
       +'</div>';
