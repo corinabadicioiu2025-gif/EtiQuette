@@ -1625,8 +1625,10 @@ function calcNutritional(nutrition, ingredients){
 // ============================================================
 function doAnalyze(){
   if(!getKey()){showApiModal();return;}
-  var ing=scanData.ingredients||document.getElementById('ing-textarea').value.trim();
-  if(!ing||ing.length<5){showError('Ingredientele nu au fost citite. Reia scanarea.');return;}
+
+  // ingOriginal = text brut din OFF sau OCR, in orice limba — pentru algoritm
+  var ingOriginal=scanData.ingredients||document.getElementById('ing-textarea').value.trim();
+  if(!ingOriginal||ingOriginal.length<5){showError('Ingredientele nu au fost citite. Reia scanarea.');return;}
 
   var btn=document.getElementById('analyze-btn');
   if(btn)btn.disabled=true;
@@ -1635,13 +1637,14 @@ function doAnalyze(){
   document.getElementById('results').innerHTML='';
   document.getElementById('error-msg').classList.remove('show');
 
-  // Calculăm scorurile algoritmice
-  var compatResult=calcCompatibility(ing, activeConditions, members, selectedMembers, productType);
-  var nutritResult=calcNutritional(scanData.nutrition, ing);
+  // Algoritmul ruleaza pe textul ORIGINAL (fr/en/ro/de)
+  // codurile E, glutamate monosodique, maltodextrine etc. detectate corect
+  var compatResult=calcCompatibility(ingOriginal, activeConditions, members, selectedMembers, productType);
+  var nutritResult=calcNutritional(scanData.nutrition, ingOriginal);
 
-  // Claude pentru explicații și analiza detaliată a ingredientelor
+  // Claude primeste textul original si traduce DOAR pentru afisare
   var typeLabel=productType==='food'?'alimentare':'cosmetice';
-  var prompt='Ești expert în ingrediente '+typeLabel+'. Ingredientele pot fi în orice limbă (română, franceză, engleză, germană). Analizează și returnează TOATE răspunsurile în română.\n\nReturnează DOAR JSON valid:\n{"summary":"<2-3 propoziții în română despre calitatea generală>","ingredients":[{"name":"<nume ingredient tradus în română>","rating":"<good/medium/bad>","desc":"<explicație scurtă în română>","risk":"<null sau risc specific în română>"}],"positives":["<aspect pozitiv în română>"],"negatives":["<aspect negativ în română>"],"recommendation":"<sfat final în română>"}\n\nIngrediente: "'+ing+'"';
+  var prompt='Esti expert in ingrediente '+typeLabel+'. Ingredientele pot fi in orice limba (romana, franceza, engleza, germana, spaniola). Toate raspunsurile returneaza-le EXCLUSIV in romana.\n\nReturneaza DOAR JSON valid:\n{"summary":"<2-3 propozitii in romana despre calitatea generala>","ingredients":[{"name":"<nume ingredient tradus in romana>","rating":"<good/medium/bad>","desc":"<explicatie scurta in romana, max 10 cuvinte>","risk":"<null sau risc specific in romana>"}],"positives":["<aspect pozitiv in romana>"],"negatives":["<aspect negativ in romana>"],"recommendation":"<sfat final in romana>"}\n\nIngrediente originale: "'+ingOriginal+'"';
 
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
@@ -1658,15 +1661,16 @@ function doAnalyze(){
       if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
       detail=JSON.parse(clean);
     }catch(e){detail={summary:'',ingredients:[],positives:[],negatives:[],recommendation:''};}
-    renderResults(compatResult, nutritResult, detail, ing);
+    renderResults(compatResult, nutritResult, detail, ingOriginal);
   })
-  .catch(function(err){showError(err.message||'Eroare. Verifică cheia API.');})
+  .catch(function(err){showError(err.message||'Eroare. Verifica cheia API.');})
   .finally(function(){
     var btn=document.getElementById('analyze-btn');
     if(btn)btn.disabled=false;
     document.getElementById('loading').classList.remove('show');
   });
 }
+
 
 // ============================================================
 // RENDER RESULTS — 2 scoruri
