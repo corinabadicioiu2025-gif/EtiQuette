@@ -1224,26 +1224,22 @@ function handleStepPhoto(e, step){
 }
 
 function searchProductInDB(b64, mime, fullImg){
-  // Step 1: Claude identifică produsul
+  // Prompt scurt — doar numele produsului vizibil pe ambalaj (1-2s)
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,messages:[{role:'user',content:[
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:60,messages:[{role:'user',content:[
       {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-      {type:'text',text:'Identifică produsul din imagine. Returnează DOAR JSON: {"name":"<nume produs>","brand":"<brand>"} sau {"name":null,"brand":null} dacă nu poți identifica.'}
+      {type:'text',text:'Ce scrie pe acest produs? Returnează DOAR numele produsului și brandul în format: BRAND NUME. Maxim 6 cuvinte. Dacă nu poți citi nimic, returnează: NECUNOSCUT'}
     ]}]})
   })
   .then(function(r){return r.json();})
   .then(function(d){
     var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
-    var product;
-    try{var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();product=JSON.parse(clean.substring(clean.indexOf('{'),clean.lastIndexOf('}')+1));}
-    catch(e){product=null;}
+    if(!text||text==='NECUNOSCUT'||text.length<2){showManualFlow();return;}
 
-    if(!product||!product.name){showManualFlow();return;}
-
-    // Step 2: Caută în Open Food Facts / Open Beauty Facts
-    var q=encodeURIComponent((product.brand||'')+' '+product.name);
+    // Caută direct în OFF cu textul citit
+    var q=encodeURIComponent(text);
     var url=productType==='cosmetic'
       ?'https://world.openbeautyfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=3&fields=product_name,brands,ingredients_text,nutriments,labels'
       :'https://world.openfoodfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=3&fields=product_name,brands,ingredients_text,nutriments,labels';
@@ -1252,9 +1248,8 @@ function searchProductInDB(b64, mime, fullImg){
     .then(function(r){return r.json();})
     .then(function(data){
       var products=(data.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
-      if(products.length===0){showManualFlow(product);return;}
+      if(products.length===0){showManualFlow();return;}
 
-      // GĂSIT — analizează direct
       var p=products[0];
       var ing=p.ingredients_text.replace(/_/g,'').replace(/\*/g,'').trim();
       scanData.ingredients=ing;
@@ -1272,13 +1267,11 @@ function searchProductInDB(b64, mime, fullImg){
           isOrganic:(p.labels||'').toLowerCase().includes('organic')||(p.labels||'').toLowerCase().includes('bio')
         };
       }
-      // Arată produs găsit
       document.getElementById('product-searching').style.display='none';
       document.getElementById('product-found').style.display='block';
-      document.getElementById('product-name-found').textContent=p.product_name||product.name||'';
-      document.getElementById('product-brand-found').textContent=p.brands||product.brand||'';
-      // Analizează după 800ms ca userul să vadă confirmarea
-      setTimeout(function(){doAnalyze();},800);
+      document.getElementById('product-name-found').textContent=p.product_name||text||'';
+      document.getElementById('product-brand-found').textContent=p.brands||'';
+      setTimeout(function(){doAnalyze();},600);
     });
   })
   .catch(function(){showManualFlow();});
@@ -1569,7 +1562,8 @@ function doAnalyze(){
   var ing=scanData.ingredients||document.getElementById('ing-textarea').value.trim();
   if(!ing||ing.length<5){showError('Ingredientele nu au fost citite. Reia scanarea.');return;}
 
-  document.getElementById('analyze-btn').disabled=true;
+  var btn=document.getElementById('analyze-btn');
+  if(btn)btn.disabled=true;
   document.getElementById('loading').classList.add('show');
   document.getElementById('results').classList.remove('show');
   document.getElementById('results').innerHTML='';
@@ -1602,7 +1596,8 @@ function doAnalyze(){
   })
   .catch(function(err){showError(err.message||'Eroare. Verifică cheia API.');})
   .finally(function(){
-    document.getElementById('analyze-btn').disabled=false;
+    var btn=document.getElementById('analyze-btn');
+    if(btn)btn.disabled=false;
     document.getElementById('loading').classList.remove('show');
   });
 }
@@ -1689,7 +1684,7 @@ function renderResults(compat, nutrit, detail, rawIng){
 
   document.getElementById('results').classList.add('show');
   updateDashboard();
-  resetScan(); // reset pentru următoarea scanare
+  // Nu resetăm aici — userul trebuie să vadă rezultatele!
 }
 function toggleHistItem(idx){
   var b=document.getElementById('hb-'+idx),a=document.getElementById('ha-'+idx);if(!b)return;
