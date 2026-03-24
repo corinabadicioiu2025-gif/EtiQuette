@@ -1226,11 +1226,10 @@ function handleStepPhoto(e, step){
 }
 
 function searchProductInDB(b64, mime, fullImg){
-  // Prompt scurt — doar numele produsului vizibil pe ambalaj (1-2s)
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:60,messages:[{role:'user',content:[
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:150,messages:[{role:'user',content:[
       {type:'image',source:{type:'base64',media_type:mime,data:b64}},
       {type:'text',text:'Identifică brandul și numele acestui produs. Returnează DOAR JSON: {"brand":"<brand>","name":"<nume produs în limba originală>","search":"<brand + nume produs în engleză, pentru căutare internațională>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null}'}
     ]}]})
@@ -1238,20 +1237,24 @@ function searchProductInDB(b64, mime, fullImg){
   .then(function(r){return r.json();})
   .then(function(d){
     var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
+    alert('DEBUG Claude răspuns:\n'+text); // DEBUG TEMPORAR
     if(!text||text.length<2){showManualFlow();return;}
 
-    // Parsează JSON-ul returnat de Claude
     var product=null;
     try{
       var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
       var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
       if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
       product=JSON.parse(clean);
-    }catch(e){product=null;}
+    }catch(e){
+      alert('DEBUG parse error: '+e.message+'\nText: '+text);
+      product=null;
+    }
 
     if(!product||!product.search){showManualFlow();return;}
 
-    // Folosim query-ul în engleză pentru OFF — mult mai bune rezultate
+    alert('DEBUG căutare OFF cu: '+product.search); // DEBUG TEMPORAR
+
     var q=encodeURIComponent(product.search);
     var url=productType==='cosmetic'
       ?'https://world.openbeautyfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=3&fields=product_name,brands,ingredients_text,nutriments,labels'
@@ -1261,6 +1264,7 @@ function searchProductInDB(b64, mime, fullImg){
     .then(function(r){return r.json();})
     .then(function(data){
       var products=(data.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
+      alert('DEBUG OFF rezultate: '+products.length+'\n'+(products[0]?products[0].product_name+' / '+products[0].brands:'')); // DEBUG TEMPORAR
       if(products.length===0){showManualFlow();return;}
 
       var p=products[0];
@@ -1289,7 +1293,7 @@ function searchProductInDB(b64, mime, fullImg){
       setTimeout(function(){doAnalyze();},600);
     });
   })
-  .catch(function(){showManualFlow();});
+  .catch(function(e){alert('DEBUG eroare: '+e.message);showManualFlow();});
 }
 
 function showManualFlow(product){
