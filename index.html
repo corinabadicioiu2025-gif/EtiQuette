@@ -1184,18 +1184,16 @@ function compressImage(base64, mime, maxSizeBytes, callback){
     var canvas=document.createElement('canvas');
     var ctx=canvas.getContext('2d');
     var w=img.width, h=img.height;
-    // Redimensionăm dacă e prea mare
-    var maxDim=1200;
-    if(w>maxDim||h>maxDim){
-      if(w>h){h=Math.round(h*maxDim/w);w=maxDim;}
-      else{w=Math.round(w*maxDim/h);h=maxDim;}
-    }
+    // Reducem agresiv — 800px e suficient pentru OCR text
+    var maxDim=800;
+    if(w>h){h=Math.round(h*maxDim/w);w=maxDim;}
+    else{w=Math.round(w*maxDim/h);h=maxDim;}
     canvas.width=w; canvas.height=h;
     ctx.drawImage(img,0,0,w,h);
-    // Comprimăm progresiv până sub limită
-    var quality=0.8;
+    // Pornim de la calitate 0.7 și scădem dacă e nevoie
+    var quality=0.7;
     var result=canvas.toDataURL('image/jpeg',quality);
-    while(result.length*0.75>maxSizeBytes&&quality>0.3){
+    while(result.length*0.75>maxSizeBytes&&quality>0.2){
       quality-=0.1;
       result=canvas.toDataURL('image/jpeg',quality);
     }
@@ -1213,15 +1211,14 @@ function handleStepPhoto(e, step){
     var mime=file.type||'image/jpeg';
 
     if(step===0){
-      alert('DEBUG: poza primită, pornesc căutarea...\nAPI key: '+(getKey()?'prezentă':'LIPSĂ!'));
       scanData.productPhoto=full;
       scanData.photos[3]=full;
       document.getElementById('step-0-wrap').style.display='none';
       document.getElementById('product-search-wrap').style.display='block';
       document.getElementById('product-searching').style.display='flex';
-      // Comprimăm înainte să trimitem la API (limita 5MB)
+      // Comprimăm agresiv — avem nevoie doar de text lizibil, nu de calitate
       compressImage(b64, mime, 4*1024*1024, function(compB64, compMime){
-        searchProductInDB(compB64, compMime, full);
+        searchProductInDB(compB64, compMime);
       });
       return;
     }
@@ -1258,7 +1255,7 @@ function handleStepPhoto(e, step){
   reader.readAsDataURL(file);
 }
 
-function searchProductInDB(b64, mime, fullImg){
+function searchProductInDB(b64, mime){
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
@@ -1269,10 +1266,8 @@ function searchProductInDB(b64, mime, fullImg){
   })
   .then(function(r){return r.json();})
   .then(function(d){
-    // Verifică erori API
-    if(d.error){alert('DEBUG eroare API: '+d.error.message);showManualFlow();return;}
+    if(d.error){showManualFlow();return;}
     var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
-    alert('DEBUG Claude răspuns:\n"'+text+'"');
     if(!text||text.length<2){showManualFlow();return;}
 
     var product=null;
@@ -1281,14 +1276,9 @@ function searchProductInDB(b64, mime, fullImg){
       var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
       if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
       product=JSON.parse(clean);
-    }catch(e){
-      alert('DEBUG parse error: '+e.message);
-      showManualFlow();return;
-    }
+    }catch(e){showManualFlow();return;}
 
     if(!product||!product.search){showManualFlow();return;}
-
-    alert('DEBUG căutare OFF cu: "'+product.search+'"');
 
     var q=encodeURIComponent(product.search);
     var url=productType==='cosmetic'
@@ -1299,7 +1289,6 @@ function searchProductInDB(b64, mime, fullImg){
     .then(function(r){return r.json();})
     .then(function(data){
       var products=(data.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
-      alert('DEBUG OFF: '+products.length+' rezultate\n'+(products[0]?products[0].product_name+' / '+products[0].brands:'nimic'));
       if(products.length===0){showManualFlow();return;}
 
       var p=products[0];
@@ -1328,7 +1317,7 @@ function searchProductInDB(b64, mime, fullImg){
       setTimeout(function(){doAnalyze();},600);
     });
   })
-  .catch(function(e){alert('DEBUG catch: '+(e&&e.message?e.message:e));showManualFlow();});
+  .catch(function(){showManualFlow();});
 }
 
 function showManualFlow(product){
