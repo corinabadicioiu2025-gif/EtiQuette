@@ -1268,6 +1268,7 @@ function searchProductInDB(b64, mime){
   .then(function(d){
     if(d.error){showManualFlow();return;}
     var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
+    alert('Claude a returnat:\n"'+text+'"');
     if(!text||text.length<2){showManualFlow();return;}
 
     var product=null;
@@ -1280,9 +1281,7 @@ function searchProductInDB(b64, mime){
 
     if(!product||!product.search){showManualFlow();return;}
 
-    // Afișăm temporar ce caută — să verificăm
-    document.getElementById('product-brand-found').style.display='block';
-    document.getElementById('product-searching').querySelector('div div:last-child').textContent='Caut: "'+product.search+'"';
+    alert('Caut în OFF: "'+product.search+'"');
 
     var q=encodeURIComponent(product.search);
     var url=productType==='cosmetic'
