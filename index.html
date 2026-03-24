@@ -1280,6 +1280,10 @@ function searchProductInDB(b64, mime){
 
     if(!product||!product.search){showManualFlow();return;}
 
+    // Afișăm temporar ce caută — să verificăm
+    document.getElementById('product-brand-found').style.display='block';
+    document.getElementById('product-searching').querySelector('div div:last-child').textContent='Caut: "'+product.search+'"';
+
     var q=encodeURIComponent(product.search);
     var url=productType==='cosmetic'
       ?'https://world.openbeautyfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=3&fields=product_name,brands,ingredients_text,nutriments,labels'
