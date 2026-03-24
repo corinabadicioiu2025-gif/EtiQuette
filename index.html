@@ -1188,6 +1188,7 @@ function handleStepPhoto(e, step){
 
     if(step===0){
       // Fața produsului — caută în DB
+      alert('DEBUG: poza primită, pornesc căutarea...\nAPI key: '+(getKey()?'prezentă':'LIPSĂ!'));
       scanData.productPhoto=full;
       scanData.photos[3]=full;
       document.getElementById('step-0-wrap').style.display='none';
