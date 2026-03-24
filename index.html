@@ -939,16 +939,16 @@ function checkBirthdays(){
 function closeBirthday(){document.getElementById('birthday-overlay').classList.remove('show');}
 
 // NAVIGATION
+var currentPage='dashboard';
 function goTo(page){
+  currentPage=page;
   ['dashboard','home','history','favorites'].forEach(function(p){
     document.getElementById('page-'+p).classList.toggle('active',p===page);
   });
-  // nav buttons
   ['dashboard','history','favorites'].forEach(function(p){
     var btn=document.getElementById('nav-'+p);
     if(btn)btn.classList.toggle('active',p===page);
   });
-  // oval color
   var oval=document.getElementById('nav-oval');
   if(oval){
     oval.className='nav-oval';
@@ -1628,9 +1628,20 @@ function calcNutritional(nutrition, ingredients){
 function doAnalyze(){
   if(!getKey()){showApiModal();return;}
 
+  // Dacă nu suntem pe pagina de analiză, navigăm acolo
+  if(currentPage!=='home') goTo('home');
+
   // ingOriginal = text brut din OFF sau OCR, in orice limba — pentru algoritm
   var ingOriginal=scanData.ingredients||document.getElementById('ing-textarea').value.trim();
-  if(!ingOriginal||ingOriginal.length<5){showError('Ingredientele nu au fost citite. Reia scanarea.');return;}
+  if(!ingOriginal||ingOriginal.length<5){
+    // Mesaj clar — userul trebuie să fotografieze mai întâi
+    setTimeout(function(){
+      document.getElementById('error-msg').textContent='⚠️ Fotografiază mai întâi fața produsului pentru a începe analiza.';
+      document.getElementById('error-msg').classList.add('show');
+      document.getElementById('error-msg').scrollIntoView({behavior:'smooth',block:'center'});
+    }, 300);
+    return;
+  }
 
   var btn=document.getElementById('analyze-btn');
   if(btn)btn.disabled=true;
