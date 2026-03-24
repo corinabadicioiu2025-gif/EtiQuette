@@ -1232,16 +1232,27 @@ function searchProductInDB(b64, mime, fullImg){
     headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:60,messages:[{role:'user',content:[
       {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-      {type:'text',text:'Ce scrie pe acest produs? Returnează DOAR numele produsului și brandul în format: BRAND NUME. Maxim 6 cuvinte. Dacă nu poți citi nimic, returnează: NECUNOSCUT'}
+      {type:'text',text:'Identifică brandul și numele acestui produs. Returnează DOAR JSON: {"brand":"<brand>","name":"<nume produs în limba originală>","search":"<brand + nume produs în engleză, pentru căutare internațională>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null}'}
     ]}]})
   })
   .then(function(r){return r.json();})
   .then(function(d){
     var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
-    if(!text||text==='NECUNOSCUT'||text.length<2){showManualFlow();return;}
+    if(!text||text.length<2){showManualFlow();return;}
 
-    // Caută direct în OFF cu textul citit
-    var q=encodeURIComponent(text);
+    // Parsează JSON-ul returnat de Claude
+    var product=null;
+    try{
+      var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
+      var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
+      if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
+      product=JSON.parse(clean);
+    }catch(e){product=null;}
+
+    if(!product||!product.search){showManualFlow();return;}
+
+    // Folosim query-ul în engleză pentru OFF — mult mai bune rezultate
+    var q=encodeURIComponent(product.search);
     var url=productType==='cosmetic'
       ?'https://world.openbeautyfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=3&fields=product_name,brands,ingredients_text,nutriments,labels'
       :'https://world.openfoodfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=3&fields=product_name,brands,ingredients_text,nutriments,labels';
@@ -1255,8 +1266,6 @@ function searchProductInDB(b64, mime, fullImg){
       var p=products[0];
       var ing=p.ingredients_text.replace(/_/g,'').replace(/\*/g,'').trim();
       scanData.ingredients=ing;
-      // DEBUG — alert cu primele 300 caractere din ingrediente
-      setTimeout(function(){alert('OFF ingredients:\n\n'+ing.substring(0,400));},200);
       if(p.nutriments){
         scanData.nutrition={
           energy_kj:p.nutriments['energy-kj_100g']||null,
@@ -1273,10 +1282,10 @@ function searchProductInDB(b64, mime, fullImg){
       }
       document.getElementById('product-searching').style.display='none';
       document.getElementById('product-found').style.display='block';
-      document.getElementById('product-name-found').textContent=p.product_name||text||'';
-      document.getElementById('product-brand-found').textContent=p.brands||'';
-      scanData.productName=p.product_name||text||'';
-      scanData.productBrand=p.brands||'';
+      document.getElementById('product-name-found').textContent=product.name||p.product_name||'';
+      document.getElementById('product-brand-found').textContent=product.brand||p.brands||'';
+      scanData.productName=product.name||p.product_name||'';
+      scanData.productBrand=product.brand||p.brands||'';
       setTimeout(function(){doAnalyze();},600);
     });
   })
