@@ -1178,6 +1178,32 @@ function openCameraStep(step){
   document.getElementById('file-input-'+step).click();
 }
 
+function compressImage(base64, mime, maxSizeBytes, callback){
+  var img=new Image();
+  img.onload=function(){
+    var canvas=document.createElement('canvas');
+    var ctx=canvas.getContext('2d');
+    var w=img.width, h=img.height;
+    // Redimensionăm dacă e prea mare
+    var maxDim=1200;
+    if(w>maxDim||h>maxDim){
+      if(w>h){h=Math.round(h*maxDim/w);w=maxDim;}
+      else{w=Math.round(w*maxDim/h);h=maxDim;}
+    }
+    canvas.width=w; canvas.height=h;
+    ctx.drawImage(img,0,0,w,h);
+    // Comprimăm progresiv până sub limită
+    var quality=0.8;
+    var result=canvas.toDataURL('image/jpeg',quality);
+    while(result.length*0.75>maxSizeBytes&&quality>0.3){
+      quality-=0.1;
+      result=canvas.toDataURL('image/jpeg',quality);
+    }
+    callback(result.split(',')[1],'image/jpeg');
+  };
+  img.src='data:'+mime+';base64,'+base64;
+}
+
 function handleStepPhoto(e, step){
   var file=e.target.files[0]; if(!file) return;
   var reader=new FileReader();
@@ -1187,14 +1213,16 @@ function handleStepPhoto(e, step){
     var mime=file.type||'image/jpeg';
 
     if(step===0){
-      // Fața produsului — caută în DB
       alert('DEBUG: poza primită, pornesc căutarea...\nAPI key: '+(getKey()?'prezentă':'LIPSĂ!'));
       scanData.productPhoto=full;
       scanData.photos[3]=full;
       document.getElementById('step-0-wrap').style.display='none';
       document.getElementById('product-search-wrap').style.display='block';
       document.getElementById('product-searching').style.display='flex';
-      searchProductInDB(b64, mime, full);
+      // Comprimăm înainte să trimitem la API (limita 5MB)
+      compressImage(b64, mime, 4*1024*1024, function(compB64, compMime){
+        searchProductInDB(compB64, compMime, full);
+      });
       return;
     }
 
@@ -1211,12 +1239,16 @@ function handleStepPhoto(e, step){
       document.getElementById('step-1-wrap').style.display='none';
       document.getElementById('step-2-wrap').style.display='block';
       document.getElementById('step-2-dot').className='step-dot active';
-      extractIngredients(b64, mime);
+      compressImage(b64, mime, 4*1024*1024, function(compB64, compMime){
+        extractIngredients(compB64, compMime);
+      });
     } else if(step===2){
       document.getElementById('step-2-wrap').style.display='none';
       document.getElementById('step-3-wrap').style.display='block';
       document.getElementById('step-3-dot').className='step-dot active';
-      extractNutrition(b64, mime);
+      compressImage(b64, mime, 4*1024*1024, function(compB64, compMime){
+        extractNutrition(compB64, compMime);
+      });
     } else if(step===3){
       scanData.productPhoto=full;
       document.getElementById('step-3-wrap').style.display='none';
