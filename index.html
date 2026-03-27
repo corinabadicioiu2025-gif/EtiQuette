@@ -1316,9 +1316,11 @@ function searchProductInDB(b64, mime){
     logStep('Caut în baza de date cu: <em>"'+product.search+'"</em>','loading');
 
     var q=encodeURIComponent(product.search);
-    var url=productType==='cosmetic'
-      ?'https://world.openbeautyfacts.org/api/v2/search?search_terms='+q+'&page_size=3&fields=product_name,brands,ingredients_text,nutriments,labels'
-      :'https://world.openfoodfacts.org/api/v2/search?search_terms='+q+'&page_size=3&fields=product_name,brands,ingredients_text,nutriments,labels';
+    // Folosim proxy CORS — OFF nu permite direct din browser
+    var offUrl=productType==='cosmetic'
+      ?'https://world.openbeautyfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,nutriments,labels'
+      :'https://world.openfoodfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,nutriments,labels';
+    var url='https://corsproxy.io/?'+encodeURIComponent(offUrl);
 
     return fetch(url)
     .then(function(r){return r.json();})
