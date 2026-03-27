@@ -432,12 +432,9 @@ textarea::placeholder{color:var(--muted)}
 
   <!-- STATUS căutare produs -->
   <div id="product-search-wrap" style="display:none;margin-top:10px">
-    <div id="product-searching" style="display:none;align-items:center;gap:10px;background:var(--gold-pale);border:0.5px solid var(--gold);border-radius:var(--radius);padding:14px">
-      <div class="spinner" style="width:16px;height:16px;border-width:1.5px;margin:0;flex-shrink:0"></div>
-      <div>
-        <div style="font-family:'Jost',sans-serif;font-size:14px;color:var(--gold);font-weight:500">Identific produsul...</div>
-        <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--muted);margin-top:2px">Caut în baza de date</div>
-      </div>
+    <div id="product-searching" style="display:none;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px">
+      <div style="font-family:'Jost',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Procesare</div>
+      <div id="log-list" style="display:flex;flex-direction:column;gap:6px"></div>
     </div>
     <div id="product-found" style="display:none;background:var(--good-pale);border:0.5px solid var(--good);border-radius:var(--radius);padding:14px">
       <div style="font-family:'Jost',sans-serif;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--good);margin-bottom:4px">✓ Produs identificat</div>
@@ -446,6 +443,7 @@ textarea::placeholder{color:var(--muted)}
     </div>
     <div id="product-not-found" style="display:none;background:var(--warn-pale);border:0.5px solid var(--warn);border-radius:var(--radius);padding:14px">
       <div style="font-family:'Jost',sans-serif;font-size:14px;font-weight:500;color:var(--warn);margin-bottom:6px">Produs negăsit în baza de date</div>
+      <div id="log-list-fail" style="margin-bottom:8px"></div>
       <div style="font-family:'Jost',sans-serif;font-size:13px;color:var(--text2);line-height:1.5">Fotografiază manual cele 3 imagini de mai jos pentru a continua analiza.</div>
     </div>
   </div>
@@ -1215,7 +1213,7 @@ function handleStepPhoto(e, step){
       scanData.photos[3]=full;
       document.getElementById('step-0-wrap').style.display='none';
       document.getElementById('product-search-wrap').style.display='block';
-      document.getElementById('product-searching').style.display='flex';
+      document.getElementById('product-searching').style.display='block';
       // Comprimăm agresiv — avem nevoie doar de text lizibil, nu de calitate
       compressImage(b64, mime, 4*1024*1024, function(compB64, compMime){
         searchProductInDB(compB64, compMime);
@@ -1255,7 +1253,29 @@ function handleStepPhoto(e, step){
   reader.readAsDataURL(file);
 }
 
+function logStep(msg, status){
+  // status: 'loading' | 'ok' | 'warn' | 'error'
+  var icon = status==='ok'?'✅':status==='warn'?'⚠️':status==='error'?'❌':'⏳';
+  var color = status==='ok'?'var(--good)':status==='warn'?'var(--warn)':status==='error'?'var(--danger)':'var(--gold)';
+  var row = '<div style="display:flex;align-items:flex-start;gap:8px;font-family:\'Jost\',sans-serif;font-size:13px;color:var(--text2);line-height:1.4">'
+    +'<span style="flex-shrink:0;color:'+color+'">'+icon+'</span>'
+    +'<span>'+msg+'</span>'
+    +'</div>';
+  var list=document.getElementById('log-list');
+  if(list)list.innerHTML+=row;
+  var listFail=document.getElementById('log-list-fail');
+  if(listFail)listFail.innerHTML+=row;
+}
+
 function searchProductInDB(b64, mime){
+  var logList=document.getElementById('log-list');
+  if(logList)logList.innerHTML='';
+  var logListFail=document.getElementById('log-list-fail');
+  if(logListFail)logListFail.innerHTML='';
+
+  logStep('Comprim imaginea...','loading');
+  logStep('Trimit la Claude pentru identificare...','loading');
+
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
@@ -1266,10 +1286,15 @@ function searchProductInDB(b64, mime){
   })
   .then(function(r){return r.json();})
   .then(function(d){
-    if(d.error){showManualFlow();return;}
+    if(d.error){
+      logStep('Eroare API Claude: '+d.error.message,'error');
+      showManualFlow();return;
+    }
     var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
-    alert('Claude a returnat:\n"'+text+'"');
-    if(!text||text.length<2){showManualFlow();return;}
+    if(!text||text.length<2){
+      logStep('Claude nu a putut citi produsul din poză','error');
+      showManualFlow();return;
+    }
 
     var product=null;
     try{
@@ -1277,11 +1302,18 @@ function searchProductInDB(b64, mime){
       var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
       if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
       product=JSON.parse(clean);
-    }catch(e){showManualFlow();return;}
+    }catch(e){
+      logStep('Eroare parsare răspuns Claude: '+text,'error');
+      showManualFlow();return;
+    }
 
-    if(!product||!product.search){showManualFlow();return;}
+    if(!product||!product.search){
+      logStep('Produs nerecunoscut în poză','warn');
+      showManualFlow();return;
+    }
 
-    alert('Caut în OFF: "'+product.search+'"');
+    logStep('Claude identificat: <strong>'+product.brand+' '+product.name+'</strong>','ok');
+    logStep('Caut în baza de date cu: <em>"'+product.search+'"</em>','loading');
 
     var q=encodeURIComponent(product.search);
     var url=productType==='cosmetic'
@@ -1291,10 +1323,18 @@ function searchProductInDB(b64, mime){
     return fetch(url)
     .then(function(r){return r.json();})
     .then(function(data){
+      var total=(data.products||[]).length;
       var products=(data.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
-      if(products.length===0){showManualFlow();return;}
+      logStep('OFF: '+total+' produse găsite, '+products.length+' cu ingrediente complete', products.length>0?'ok':'warn');
+      if(products.length===0){
+        if(total>0) logStep('Produsele găsite nu au ingrediente completate în baza de date','warn');
+        showManualFlow();return;
+      }
 
       var p=products[0];
+      logStep('Produs selectat: <strong>'+(p.product_name||product.name)+'</strong>','ok');
+      logStep('Ingrediente preluate ('+p.ingredients_text.split(',').length+' ingrediente)','ok');
+
       var ing=p.ingredients_text.replace(/_/g,'').replace(/\*/g,'').trim();
       scanData.ingredients=ing;
       if(p.nutriments){
@@ -1310,17 +1350,24 @@ function searchProductInDB(b64, mime){
           fruits_percent:p.nutriments['fruits-vegetables-nuts_100g']||0,
           isOrganic:(p.labels||'').toLowerCase().includes('organic')||(p.labels||'').toLowerCase().includes('bio')
         };
+        logStep('Valori nutriționale preluate','ok');
+      } else {
+        logStep('Fără valori nutriționale în baza de date','warn');
       }
+
       document.getElementById('product-searching').style.display='none';
       document.getElementById('product-found').style.display='block';
       document.getElementById('product-name-found').textContent=product.name||p.product_name||'';
       document.getElementById('product-brand-found').textContent=product.brand||p.brands||'';
       scanData.productName=product.name||p.product_name||'';
       scanData.productBrand=product.brand||p.brands||'';
-      setTimeout(function(){doAnalyze();},600);
+      setTimeout(function(){doAnalyze();},800);
     });
   })
-  .catch(function(){showManualFlow();});
+  .catch(function(e){
+    logStep('Eroare conexiune: '+(e&&e.message?e.message:'necunoscută'),'error');
+    showManualFlow();
+  });
 }
 
 function showManualFlow(product){
