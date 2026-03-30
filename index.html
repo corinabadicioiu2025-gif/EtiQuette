@@ -330,6 +330,31 @@ textarea::placeholder{color:var(--muted)}
 /* SVG ICONS inline */
 .svg-food{display:block}
 .svg-cosm{display:block}
+
+/* GDPR ONBOARDING */
+.gdpr-overlay{display:none;position:fixed;inset:0;z-index:500;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;animation:fadeIn 0.5s ease}
+.gdpr-overlay.show{display:flex}
+.gdpr-logo{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:600;color:var(--text);letter-spacing:0.01em;margin-bottom:4px}
+.gdpr-logo span{color:var(--gold);font-style:italic}
+.gdpr-tagline{font-family:'Jost',sans-serif;font-size:13px;color:var(--muted);font-style:italic;letter-spacing:0.08em;margin-bottom:32px}
+.gdpr-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--text);margin-bottom:8px;text-align:center}
+.gdpr-subtitle{font-family:'Jost',sans-serif;font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:28px;text-align:center}
+.gdpr-checks{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+.gdpr-check-row{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:all 0.2s}
+.gdpr-check-row:hover{border-color:var(--gold)}
+.gdpr-check-row.checked{border-color:var(--gold);background:var(--gold-pale)}
+.gdpr-check-row.required-check{border-color:var(--border)}
+.gdpr-checkbox{width:22px;height:22px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.2s;background:var(--surface)}
+.gdpr-check-row.checked .gdpr-checkbox{background:var(--gold);border-color:var(--gold);color:white}
+.gdpr-check-text{flex:1}
+.gdpr-check-label{font-family:'Jost',sans-serif;font-size:14px;font-weight:500;color:var(--text);margin-bottom:3px}
+.gdpr-check-desc{font-family:'Jost',sans-serif;font-size:12px;color:var(--muted);line-height:1.5}
+.gdpr-optional-badge{font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border:0.5px solid var(--border);border-radius:4px;padding:2px 7px;display:inline-block;margin-bottom:5px}
+.gdpr-required-badge{font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);background:var(--gold-pale);border:0.5px solid var(--gold);border-radius:4px;padding:2px 7px;display:inline-block;margin-bottom:5px}
+.gdpr-continue-btn{width:100%;max-width:380px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;padding:17px;font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;cursor:pointer;transition:all 0.3s;opacity:0.35;pointer-events:none}
+.gdpr-continue-btn.active{opacity:1;pointer-events:auto}
+.gdpr-continue-btn.active:hover{background:var(--text)}
+.gdpr-note{font-family:'Jost',sans-serif;font-size:11px;color:var(--muted);text-align:center;margin-top:12px;font-style:italic;line-height:1.6;max-width:340px}
 </style>
 </head>
 <body>
@@ -781,8 +806,226 @@ textarea::placeholder{color:var(--muted)}
   </div>
 </div>
 
+<!-- GDPR ONBOARDING OVERLAY -->
+<div class="gdpr-overlay" id="gdpr-overlay">
+  <div class="gdpr-logo">Eti<span>Q</span>uette</div>
+  <div class="gdpr-tagline">ajutorul tău pentru alegeri sănătoase</div>
+  <div class="gdpr-title">Bun venit!</div>
+  <div class="gdpr-subtitle">Înainte să începi, te rugăm să confirmi<br>cele două lucruri de mai jos.</div>
+  <div class="gdpr-checks">
+    <!-- Checkbox 1 — OPȚIONAL -->
+    <div class="gdpr-check-row" id="gdpr-row-1" onclick="toggleGdpr(1)">
+      <div class="gdpr-checkbox" id="gdpr-box-1"></div>
+      <div class="gdpr-check-text">
+        <div class="gdpr-optional-badge">Opțional</div>
+        <div class="gdpr-check-label">Contribui anonim la EtiQuette</div>
+        <div class="gdpr-check-desc">Datele scanărilor sunt pseudonimizate și nu pot fi legate de identitatea ta. Ne ajuți să construim o bază de date de produse românești.</div>
+      </div>
+    </div>
+    <!-- Checkbox 2 — OBLIGATORIU -->
+    <div class="gdpr-check-row" id="gdpr-row-2" onclick="toggleGdpr(2)">
+      <div class="gdpr-checkbox" id="gdpr-box-2"></div>
+      <div class="gdpr-check-text">
+        <div class="gdpr-required-badge">Obligatoriu</div>
+        <div class="gdpr-check-label">Am înțeles că EtiQuette este orientativ</div>
+        <div class="gdpr-check-desc">EtiQuette nu înlocuiește sfatul medical profesionist. Scorurile sunt estimări bazate pe date publice.</div>
+      </div>
+    </div>
+  </div>
+  <button class="gdpr-continue-btn" id="gdpr-continue-btn" onclick="acceptGdpr()">Continuă</button>
+  <div class="gdpr-note">Poți modifica preferințele oricând din meniu → Confidențialitate.<br>Datele personale (profil, afecțiuni) rămân exclusiv pe dispozitivul tău.</div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getFirestore, collection, addDoc, doc, setDoc, getDoc, query, where, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { getStorage, ref, uploadString, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+
+  // ── CONFIGURARE FIREBASE ─────────────────────────────────
+  // TODO: Înlocuiește cu valorile tale din Firebase Console
+  // console.firebase.google.com → Proiect → Setări → Aplicații web
+  const firebaseConfig = {
+    apiKey: "INLOCUIESTE_CU_CHEIA_TA",
+    authDomain: "PROIECT_ID.firebaseapp.com",
+    projectId: "INLOCUIESTE_CU_PROIECT_ID",
+    storageBucket: "PROIECT_ID.appspot.com",
+    messagingSenderId: "INLOCUIESTE",
+    appId: "INLOCUIESTE"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // ── ID ANONIM utilizator ─────────────────────────────────
+  function getAnonymousId() {
+    let uid = localStorage.getItem('eq_uid');
+    if (!uid) {
+      uid = 'eq_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('eq_uid', uid);
+    }
+    return uid;
+  }
+
+  // ── TRIMITE SCANARE ANONIMĂ LA FIREBASE ─────────────────
+  // Apelată din autoSave() doar dacă userul a acceptat contribuția
+  window.firebaseSaveScan = async function(compatScore, nutritScore, type, alerts, productName, productBrand) {
+    if (!window.gdprContributie) return; // nu a acceptat contribuția anonimă
+    try {
+      await addDoc(collection(db, 'scanari'), {
+        uid: getAnonymousId(),
+        tip_produs: type,
+        scor_compatibilitate: compatScore,
+        scor_nutritional: nutritScore,
+        nr_alerte: alerts,
+        produs_gasit_automat: productName ? true : false,
+        timestamp: serverTimestamp()
+        // NU trimitem: afecțiuni specifice, nume membre, date naștere
+      });
+    } catch(e) {
+      console.warn('Firebase scanare:', e.message);
+    }
+  };
+
+  // ── TRIMITE PRODUS NECUNOSCUT LA FIREBASE ────────────────
+  // Apelată din fluxul manual 3 poze
+  window.firebaseSaveProduct = async function(productId, brand, name, ingredients, nutrition, photos) {
+    if (!window.gdprContributie) return;
+    try {
+      // Verificăm dacă produsul există deja
+      const docRef = doc(db, 'produse', productId);
+      const existing = await getDoc(docRef);
+      if (existing.exists()) return; // produs deja în baza de date
+
+      // Urcăm fotografiile în Storage
+      const photoUrls = {};
+      const photoLabels = ['fata', 'ingrediente', 'nutritional'];
+      for (let i = 0; i < photoLabels.length; i++) {
+        if (photos[i]) {
+          try {
+            const storageRef = ref(storage, `produse/${productId}/${photoLabels[i]}.jpg`);
+            await uploadString(storageRef, photos[i], 'data_url');
+            photoUrls[photoLabels[i]] = await getDownloadURL(storageRef);
+          } catch(e) {
+            console.warn('Upload poza', photoLabels[i], ':', e.message);
+          }
+        }
+      }
+
+      // Salvăm documentul produsului
+      await setDoc(docRef, {
+        product_id: productId,
+        brand: brand || '',
+        name: name || '',
+        ingredients_original: ingredients || '',
+        limba_originala: detectLimba(ingredients),
+        nutrition: nutrition || null,
+        photos: photoUrls,
+        uid_contributor: getAnonymousId(),
+        status: 'pending_review', // produsul așteaptă verificare
+        timestamp: serverTimestamp()
+      });
+
+    } catch(e) {
+      console.warn('Firebase produs:', e.message);
+    }
+  };
+
+  // ── ÎNREGISTRARE PRODUS NECĂUTAT (jurnal căutări nereușite) ──
+  window.firebaseLogMissedProduct = async function(searchQuery, type) {
+    if (!window.gdprContributie) return;
+    try {
+      // Căutăm dacă există deja
+      const q = query(collection(db, 'cautari_nereușite'), where('search_query', '==', searchQuery));
+      const snapshot = await getDocs(q);
+
+      if (!snapshot.empty) {
+        // Există deja — incrementăm contorul
+        const docRef = snapshot.docs[0].ref;
+        const data = snapshot.docs[0].data();
+        await setDoc(docRef, {
+          ...data,
+          de_cate_ori_cautat: (data.de_cate_ori_cautat || 1) + 1,
+          ultima_cautare: serverTimestamp()
+        });
+      } else {
+        // Produs nou nefound — îl înregistrăm
+        await addDoc(collection(db, 'cautari_nereușite'), {
+          search_query: searchQuery,
+          tip_produs: type,
+          de_cate_ori_cautat: 1,
+          status: 'nerezolvat',
+          prima_cautare: serverTimestamp(),
+          ultima_cautare: serverTimestamp()
+        });
+      }
+    } catch(e) {
+      console.warn('Firebase jurnal:', e.message);
+    }
+  };
+
+  // ── Detectare limbă ingrediente ─────────────────────────
+  function detectLimba(text) {
+    if (!text) return 'necunoscuta';
+    const t = text.toLowerCase();
+    if (t.includes('farine') || t.includes('lait') || t.includes('sucre') || t.includes('beurre')) return 'fr';
+    if (t.includes('zucker') || t.includes('milch') || t.includes('mehl') || t.includes('butter')) return 'de';
+    if (t.includes('zahar') || t.includes('lapte') || t.includes('apa') || t.includes('sare')) return 'ro';
+    return 'en';
+  }
+
+  // Facem funcțiile disponibile global
+  window._firebaseReady = true;
+</script>
+
 <script>
-var AVATARS=['👦','👧','👨','👩','👴','👵','🧒','🧑','👶','🧔','👱','🧕','🧑‍🦰','🧑‍🦱','🧑‍🦳','🧑‍🦲','😀','😎','🤓','🥰'];
+// ── GDPR LOGIC ───────────────────────────────────────────────────────────────
+var gdprCheck1 = false; // opțional — contribuție anonimă
+var gdprCheck2 = false; // obligatoriu — disclaimer medical
+
+window.gdprContributie = false; // folosit de Firebase
+
+function toggleGdpr(nr) {
+  if (nr === 1) {
+    gdprCheck1 = !gdprCheck1;
+    document.getElementById('gdpr-row-1').classList.toggle('checked', gdprCheck1);
+    document.getElementById('gdpr-box-1').textContent = gdprCheck1 ? '✓' : '';
+  } else {
+    gdprCheck2 = !gdprCheck2;
+    document.getElementById('gdpr-row-2').classList.toggle('checked', gdprCheck2);
+    document.getElementById('gdpr-box-2').textContent = gdprCheck2 ? '✓' : '';
+  }
+  // Butonul Continuă e activ doar când checkbox-ul obligatoriu e bifat
+  var btn = document.getElementById('gdpr-continue-btn');
+  btn.classList.toggle('active', gdprCheck2);
+}
+
+function acceptGdpr() {
+  if (!gdprCheck2) return;
+  window.gdprContributie = gdprCheck1; // salvăm preferința contribuției
+  try {
+    localStorage.setItem('eq_gdpr_v1', JSON.stringify({
+      accepted: true,
+      contributie: gdprCheck1,
+      data: new Date().toISOString()
+    }));
+  } catch(e) {}
+  document.getElementById('gdpr-overlay').classList.remove('show');
+}
+
+function checkGdpr() {
+  try {
+    var stored = JSON.parse(localStorage.getItem('eq_gdpr_v1') || 'null');
+    if (stored && stored.accepted) {
+      window.gdprContributie = stored.contributie || false;
+      return; // nu afișăm onboarding-ul
+    }
+  } catch(e) {}
+  // Prima deschidere sau GDPR neacceptat — afișăm onboarding
+  document.getElementById('gdpr-overlay').classList.add('show');
+}
+</script>=['👦','👧','👨','👩','👴','👵','🧒','🧑','👶','🧔','👱','🧕','🧑‍🦰','🧑‍🦱','🧑‍🦳','🧑‍🦲','😀','😎','🤓','🥰'];
 var AGE_GROUPS=[
   {max:0.5,label:'0-6 luni',foodKeys:['sugar','sucrose','glucose','fructose','salt','sodium','honey','miere','nitrite','zahar','sare','sweetener','colorant'],cosKeys:['fragrance','parfum','alcohol','sls','sles','parabens','phenoxyethanol']},
   {max:1,label:'6-12 luni',foodKeys:['honey','miere','salt','sodium','sugar','sucrose','zahar','sare','nitrite','sweetener','artificial','colorant'],cosKeys:['fragrance','parfum','alcohol denat','sls','sles','parabens']},
@@ -1277,6 +1520,19 @@ function handleStepPhoto(e, step){
       scanData.productPhoto=full;
       document.getElementById('step-3-wrap').style.display='none';
       document.getElementById('analyze-btn').style.display='flex';
+      // Trimitem produsul necunoscut la Firebase cu cele 3 fotografii
+      if (window.firebaseSaveProduct && (scanData.productName || scanData.productBrand)) {
+        var productId = ((scanData.productBrand||'') + '-' + (scanData.productName||''))
+          .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        window.firebaseSaveProduct(
+          productId,
+          scanData.productBrand,
+          scanData.productName,
+          scanData.ingredients,
+          scanData.nutrition,
+          [scanData.photos[1], scanData.photos[2], full]
+        );
+      }
     }
   };
   reader.readAsDataURL(file);
@@ -1408,6 +1664,10 @@ function searchProductInDB(b64, mime){
 
 function showManualFlow(product){
   trackEvent('flux_manual_3_poze', {tip_produs: productType});
+  // Înregistrăm produsul ca "necăutat" în jurnalul Firebase
+  if (product && product.search && window.firebaseLogMissedProduct) {
+    window.firebaseLogMissedProduct(product.search, productType);
+  }
   document.getElementById('product-searching').style.display='none';
   document.getElementById('product-not-found').style.display='block';
   // Salvăm poza față produs ca preview-3 în fluxul manual
@@ -1881,6 +2141,10 @@ function renderResults(compat, nutrit, detail, rawIng){
   updateDashboard();
 }
 function autoSave(compatScore, nutritScore, type, alerts){
+  // Trimite scanare anonimă la Firebase (dacă userul a acceptat)
+  if (window.firebaseSaveScan) {
+    window.firebaseSaveScan(compatScore, nutritScore, type, alerts, scanData.productName, scanData.productBrand);
+  }
   // Track analiză completă
   trackEvent('analiza_finalizata', {
     tip_produs: type,
@@ -2039,7 +2303,8 @@ renderFavorites();
 renderMemberSelector();
 renderDefaultSetting();
 resetScan();
-if(!getKey())showApiModal();
+checkGdpr();
+if(!getKey())setTimeout(function(){if(!document.getElementById('gdpr-overlay').classList.contains('show'))showApiModal();},500);
 setTimeout(checkBirthdays,1000);
 </script>
 </body>
