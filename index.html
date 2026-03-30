@@ -1320,14 +1320,17 @@ function searchProductInDB(b64, mime){
     var offUrl=productType==='cosmetic'
       ?'https://world.openbeautyfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,nutriments,labels'
       :'https://world.openfoodfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,nutriments,labels';
-    var url='https://api.allorigins.win/get?url='+encodeURIComponent(offUrl);
-
-    return fetch(url)
-    .then(function(r){return r.json();})
-    .then(function(wrapper){
-      // allorigins întoarce {contents: "...", status: {...}}
-      var raw = wrapper.contents || wrapper;
-      var data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    // Încercăm OFF direct — are CORS activat pe unele endpoint-uri
+    return fetch(offUrl, {
+      method: 'GET',
+      mode: 'cors',
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.json();
+    })
+    .then(function(data){
       var total=(data.products||[]).length;
       var products=(data.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
       logStep('OFF: '+total+' produse găsite, '+products.length+' cu ingrediente complete', products.length>0?'ok':'warn');
