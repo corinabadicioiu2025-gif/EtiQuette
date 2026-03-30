@@ -4,6 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>EtiQuette</title>
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JRRWQWS3ZW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JRRWQWS3ZW', {
+    anonymize_ip: true,
+    cookie_flags: 'SameSite=None;Secure'
+  });
+
+  // ── Helper pentru evenimente custom ──────────────────
+  function trackEvent(name, params){
+    if(typeof gtag !== 'undefined'){
+      gtag('event', name, params || {});
+    }
+  }
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -1117,7 +1136,17 @@ function renderCatGroups(){
 }
 function toggleCat(id){var el=document.getElementById('cat-'+id);if(el)el.classList.toggle('open');}
 function updateCountBadge(){var a=getActiveConds();var b=document.getElementById('count-badge');if(b)b.textContent=a.size+' active';}
-function saveProfile(){saveConditions();saveMembers();updateCondBar();renderMemberSelector();document.getElementById('profile-overlay').classList.remove('show');setTimeout(function(){openMenu();},50);}
+function saveProfile(){
+  saveConditions();saveMembers();updateCondBar();renderMemberSelector();
+  // Track profil salvat
+  trackEvent('profil_salvat', {
+    nr_membri: members.length,
+    nr_afectiuni_eu: activeConditions.size,
+    tip_scanare_implicit: defaultScan
+  });
+  document.getElementById('profile-overlay').classList.remove('show');
+  setTimeout(function(){openMenu();},50);
+}
 function updateCondBar(){
   var all=getAllConditions();var active=all.filter(function(c){return activeConditions.has(c.id);});
   document.getElementById('cond-summary').textContent=active.length===0?'Nicio afecțiune selectată':active.length+(active.length===1?' afecțiune activă':' afecțiuni active');
@@ -1214,7 +1243,7 @@ function handleStepPhoto(e, step){
       document.getElementById('step-0-wrap').style.display='none';
       document.getElementById('product-search-wrap').style.display='block';
       document.getElementById('product-searching').style.display='block';
-      // Comprimăm agresiv — avem nevoie doar de text lizibil, nu de calitate
+      trackEvent('scanare_initiata', {tip_produs: productType});
       compressImage(b64, mime, 4*1024*1024, function(compB64, compMime){
         searchProductInDB(compB64, compMime);
       });
@@ -1317,59 +1346,58 @@ function searchProductInDB(b64, mime){
 
     var q=encodeURIComponent(product.search);
     // Folosim proxy CORS — OFF nu permite direct din browser
-    var offUrl=productType==='cosmetic'
-      ?'https://world.openbeautyfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,nutriments,labels'
-      :'https://world.openfoodfacts.org/cgi/search.pl?search_terms='+q+'&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,nutriments,labels';
-    // Încercăm OFF direct — are CORS activat pe unele endpoint-uri
-    return fetch(offUrl, {
-      method: 'GET',
-      mode: 'cors',
-      headers: { 'Accept': 'application/json' }
+
+    // Claude cunoaște ingredientele produselor mari — fără probleme CORS
+    fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:
+        'Ești expert în ingrediente alimentare și cosmetice. Pentru produsul "'+product.search+'" returnează DOAR JSON:\n'+
+        '{"found":true,"ingredients":"<lista completa ingrediente in engleza/franceza asa cum apare pe ambalaj>","nutrition":{"energy_kj":null,"fat":null,"saturated_fat":null,"carbohydrates":null,"sugars":null,"fiber":null,"protein":null,"sodium":null},"is_organic":false}\n'+
+        'Dacă nu cunoști ingredientele exacte ale acestui produs: {"found":false}\n'+
+        'IMPORTANT: returnează ingredientele ORIGINALE (en/fr/ro) nu traduse. Valorile nutritionale sunt per 100g, sodiu in mg.'
+      }]})
     })
-    .then(function(r){
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      return r.json();
-    })
-    .then(function(data){
-      var total=(data.products||[]).length;
-      var products=(data.products||[]).filter(function(p){return p.ingredients_text&&p.ingredients_text.length>10;});
-      logStep('OFF: '+total+' produse găsite, '+products.length+' cu ingrediente complete', products.length>0?'ok':'warn');
-      if(products.length===0){
-        if(total>0) logStep('Produsele găsite nu au ingrediente completate în baza de date','warn');
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){logStep('Eroare API: '+d.error.message,'error');showManualFlow();return;}
+      var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
+      var result=null;
+      try{
+        var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
+        var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
+        if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
+        result=JSON.parse(clean);
+      }catch(e){result=null;}
+
+      if(!result||!result.found){
+        logStep('Produs necunoscut — fotografiază manual ingredientele','warn');
         showManualFlow();return;
       }
 
-      var p=products[0];
-      logStep('Produs selectat: <strong>'+(p.product_name||product.name)+'</strong>','ok');
-      logStep('Ingrediente preluate ('+p.ingredients_text.split(',').length+' ingrediente)','ok');
+      logStep('Ingrediente găsite din baza de cunoștințe','ok');
+      scanData.ingredients=result.ingredients||'';
+      trackEvent('produs_gasit_automat', {tip_produs: productType, brand: product.brand||''});
 
-      var ing=p.ingredients_text.replace(/_/g,'').replace(/\*/g,'').trim();
-      scanData.ingredients=ing;
-      if(p.nutriments){
-        scanData.nutrition={
-          energy_kj:p.nutriments['energy-kj_100g']||null,
-          fat:p.nutriments['fat_100g']||null,
-          saturated_fat:p.nutriments['saturated-fat_100g']||null,
-          carbohydrates:p.nutriments['carbohydrates_100g']||null,
-          sugars:p.nutriments['sugars_100g']||null,
-          fiber:p.nutriments['fiber_100g']||null,
-          protein:p.nutriments['proteins_100g']||null,
-          sodium:p.nutriments['sodium_100g']?p.nutriments['sodium_100g']*1000:null,
-          fruits_percent:p.nutriments['fruits-vegetables-nuts_100g']||0,
-          isOrganic:(p.labels||'').toLowerCase().includes('organic')||(p.labels||'').toLowerCase().includes('bio')
-        };
-        logStep('Valori nutriționale preluate','ok');
+      if(result.nutrition&&Object.values(result.nutrition).some(function(v){return v!==null;})){
+        scanData.nutrition=result.nutrition;
+        scanData.nutrition.isOrganic=result.is_organic||false;
+        logStep('Valori nutriționale găsite','ok');
       } else {
-        logStep('Fără valori nutriționale în baza de date','warn');
+        logStep('Fără valori nutriționale cunoscute','warn');
       }
 
       document.getElementById('product-searching').style.display='none';
       document.getElementById('product-found').style.display='block';
-      document.getElementById('product-name-found').textContent=product.name||p.product_name||'';
-      document.getElementById('product-brand-found').textContent=product.brand||p.brands||'';
-      scanData.productName=product.name||p.product_name||'';
-      scanData.productBrand=product.brand||p.brands||'';
-      setTimeout(function(){doAnalyze();},800);
+      document.getElementById('product-name-found').textContent=product.name||'';
+      document.getElementById('product-brand-found').textContent=product.brand||'';
+      scanData.productName=product.name||'';
+      scanData.productBrand=product.brand||'';
+      setTimeout(function(){doAnalyze();},600);
+    })
+    .catch(function(e){
+      logStep('Eroare: '+(e&&e.message?e.message:'necunoscută'),'error');
+      showManualFlow();
     });
   })
   .catch(function(e){
@@ -1379,6 +1407,7 @@ function searchProductInDB(b64, mime){
 }
 
 function showManualFlow(product){
+  trackEvent('flux_manual_3_poze', {tip_produs: productType});
   document.getElementById('product-searching').style.display='none';
   document.getElementById('product-not-found').style.display='block';
   // Salvăm poza față produs ca preview-3 în fluxul manual
@@ -1771,7 +1800,7 @@ function doAnalyze(){
     }catch(e){detail={summary:'',ingredients:[],positives:[],negatives:[],recommendation:''};}
     renderResults(compatResult, nutritResult, detail, ingOriginal);
   })
-  .catch(function(err){showError(err.message||'Eroare. Verifica cheia API.');})
+  .catch(function(err){trackEvent('eroare_analiza',{mesaj:err&&err.message?err.message:'unknown'});showError(err.message||'Eroare. Verifica cheia API.');})
   .finally(function(){
     var btn=document.getElementById('analyze-btn');
     if(btn)btn.disabled=false;
@@ -1852,6 +1881,14 @@ function renderResults(compat, nutrit, detail, rawIng){
   updateDashboard();
 }
 function autoSave(compatScore, nutritScore, type, alerts){
+  // Track analiză completă
+  trackEvent('analiza_finalizata', {
+    tip_produs: type,
+    scor_compatibilitate: compatScore,
+    scor_nutritional: nutritScore,
+    nr_alerte: alerts,
+    produs_gasit_automat: scanData.productName ? 'da' : 'nu'
+  });
   var now=new Date();
   var photo=scanData.photos[1]||scanData.productPhoto||'';
   var productName=scanData.productName||'';
@@ -1955,6 +1992,7 @@ function toggleFavorite(compatScore,nutritScore,type){
       fullData:currentAnalysisData,
       date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
     });
+    trackEvent('produs_adaugat_favorite', {tip_produs: type});
     alert('❤️ Adăugat la favorite!');
   }
   try{localStorage.setItem('eq_fav',JSON.stringify(favorites));}catch(e){}
