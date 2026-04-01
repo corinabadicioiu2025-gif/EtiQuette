@@ -442,7 +442,8 @@ textarea::placeholder{color:var(--muted)}
       </div>
       <span class="type-lbl">Alimentar</span>
     </button>
-    <button class="type-btn" id="btn-cosm" onclick="selectType('cosmetic')">
+    <button class="type-btn" id="btn-cosm" style="opacity:0.45;cursor:not-allowed;position:relative" disabled>
+      <div style="position:absolute;top:8px;right:8px;background:var(--gold);color:var(--bg);font-family:'Jost',sans-serif;font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:2px 7px;border-radius:4px">În curând</div>
       <div class="type-icon">
         <svg class="svg-cosm" width="36" height="36" viewBox="0 0 60 60" fill="none">
           <rect x="14" y="26" width="24" height="26" rx="3" stroke="currentColor" stroke-width="1.5" fill="none"/>
@@ -609,7 +610,6 @@ textarea::placeholder{color:var(--muted)}
   <div class="fav-filters">
     <button class="fav-filter active" id="fav-filter-all" onclick="setFavFilter('all')">Toate</button>
     <button class="fav-filter" id="fav-filter-food" onclick="setFavFilter('food')">Alimentare</button>
-    <button class="fav-filter" id="fav-filter-cosmetic" onclick="setFavFilter('cosmetic')">Cosmetice</button>
   </div>
   <div id="favorites-list"></div>
 </div>
@@ -1054,23 +1054,12 @@ var CONDITION_CATEGORIES=[
     {id:'reflux',icon:'🔥',name:'Reflux / GERD',keys:['citric acid','acetic acid','vinegar','caffeine','alcohol','menthol','peppermint','acid citric','otet']},
     {id:'guta',icon:'🦴',name:'Gută',keys:['fructose','high-fructose corn syrup','fructoza']}
   ]},
-  {id:'cosmetic-skin',icon:'✨',name:'Afecțiuni de Piele',conditions:[
-    {id:'dermatita',icon:'🌸',name:'Dermatită Atopică',keys:['sodium lauryl sulfate','sodium laureth sulfate','sls','sles','alcohol denat','parfum','fragrance','methylparaben','ethylparaben','propylparaben','butylparaben','quaternium-15','dmdm hydantoin','propylene glycol','formaldehyde','lanolin','retinol']},
-    {id:'acnee',icon:'🫧',name:'Acnee / Ten Acneic',keys:['isopropyl myristate','isopropyl palmitate','cocoa butter','coconut oil','cocos nucifera','mineral oil','paraffinum liquidum','lanolin','dimethicone','cyclopentasiloxane','laureth-4']},
-    {id:'piele-sens',icon:'🌿',name:'Piele Sensibilă',keys:['fragrance','parfum','alcohol denat','witch hazel','menthol','eucalyptus','limonene','linalool','geraniol','methylparaben','sodium lauryl sulfate']},
-    {id:'rozacee',icon:'🌹',name:'Rozacee',keys:['alcohol','menthol','eucalyptus','peppermint','witch hazel','fragrance','parfum','sodium lauryl sulfate']},
-    {id:'psoriazis',icon:'🔴',name:'Psoriazis',keys:['fragrance','parfum','alcohol denat','sodium lauryl sulfate','parabens','methylparaben']}
-  ]},
-  {id:'cosmetic-special',icon:'💎',name:'Preferințe Cosmetice',conditions:[
-    {id:'sarcina',icon:'🤰',name:'Sarcină / Alăptare',keys:['retinol','retinyl','tretinoin','retinoic acid','salicylic acid','oxybenzone','benzophenone','hydroquinone','formaldehyde','methylparaben','propylparaben']},
-    {id:'noncomedo',icon:'🫧',name:'Non-Comedogenic',keys:['isopropyl myristate','isopropyl palmitate','cocoa butter','coconut oil','cocos nucifera','mineral oil','paraffinum liquidum','lanolin','dimethicone','cyclopentasiloxane']},
-    {id:'fara-parfum',icon:'🚫',name:'Fără Parfum',keys:['fragrance','parfum','perfume','limonene','linalool','geraniol','citronellol','eugenol','cinnamal','benzyl alcohol','coumarin','farnesol']}
-  ]},
   {id:'lifestyle',icon:'🌱',name:'Stil de Viață',conditions:[
     {id:'vegan',icon:'🌱',name:'Vegan / Vegetarian',keys:['gelatine','gelatin','gelatina','carmine','cochineal','e120','casein','whey','albumin','isinglass','lanolin','beeswax','cera alba','keratin','collagen','silk','honey','miere','tallow','lard']},
     {id:'halal',icon:'☪️',name:'Halal',keys:['pork','lard','gelatin','alcohol','ethanol','carmine','cochineal','e120','porc','gelatina','alcool']},
     {id:'kosher',icon:'✡️',name:'Kosher',keys:['pork','shellfish','lard','gelatin','porc','gelatina']}
   ]}
+  // Categorii cosmetice dezactivate temporar — revin după lansarea algoritmului cosmetic
 ];
 
 function getAllConditions(){var a=[];CONDITION_CATEGORIES.forEach(function(c){c.conditions.forEach(function(x){a.push(x);});});return a;}
