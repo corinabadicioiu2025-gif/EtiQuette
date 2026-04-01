@@ -846,12 +846,12 @@ textarea::placeholder{color:var(--muted)}
   // TODO: Înlocuiește cu valorile tale din Firebase Console
   // console.firebase.google.com → Proiect → Setări → Aplicații web
   const firebaseConfig = {
-    apiKey: "INLOCUIESTE_CU_CHEIA_TA",
-    authDomain: "PROIECT_ID.firebaseapp.com",
-    projectId: "INLOCUIESTE_CU_PROIECT_ID",
-    storageBucket: "PROIECT_ID.appspot.com",
-    messagingSenderId: "INLOCUIESTE",
-    appId: "INLOCUIESTE"
+    apiKey: "AIzaSyCBxIiy0PohexzyBs-JwwW3JehlFydrwUU",
+    authDomain: "etiquette-app-7f185.firebaseapp.com",
+    projectId: "etiquette-app-7f185",
+    storageBucket: "etiquette-app-7f185.firebasestorage.app",
+    messagingSenderId: "62374761795",
+    appId: "1:62374761795:web:236582263b17cb49200bf6"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -1762,95 +1762,294 @@ function toggleIngCollapse(){
 // ============================================================
 
 // ADITIVI
+// ─────────────────────────────────────────────────────────────────────────────
+// LISTE ADITIVI — standard EN (codurile E sunt universale)
+// Logica: algoritmul rulează pe textul original (en/fr/ro)
+// Cheile sunt în engleză — limba cea mai frecventă pe ambalaje internaționale
+// Variantele FR sunt păstrate doar unde apar frecvent pe produse din România
+// ─────────────────────────────────────────────────────────────────────────────
 var ADITIVI_RISC_RIDICAT=[
-  // Coduri E — universale
-  'e102','e104','e110','e122','e124','e129','e131','e132','e133',
+  // ── Coduri E — universale ────────────────────────────────
+  'e102','e104','e110','e122','e124','e129','e131','e132','e133','e142','e150d',
+  'e151','e155','e160b',
   'e210','e211','e212','e213','e214','e215','e216','e217','e218','e219',
+  'e220','e221','e222','e223','e224','e225','e226','e227','e228',
   'e249','e250','e251','e252',
-  'e320','e321','e407','e621','e951','e952','e954','e955','e962',
-  // Coloranți azoici — EN/FR/RO/DE
-  'tartrazine','tartrazina','tartrazin',
-  'sunset yellow','jaune soleil','gelb',
-  'azorubine','azorubina','carmoisine',
-  'ponceau','rouge','allura red','allura',
-  // Conservanți — EN/FR/RO/DE
-  'sodium benzoate','benzoate de sodium','benzoat de sodiu','natriumbenzoat',
-  'potassium benzoate','benzoate de potassium','benzoat de potasiu',
-  'sodium nitrite','nitrite de sodium','nitrit de sodiu','natriumnitrit',
-  'sodium nitrate','nitrate de sodium','nitrat de sodiu','natriumnitrat',
-  'potassium nitrite','nitrite de potassium',
-  'potassium nitrate','nitrate de potassium',
-  // MSG — EN/FR/RO/DE
-  'monosodium glutamate','glutamate monosodique','glutamat monosodic','mononatriumglutamat','glutamate de sodium',
-  // Îndulcitori — EN/FR/RO/DE
-  'aspartame','aspartam','aspartamo',
-  'acesulfame','acésulfame',
-  'saccharin','saccharine','zaharină',
-  'sucralose','sucraloza','sucralose',
-  // Antioxidanți — EN/FR/RO
-  'butylated hydroxyanisole','hydroxyanisole butylé','bha',
-  'butylated hydroxytoluene','hydroxytoluène butylé','bht',
-  // Caragenan — EN/FR/RO
-  'carrageenan','carraghénane','caragenan','carragénane','carageenan'
-];
-var ADITIVI_RISC_LIMITAT=[
-  // Coduri E
-  'e200','e201','e202','e203','e270','e282',
-  'e410','e412','e415','e440',
-  'e420','e421','e953','e965','e966','e967','e968',
-  'e433','e435','e436',
-  'e450','e451','e452',
-  'e471','e472a','e472b','e472c','e472d','e472e','e472f',
-  // Polioli — EN/FR/RO
-  'sorbitol','sorbitol','sorbitol',
-  'mannitol','mannite','manitol',
-  'xylitol','xylitol','xilitol',
-  'maltitol','maltitol','maltitol',
-  'erythritol','érythritol','eritritol',
-  // Emulsifianți — EN/FR/RO
-  'polysorbate','polysorbate 80','polysorbate 60','polisorbat',
-  'soy lecithin','lécithine de soja','lecitina de soia','sonnenblumenlecithin','lécithine de tournesol',
-  // Agenți îngroșare — EN/FR/RO/DE
-  'xanthan','xanthan gum','gomme xanthane','gumă de xantan','xanthan-gummi',
-  'guar','guar gum','gomme guar','gumă guar',
-  'carob','locust bean','caroube','roscoveanu',
-  // Maltodextrin — EN/FR/RO
-  'maltodextrin','maltodextrine','maltodextrină',
-  // Arome artificiale — EN/FR/RO/DE
-  'artificial flavor','artificial flavour','artificial flavoring',
-  'arôme artificiel','arômes artificiels','arome artificiale','aroma artificiala',
-  'künstliches aroma','künstliche aromen',
-  // Conservanți moderați
-  'sorbic acid','acide sorbique','acid sorbic',
-  'calcium propionate','propionate de calcium','propionat de calciu',
-  // Agenți îngroșare industriali
-  'carboxymethyl','cellulose gum','gomme cellulose'
+  'e310','e311','e312','e320','e321',
+  'e385','e407',
+  'e512','e520','e521','e522','e523',
+  'e620','e621','e622','e623','e624','e625',
+  'e951','e952','e954','e955','e959','e962','e969',
+  // ── Coloranți azoici (EN) ────────────────────────────────
+  'tartrazine','quinoline yellow','sunset yellow fcf','carmoisine',
+  'azorubine','ponceau 4r','erythrosine','patent blue v',
+  'indigo carmine','brilliant blue fcf','green s','allura red ac',
+  'allura red','brown ht',
+  // ── Conservanți (EN + FR frecvent pe etichete RO) ────────
+  'sodium benzoate','potassium benzoate','calcium benzoate',
+  'benzoate de sodium','benzoate de potassium',
+  'sodium nitrite','sodium nitrate','potassium nitrite','potassium nitrate',
+  'nitrite de sodium','nitrate de sodium',
+  // ── MSG și glutamați (EN + FR) ───────────────────────────
+  'monosodium glutamate','msg','glutamate de sodium','glutamate monosodique',
+  'monopotassium glutamate','calcium diglutamate',
+  // ── Îndulcitori intensivi (EN) ───────────────────────────
+  'aspartame','acesulfame k','acesulfame potassium','saccharin',
+  'sodium saccharin','cyclamate','sodium cyclamate','sucralose',
+  'neotame','advantame','alitame',
+  // ── Antioxidanți sintetici (EN) ──────────────────────────
+  'butylated hydroxyanisole','bha','butylated hydroxytoluene','bht',
+  'propyl gallate','octyl gallate','dodecyl gallate','etda','edta',
+  // ── Caragenan (EN + FR) ──────────────────────────────────
+  'carrageenan','carragheenan','carraghénane',
+  // ── Bromați (EN) ─────────────────────────────────────────
+  'potassium bromate','calcium bromate',
+  // ── Coloranți sintetici suplimentari (EN) ────────────────
+  'amaranth','fast red e','fast yellow ab','orange gcn',
+  'brilliant scarlet','red 2g'
 ];
 
-// COMPATIBILITATE — chei per afecțiune (alergii + intoleranțe = deal-breaker)
+var ADITIVI_RISC_LIMITAT=[
+  // ── Coduri E ─────────────────────────────────────────────
+  'e200','e201','e202','e203','e234','e235','e239','e242','e243',
+  'e260','e261','e262','e263','e270','e280','e281','e282','e283',
+  'e296','e297',
+  'e338','e339','e340','e341','e343',
+  'e350','e351','e352','e353','e354','e355','e356','e357',
+  'e363','e380','e381',
+  'e400','e401','e402','e403','e404','e405',
+  'e406','e408','e409','e410','e412','e413','e414','e415','e416','e417','e418',
+  'e420','e421','e422',
+  'e425','e426','e427','e432','e433','e434','e435','e436',
+  'e440','e441','e442','e444','e445','e450','e451','e452','e459',
+  'e460','e461','e462','e463','e464','e465','e466','e467','e468','e469',
+  'e470a','e470b','e471','e472a','e472b','e472c','e472d','e472e','e472f',
+  'e473','e474','e475','e476','e477','e479b','e481','e482','e483','e491','e492','e495',
+  'e500','e501','e503','e504','e507','e508','e509','e511','e513','e514','e515','e516',
+  'e524','e525','e526','e527','e528','e529','e530',
+  'e541','e551','e552','e553','e554','e555','e556','e558','e559',
+  'e570','e574','e575','e576','e577','e578','e579',
+  'e585','e586',
+  'e627','e628','e629','e630','e631','e632','e633','e634','e635',
+  'e640','e641',
+  'e900','e901','e902','e903','e904','e905','e907','e912','e914',
+  'e920','e921','e927b','e938','e939','e941','e942','e943a','e943b','e944','e948','e949','e950','e953',
+  'e957','e958','e960','e961','e965','e966','e967','e968',
+  'e999','e1105',
+  'e1200','e1201','e1202','e1204','e1205','e1206','e1207','e1208','e1209',
+  'e1400','e1401','e1402','e1403','e1404','e1405','e1410','e1411','e1412',
+  'e1413','e1414','e1420','e1421','e1422','e1423','e1440','e1441','e1442',
+  'e1443','e1450','e1451','e1452',
+  // ── Polioli / înlocuitori zahăr (EN) ────────────────────
+  'sorbitol','mannitol','xylitol','maltitol','erythritol','isomalt',
+  'lactitol','trehalose','palatinose',
+  // ── Emulsifianți (EN + FR frecvent) ─────────────────────
+  'polysorbate 20','polysorbate 60','polysorbate 80','polysorbate',
+  'soy lecithin','sunflower lecithin','lecithine de soja','lecithine de tournesol',
+  'mono and diglycerides','monoglycerides','diglycerides',
+  // ── Agenți de îngroșare (EN) ────────────────────────────
+  'xanthan gum','xanthan','guar gum','guar',
+  'locust bean gum','carob bean gum','tara gum','konjac','konjac gum',
+  'gellan gum','methyl cellulose','hydroxypropyl cellulose',
+  'hydroxypropyl methylcellulose','microcrystalline cellulose',
+  // ── Amidon modificat (EN) ────────────────────────────────
+  'modified starch','modified corn starch','modified potato starch',
+  'modified tapioca starch','acetylated starch','oxidized starch',
+  // ── Maltodextrin (EN) ────────────────────────────────────
+  'maltodextrin','maltodextrine',
+  // ── Arome artificiale (EN + FR frecvent) ─────────────────
+  'artificial flavor','artificial flavour','artificial flavoring','artificial flavouring',
+  'aromes artificiels','arômes artificiels',
+  // ── Conservanți moderați (EN) ────────────────────────────
+  'sorbic acid','potassium sorbate','calcium sorbate',
+  'propionic acid','calcium propionate','sodium propionate','potassium propionate',
+  'natamycin','nisin',
+  // ── Regulatori aciditate (EN) ────────────────────────────
+  'phosphoric acid','sodium phosphate','potassium phosphate',
+  'calcium phosphate','ammonium phosphate',
+  // ── Agenți antiaglomeranți (EN) ──────────────────────────
+  'silicon dioxide','calcium silicate','magnesium silicate',
+  'sodium aluminosilicate','talc',
+  // ── Agenți de glazurare (EN) ─────────────────────────────
+  'carnauba wax','shellac','mineral oil','petroleum wax',
+  // ── Stabilizatori (EN) ───────────────────────────────────
+  'carboxymethyl cellulose','cellulose gum','sodium carboxymethyl cellulose'
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ALERGENI — standard EN
+// Cheile sunt în engleză (standard internațional pe etichete)
+// FR adăugat doar pentru ingrediente care apar frecvent în FR pe produse din RO
+// ─────────────────────────────────────────────────────────────────────────────
 var ALLERGY_KEYS={
-  gluten:['wheat','gluten','triticum','barley','rye','spelt','kamut','malt','semolina','orz','secara','grau','hordeum','triticale','bulgur','durum'],
-  lactoza:['lactose','milk','lactis','whey','casein','lactalbumin','cream','butter','lapte','zer','cazeina','lactoza','laptelui','smantana','unt'],
-  arahide:['peanut','arachide','arachis','groundnut','arahida'],
-  soia:['soy','soya','soia','tofu','miso','edamame','glycine max'],
-  nuci:['almond','walnut','hazelnut','cashew','pistachio','nuca','migdale','alune','nucilor','migdalelor'],
-  oua:['egg','albumin','ovalbumin','lysozyme','ou','oua','oualor','melange'],
-  peste:['fish','salmon','tuna','cod','anchovy','peste','somon','ton','hering','sardine'],
-  'fructe-mare':['shrimp','prawn','crab','lobster','shellfish','crustacean','creveti','midii','scoici','calamar'],
-  susan:['sesame','tahini','susan','sesamum'],
-  vegan:['gelatine','gelatin','gelatina','carmine','cochineal','e120','casein','whey','albumin','isinglass','lanolin','beeswax','cera alba','keratin','collagen','silk','honey','miere','tallow','lard','seu','untura'],
-  halal:['pork','lard','gelatin','alcohol','ethanol','carmine','cochineal','e120','porc','gelatina','alcool','porc','suncă','bacon','ham'],
-  kosher:['pork','shellfish','lard','gelatin','porc','gelatina','creveti','midii']
+  gluten:[
+    'wheat','gluten','triticum','barley','rye','spelt','kamut','malt',
+    'semolina','hordeum','triticale','bulgur','durum','einkorn','emmer',
+    'farro','khorasan','wheat starch','wheat flour','wheat protein',
+    'barley malt','barley extract','malt extract','rye flour',
+    // FR — frecvent pe etichete
+    'farine de blé','gluten de blé','orge','seigle','avoine','épeautre',
+    'extrait de malt','amidon de blé'
+  ],
+  lactoza:[
+    'milk','lactose','whey','casein','lactalbumin','lactoglobulin',
+    'cream','butter','ghee','cheese','yogurt','kefir','skimmed milk',
+    'whole milk','milk powder','milk solids','milk fat','milk protein',
+    'buttermilk','butterfat','lactis','lactoferrin','lactulose',
+    // FR — frecvent pe etichete
+    'lait','lactosérum','petit-lait','caséine','beurre','crème',
+    'fromage','poudre de lait','protéines de lait','matière grasse du lait'
+  ],
+  arahide:[
+    'peanut','peanuts','groundnut','groundnuts','arachis','arachis oil',
+    'arachide','arachides','monkey nut',
+    // FR
+    'arachide','cacahuète','huile d\'arachide'
+  ],
+  soia:[
+    'soy','soya','soybean','soy protein','soy lecithin','tofu',
+    'miso','tempeh','edamame','natto','glycine max','soy flour',
+    'soy sauce','tamari','textured soy protein','textured vegetable protein',
+    // FR
+    'soja','protéines de soja','lécithine de soja','farine de soja'
+  ],
+  nuci:[
+    'almond','almonds','walnut','walnuts','hazelnut','hazelnuts',
+    'cashew','cashews','pistachio','pistachios','pecan','pecans',
+    'brazil nut','brazil nuts','macadamia','pine nut','pine nuts',
+    'queensland nut','prunus dulcis','corylus','juglans','anacardium',
+    // FR
+    'amande','noix','noisette','noix de cajou','pistache','noix de pécan',
+    'noix du brésil','noix de macadamia','pignon de pin'
+  ],
+  oua:[
+    'egg','eggs','egg white','egg yolk','egg powder','dried egg',
+    'albumin','ovalbumin','lysozyme','globulin','ovomucin','ovomucoid',
+    'livetin','mayonnaise','meringue',
+    // FR
+    'oeuf','oeufs','blanc d\'oeuf','jaune d\'oeuf','poudre d\'oeuf',
+    'albumine','lysozyme','mayonnaise'
+  ],
+  peste:[
+    'fish','anchovy','anchovies','sardine','sardines','salmon','tuna',
+    'cod','haddock','herring','mackerel','plaice','sprat','swordfish',
+    'trout','turbot','tilapia','bass','bream','carp','catfish','eel',
+    'fish sauce','fish stock','worcestershire sauce','caesar dressing',
+    // FR
+    'poisson','anchois','sardine','saumon','thon','cabillaud','hareng',
+    'maquereau','sauce de poisson','sauce worcestershire'
+  ],
+  'fructe-mare':[
+    'crustacean','crustaceans','shellfish','shrimp','prawns','crab',
+    'lobster','crayfish','langoustine','barnacle','krill',
+    'mollusc','molluscs','mollusk','clam','clams','mussel','mussels',
+    'oyster','oysters','scallop','scallops','squid','octopus','abalone',
+    'snail','whelk','cockle',
+    // FR
+    'crustacé','crevette','crabe','homard','langouste','langoustine',
+    'moule','huître','coquille saint-jacques','calmar','poulpe','escargot'
+  ],
+  susan:[
+    'sesame','sesame seed','sesame oil','sesame flour','tahini',
+    'sesamum indicum','gingelly','til','benne',
+    // FR
+    'sésame','graines de sésame','huile de sésame','tahini'
+  ],
+  vegan:[
+    'gelatin','gelatine','carmine','cochineal','e120','isinglass',
+    'lanolin','beeswax','shellac','casein','whey','albumin',
+    'lactose','honey','tallow','lard','suet','rennet','anchovy',
+    'anchovies','worcestershire','l-cysteine','e920','e901','e904',
+    // FR
+    'gélatine','carmin','cochenille','cire d\'abeille','laque','miel',
+    'saindoux','présure','kermès'
+  ],
+  halal:[
+    'pork','pig','bacon','ham','lard','gelatin','gelatine','alcohol',
+    'ethanol','wine','beer','carmine','cochineal','e120','blood',
+    'e441','pepsin','rennet',
+    // FR
+    'porc','cochon','bacon','jambon','saindoux','gélatine','alcool',
+    'vin','bière','carmin','sang','présure'
+  ],
+  kosher:[
+    'pork','pig','bacon','ham','lard','gelatin','gelatine',
+    'shellfish','shrimp','crab','lobster','mussel','oyster','clam',
+    'blood','e120','carmine','pepsin',
+    // FR
+    'porc','cochon','gélatine','crustacé','crevette','crabe','homard',
+    'moule','huître','sang','carmin'
+  ]
 };
 
-// Afecțiuni cronice — penalizare graduală
+// ─────────────────────────────────────────────────────────────────────────────
+// AFECȚIUNI CRONICE — standard EN + FR frecvent
+// ─────────────────────────────────────────────────────────────────────────────
 var CHRONIC_KEYS={
-  diabet:['sugar','sucrose','glucose','fructose','dextrose','maltose','syrup','corn syrup','high-fructose','maltodextrin','zahar','glucoza','sirop','honey','miere','dextrin','caramel','sorbitol','xylitol','zahăr','sirop de glucoză'],
-  hipertensiune:['sodium','salt','sare','msg','monosodium glutamate','sodium chloride','sodium nitrite','sodium benzoate','disodium','natriu','bicarbonate','sare iodată'],
-  colesterol:['hydrogenated','partially hydrogenated','trans fat','palm oil','palmier','lard','tallow','shortening','ulei de palmier','grăsimi hidrogenate'],
-  ibs:['fructose','lactose','sorbitol','mannitol','xylitol','inulin','wheat','rye','fructoză','lactoză'],
-  reflux:['citric acid','acetic acid','vinegar','caffeine','alcohol','menthol','peppermint','acid citric','otet','cafeina','oțet','cafea'],
-  guta:['fructose','high-fructose corn syrup','fructoza','sirop de fructoza']
+  diabet:[
+    'sugar','sucrose','glucose','fructose','dextrose','maltose',
+    'glucose syrup','corn syrup','high fructose corn syrup','hfcs',
+    'invert sugar','golden syrup','maple syrup','agave','honey',
+    'molasses','treacle','maltodextrin','dextrin','caramel',
+    'date syrup','rice syrup','barley malt syrup','cane syrup',
+    'fruit juice concentrate','concentrated fruit juice',
+    'sorbitol','xylitol','maltitol','isomalt',
+    // FR — frecvent pe etichete
+    'sucre','glucose','fructose','sirop de glucose','sirop de maïs',
+    'sucre inverti','sirop d\'agave','miel','mélasse','caramel',
+    'sirop de riz','concentré de jus de fruits','jus de fruits concentré'
+  ],
+  hipertensiune:[
+    'sodium','salt','sodium chloride','sodium nitrite','sodium nitrate',
+    'sodium benzoate','sodium phosphate','disodium','monosodium glutamate',
+    'msg','sodium bicarbonate','baking soda','sodium carbonate',
+    'sodium sulfite','sodium metabisulfite','sodium ascorbate',
+    'sodium caseinate','sodium stearoyl','soy sauce','fish sauce',
+    'worcestershire sauce','miso','pickle','brine','cured',
+    // FR — frecvent pe etichete
+    'sel','chlorure de sodium','nitrite de sodium','benzoate de sodium',
+    'bicarbonate de sodium','glutamate de sodium','sauce soja','saumure'
+  ],
+  colesterol:[
+    'hydrogenated','partially hydrogenated','interesterified',
+    'trans fat','trans fatty','palm oil','palm kernel oil',
+    'coconut oil','lard','tallow','suet','shortening','ghee',
+    'dripping','beef fat','pork fat','chicken fat','duck fat',
+    'cocoa butter','full fat','whole fat',
+    // FR — frecvent pe etichete
+    'hydrogéné','partiellement hydrogéné','huile de palme',
+    'huile de palmiste','huile de coco','saindoux','graisse végétale',
+    'graisses hydrogénées','beurre de cacao'
+  ],
+  ibs:[
+    'fructose','lactose','sorbitol','mannitol','xylitol','maltitol',
+    'isomalt','inulin','chicory root','chicory extract','fos',
+    'fructooligosaccharides','galactooligosaccharides','gos',
+    'wheat','rye','barley','onion','garlic','apple','pear',
+    'honey','high fructose corn syrup','glucose-fructose syrup',
+    // FR
+    'fructose','lactose','sorbitol','inuline','chicorée','sirop de glucose-fructose'
+  ],
+  reflux:[
+    'citric acid','acetic acid','vinegar','lactic acid','malic acid',
+    'tartaric acid','phosphoric acid','ascorbic acid',
+    'caffeine','coffee','tea','alcohol','ethanol','menthol',
+    'peppermint','spearmint','tomato','chili','pepper','capsaicin',
+    'chocolate','cocoa','carbonated','sparkling',
+    // FR — frecvent pe etichete
+    'acide citrique','acide acétique','vinaigre','acide lactique',
+    'acide malique','caféine','café','alcool','menthol','menthe',
+    'tomate','piment','chocolat','cacao','gazéifié','pétillant'
+  ],
+  guta:[
+    'fructose','high fructose corn syrup','glucose-fructose syrup',
+    'corn syrup','invert sugar','fruit juice concentrate',
+    'anchovies','sardines','herring','mackerel','organ meat',
+    'liver','kidney','game meat','yeast extract','beer',
+    // FR
+    'fructose','sirop de glucose-fructose','anchois','sardine',
+    'hareng','maquereau','extrait de levure','bière'
+  ]
 };
 
 // Afecțiuni care sunt deal-breaker (tratate ca alergii)
