@@ -1589,38 +1589,17 @@ function searchProductInDB(b64, mime){
     logStep('Claude identificat: <strong>'+product.brand+' '+product.name+'</strong>','ok');
     logStep('Caut în baza de date cu: <em>"'+product.search+'"</em>','loading');
 
-    var q=encodeURIComponent(product.search);
-    // Folosim proxy CORS — OFF nu permite direct din browser
-
-    // Claude cunoaște ingredientele produselor mari — fără probleme CORS
-    fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:
-        'Ești expert în ingrediente alimentare și cosmetice. Pentru produsul "'+product.search+'" returnează DOAR JSON:\n'+
-        '{"found":true,"ingredients":"<lista completa ingrediente in engleza/franceza asa cum apare pe ambalaj>","nutrition":{"energy_kj":null,"fat":null,"saturated_fat":null,"carbohydrates":null,"sugars":null,"fiber":null,"protein":null,"sodium":null},"is_organic":false}\n'+
-        'Dacă nu cunoști ingredientele exacte ale acestui produs: {"found":false}\n'+
-        'IMPORTANT: returnează ingredientele ORIGINALE (en/fr/ro) nu traduse. Valorile nutritionale sunt per 100g, sodiu in mg.'
-      }]})
-    })
+    // Căutăm în Open Food Facts prin Netlify proxy — fără fabulare, date reale
+    fetch('https://cool-medovik-03af5e.netlify.app/.netlify/functions/off-proxy?search='+encodeURIComponent(product.search))
     .then(function(r){return r.json();})
-    .then(function(d){
-      if(d.error){logStep('Eroare API: '+d.error.message,'error');showManualFlow();return;}
-      var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
-      var result=null;
-      try{
-        var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
-        var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
-        if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
-        result=JSON.parse(clean);
-      }catch(e){result=null;}
-
+    .then(function(result){
       if(!result||!result.found){
-        logStep('Produs necunoscut — fotografiază manual ingredientele','warn');
-        showManualFlow();return;
+        logStep('Produs negăsit în Open Food Facts — fotografiază manual','warn');
+        if(window.firebaseLogMissedProduct) window.firebaseLogMissedProduct(product.search, productType);
+        showManualFlow(product);return;
       }
 
-      logStep('Ingrediente găsite din baza de cunoștințe','ok');
+      logStep('Ingrediente găsite în Open Food Facts ✓','ok');
       scanData.ingredients=result.ingredients||'';
       trackEvent('produs_gasit_automat', {tip_produs: productType, brand: product.brand||''});
 
@@ -1629,20 +1608,20 @@ function searchProductInDB(b64, mime){
         scanData.nutrition.isOrganic=result.is_organic||false;
         logStep('Valori nutriționale găsite','ok');
       } else {
-        logStep('Fără valori nutriționale cunoscute','warn');
+        logStep('Fără valori nutriționale în OFF','warn');
       }
 
       document.getElementById('product-searching').style.display='none';
       document.getElementById('product-found').style.display='block';
-      document.getElementById('product-name-found').textContent=product.name||'';
-      document.getElementById('product-brand-found').textContent=product.brand||'';
-      scanData.productName=product.name||'';
-      scanData.productBrand=product.brand||'';
+      document.getElementById('product-name-found').textContent=result.product_name||product.name||'';
+      document.getElementById('product-brand-found').textContent=result.brand||product.brand||'';
+      scanData.productName=result.product_name||product.name||'';
+      scanData.productBrand=result.brand||product.brand||'';
       setTimeout(function(){doAnalyze();},600);
     })
     .catch(function(e){
-      logStep('Eroare: '+(e&&e.message?e.message:'necunoscută'),'error');
-      showManualFlow();
+      logStep('Eroare OFF proxy: '+(e&&e.message?e.message:'necunoscută'),'error');
+      showManualFlow(product);
     });
   })
   .catch(function(e){
