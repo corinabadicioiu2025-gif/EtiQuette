@@ -487,7 +487,10 @@ textarea::placeholder{color:var(--muted)}
       <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--text2);margin-top:2px" id="product-brand-found"></div>
     </div>
     <div id="product-not-found" style="display:none;background:var(--warn-pale);border:0.5px solid var(--warn);border-radius:var(--radius);padding:14px">
-      <div style="font-family:'Jost',sans-serif;font-size:14px;font-weight:500;color:var(--warn);margin-bottom:6px">Produs negăsit în baza de date</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-family:'Jost',sans-serif;font-size:14px;font-weight:500;color:var(--warn)">Produs negăsit în baza de date</div>
+        <button onclick="resetScan()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);padding:2px 6px;line-height:1" title="Revino la scanare">×</button>
+      </div>
       <div id="log-list-fail" style="margin-bottom:8px"></div>
       <div style="font-family:'Jost',sans-serif;font-size:13px;color:var(--text2);line-height:1.5">Fotografiază manual cele 3 imagini de mai jos pentru a continua analiza.</div>
     </div>
@@ -1558,7 +1561,7 @@ function searchProductInDB(b64, mime){
     headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:[
       {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-      {type:'text',text:'Identifică brandul și numele acestui produs. Returnează DOAR JSON: {"brand":"<brand>","name":"<nume produs în limba originală>","search":"<brand + nume produs în engleză, pentru căutare internațională>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null}'}
+      {type:'text',text:'Identifică brandul și numele acestui produs. Returnează DOAR JSON: {"brand":"<DOAR brandul, ex: Coca-Cola>","name":"<DOAR numele produsului fără brand, ex: Zero Sugar>","search":"<brand + nume scurt în engleză, max 4 cuvinte, ex: Coca-Cola Zero Sugar>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null}'}
     ]}]})
   })
   .then(function(r){return r.json();})
@@ -1589,16 +1592,38 @@ function searchProductInDB(b64, mime){
       showManualFlow();return;
     }
 
-    logStep('Claude identificat: <strong>'+product.brand+' '+product.name+'</strong>','ok');
-    logStep('Caut în baza de date cu: <em>"'+product.search+'"</em>','loading');
+    // Curățăm query-ul — eliminăm dublurile brand+name
+    var searchQuery = product.search.trim();
+    // Dacă brandul apare de două ori în search, îl eliminăm
+    if(product.brand && searchQuery.toLowerCase().startsWith(product.brand.toLowerCase()+' '+product.brand.toLowerCase())){
+      searchQuery = searchQuery.substring(product.brand.length+1).trim();
+    }
 
-    // Căutăm în Open Food Facts prin Netlify proxy — fără fabulare, date reale
-    fetch('https://cool-medovik-03af5e.netlify.app/.netlify/functions/off-proxy?search='+encodeURIComponent(product.search))
-    .then(function(r){return r.json();})
+    logStep('Claude identificat: <strong>'+product.brand+' '+product.name+'</strong>','ok');
+    logStep('Caut în baza de date cu: <em>"'+searchQuery+'"</em>','loading');
+
+    // Funcție pentru căutare în OFF cu fallback
+    function searchOFF(query, fallbackQuery) {
+      return fetch('https://cool-medovik-03af5e.netlify.app/.netlify/functions/off-proxy?search='+encodeURIComponent(query))
+      .then(function(r){return r.json();})
+      .then(function(result){
+        if(result && result.found) return result;
+        // Dacă nu găsim și avem fallback, încercăm cu brandul singur
+        if(fallbackQuery && fallbackQuery !== query){
+          return fetch('https://cool-medovik-03af5e.netlify.app/.netlify/functions/off-proxy?search='+encodeURIComponent(fallbackQuery))
+          .then(function(r2){return r2.json();});
+        }
+        return {found: false};
+      });
+    }
+
+    // Căutăm mai întâi cu query complet, apoi doar cu brandul ca fallback
+    var fallback = product.brand || '';
+    searchOFF(searchQuery, fallback)
     .then(function(result){
       if(!result||!result.found){
         logStep('Produs negăsit în Open Food Facts — fotografiază manual','warn');
-        if(window.firebaseLogMissedProduct) window.firebaseLogMissedProduct(product.search, productType);
+        if(window.firebaseLogMissedProduct) window.firebaseLogMissedProduct(searchQuery, productType);
         showManualFlow(product);return;
       }
 
