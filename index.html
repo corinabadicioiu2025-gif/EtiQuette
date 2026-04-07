@@ -2056,9 +2056,11 @@ function calcCompatibility(ingredients, activeConditions, members, selectedMembe
   var ingLower=ingredients.toLowerCase();
   var ingList=ingredients.split(',').map(function(s){return s.trim().toLowerCase();});
 
+  // Găsește poziția exactă a unui ingredient în listă
   function getPozitie(key){
+    var keyLower=key.toLowerCase();
     for(var i=0;i<ingList.length;i++){
-      if(ingList[i].includes(key)) return i+1;
+      if(ingList[i].includes(keyLower)) return i+1;
     }
     return 999;
   }
@@ -2067,36 +2069,82 @@ function calcCompatibility(ingredients, activeConditions, members, selectedMembe
     return keys.some(function(k){return ingLower.includes(k.toLowerCase());});
   }
 
-  function getMatchedKey(keys){
-    for(var i=0;i<keys.length;i++){
-      if(ingLower.includes(keys[i].toLowerCase())) return keys[i];
-    }
-    return null;
+  // Returnează cheia cea mai specifică găsită (cea mai lungă care se potrivește)
+  // Evită să detecteze "glucose" când e de fapt "glucose syrup"
+  function getBestMatchedKey(keys){
+    var matches=keys.filter(function(k){return ingLower.includes(k.toLowerCase());});
+    if(matches.length===0) return null;
+    // Sortăm descrescător după lungime — cea mai specifică cheie câștigă
+    matches.sort(function(a,b){return b.length-a.length;});
+    return matches[0];
+  }
+
+  // Returnează poziția celei mai relevante chei găsite
+  function getBestPosition(keys){
+    var matches=keys.filter(function(k){return ingLower.includes(k.toLowerCase());});
+    if(matches.length===0) return 999;
+    // Luăm poziția minimă (cel mai devreme în listă) dintre toate potrivirile
+    var minPoz=999;
+    matches.forEach(function(k){
+      var p=getPozitie(k);
+      if(p<minPoz) minPoz=p;
+    });
+    return minPoz;
   }
 
   var alerts=[];
   var score=10;
   var isIncompatible=false;
 
+  // Funcție pentru a adăuga alertă cronică fără duplicate per persoană+afecțiune
+  function addChronicAlert(person, condId, keys, memberName){
+    // O singură alertă per persoană per afecțiune
+    var alreadyAdded=alerts.some(function(a){
+      return a.person===(memberName||person) && a.condition===condId;
+    });
+    if(alreadyAdded) return;
+
+    var bestKey=getBestMatchedKey(keys);
+    if(!bestKey) return;
+
+    var poz=getBestPosition(keys);
+    var pen=poz<=3?3:poz<=6?2:1;
+    score-=pen;
+
+    var explanation;
+    if(person==='Tu'){
+      explanation=poz<=3?'Ingredient dominant (poziția '+poz+')':'Prezent în produs (poziția '+poz+')';
+    } else {
+      explanation='Atenție pentru '+(memberName||'acest membru')+' — poziția '+poz+' în ingrediente';
+    }
+
+    alerts.push({
+      severity:poz<=3?'danger':'warn',
+      person:memberName||person,
+      condition:condId,
+      ingredient:bestKey,
+      explanation:explanation
+    });
+  }
+
   // Check user's own conditions
   activeConditions.forEach(function(condId){
     if(ALLERGY_CONDITIONS.includes(condId)){
       var keys=ALLERGY_KEYS[condId]||[];
       if(containsKey(keys)){
-        isIncompatible=true;
-        var matched=getMatchedKey(keys);
-        alerts.push({severity:'danger',person:'Tu',condition:condId,ingredient:matched,explanation:'Produs nerecomandat — conține '+matched});
+        // O singură alertă per alergie
+        var alreadyAdded=alerts.some(function(a){return a.person==='Tu'&&a.condition===condId;});
+        if(!alreadyAdded){
+          isIncompatible=true;
+          var matched=getBestMatchedKey(keys);
+          alerts.push({severity:'danger',person:'Tu',condition:condId,ingredient:matched,explanation:'Produs nerecomandat — conține '+matched});
+        }
       }
     } else if(CHRONIC_CONDITIONS.includes(condId)){
       var keys=CHRONIC_KEYS[condId]||[];
-      keys.forEach(function(key){
-        if(ingLower.includes(key.toLowerCase())){
-          var poz=getPozitie(key);
-          var pen=poz<=3?3:poz<=6?2:1;
-          score-=pen;
-          alerts.push({severity:poz<=3?'danger':'warn',person:'Tu',condition:condId,ingredient:key,explanation:(poz<=3?'Ingredient dominant (poziția '+poz+')':'Prezent în produs (poziția '+poz+')')});
-        }
-      });
+      if(containsKey(keys)){
+        addChronicAlert('Tu', condId, keys, 'Tu');
+      }
     }
   });
 
@@ -2107,28 +2155,28 @@ function calcCompatibility(ingredients, activeConditions, members, selectedMembe
       if(ALLERGY_CONDITIONS.includes(condId)){
         var keys=ALLERGY_KEYS[condId]||[];
         if(containsKey(keys)){
-          isIncompatible=true;
-          var matched=getMatchedKey(keys);
-          alerts.push({severity:'danger',person:m.name||'Membru',condition:condId,ingredient:matched,explanation:'Produs nerecomandat pentru '+(m.name||'acest membru')+' — conține '+matched});
+          var alreadyAdded=alerts.some(function(a){return a.person===(m.name||'Membru')&&a.condition===condId;});
+          if(!alreadyAdded){
+            isIncompatible=true;
+            var matched=getBestMatchedKey(keys);
+            alerts.push({severity:'danger',person:m.name||'Membru',condition:condId,ingredient:matched,explanation:'Produs nerecomandat pentru '+(m.name||'acest membru')+' — conține '+matched});
+          }
         }
       } else if(CHRONIC_CONDITIONS.includes(condId)){
         var keys=CHRONIC_KEYS[condId]||[];
-        keys.forEach(function(key){
-          if(ingLower.includes(key.toLowerCase())){
-            var poz=getPozitie(key);
-            var pen=poz<=3?3:poz<=6?2:1;
-            score-=pen;
-            alerts.push({severity:poz<=3?'danger':'warn',person:m.name||'Membru',condition:condId,ingredient:key,explanation:'Atenție pentru '+(m.name||'acest membru')+' — poziția '+poz+' în ingrediente'});
-          }
-        });
+        if(containsKey(keys)){
+          addChronicAlert(m.name||'Membru', condId, keys, m.name||'Membru');
+        }
       }
     });
 
-    // Vârstă
+    // Vârstă — o singură alertă per ingredient per membru
     if(m.dob){
       var ageWarnings=getAgeWarnings(m.dob, productType);
+      var addedAgeKeys=[];
       ageWarnings.forEach(function(key){
-        if(ingLower.includes(key)){
+        if(ingLower.includes(key) && !addedAgeKeys.includes(key)){
+          addedAgeKeys.push(key);
           alerts.push({severity:'warn',person:m.name||'Membru',condition:'varsta',ingredient:key,explanation:'Nerecomandat pentru '+(m.name||'acest membru')+' ('+getAgeLabel(m.dob)+') — conține '+key});
         }
       });
@@ -2267,6 +2315,15 @@ function doAnalyze(){
 // ============================================================
 // RENDER RESULTS — 2 scoruri
 // ============================================================
+function toggleIngAnaliza(header){
+  var body=header.parentElement.querySelector('.ing-analiza-body');
+  var arrow=header.querySelector('span');
+  if(!body) return;
+  var open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  arrow.textContent=open?'▼ Vezi':'▲ Ascunde';
+}
+
 function scoreColor(s){return s>=7?'good':s>=4?'medium':'bad';}
 function nutritColor(c){return c==='good'?'var(--good)':c==='medium'?'var(--medium)':c==='warn'?'var(--warn)':'var(--danger)';}
 
@@ -2321,14 +2378,30 @@ function renderResults(compat, nutrit, detail, rawIng){
   document.getElementById('results').innerHTML=
     alertsHTML+scoresHTML+nutritBreakHTML
     +(detail.summary?'<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;font-family:\'Jost\',sans-serif;font-size:14px;color:var(--text2);line-height:1.6">'+detail.summary+'</div>':'')
-    +(ingHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:12px">Analiza ingredientelor</div>'+ingHTML+'</div>':'')
+    +(ingHTML?'<div class="section-card">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:4px" onclick="toggleIngAnaliza(this)">'
+        +'<div class="section-label" style="margin:0">Analiza ingredientelor</div>'
+        +'<span style="font-family:\'Jost\',sans-serif;font-size:12px;color:var(--gold)">▼ Vezi</span>'
+      +'</div>'
+      +'<div class="ing-analiza-body" style="display:none;margin-top:12px">'+ingHTML+'</div>'
+    +'</div>':'')
     +(posHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte forte</div>'+posHTML+'</div>':'')
     +(negHTML?'<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte slabe</div>'+negHTML+'</div>':'')
     +(detail.recommendation?'<div class="reco-box">'+detail.recommendation+'</div>':'')
     +'<div style="margin-top:12px;display:flex;gap:8px">'
     +'<button class="heart-btn" onclick="toggleFavorite('+compat.score+','+nutrit.score+',\''+productType+'\')">'+(isFavorite(scanData.productName||rawIng.substring(0,60),productType)?'❤️':'🤍')+'</button>'
     +'</div>'
-    +'<div class="disclaimer">EtiQuette nu înlocuiește sfatul medical profesionist. Metodologie: etiquette.app/metodologie</div>';
+    +'<div class="disclaimer">EtiQuette nu înlocuiește sfatul medical profesionist. Metodologie: etiquette.app/metodologie</div>'
+    +'<div style="margin-top:16px;padding-top:16px;border-top:0.5px solid var(--border)">'
+      +'<button class="camera-btn" onclick="resetScan()">'
+        +'<svg width="17" height="17" viewBox="0 0 18 18" fill="none">'
+          +'<rect x="1" y="3" width="16" height="12" rx="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/>'
+          +'<rect x="4" y="6" width="10" height="6" rx="1.5" stroke="currentColor" stroke-width="1" fill="none" opacity="0.5"/>'
+          +'<line x1="9" y1="1" x2="9" y2="3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>'
+        +'</svg>'
+        +'Fotografiază fața produsului'
+      +'</button>'
+    +'</div>';
 
   document.getElementById('results').classList.add('show');
   // Salvare automată
