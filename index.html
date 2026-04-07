@@ -1506,11 +1506,19 @@ function handleStepPhoto(e, step){
       });
     } else if(step===2){
       document.getElementById('step-2-wrap').style.display='none';
-      document.getElementById('step-3-wrap').style.display='block';
-      document.getElementById('step-3-dot').className='step-dot active';
+      document.getElementById('step-2-dot').className='step-dot done';
+      document.getElementById('step-3-dot').className='step-dot done';
       compressImage(b64, mime, 4*1024*1024, function(compB64, compMime){
         extractNutrition(compB64, compMime);
       });
+      // Poza feței e deja salvată din pasul 0 — sărim direct la Analizează
+      if(scanData.productPhoto){
+        document.getElementById('step-3-wrap').style.display='none';
+        document.getElementById('analyze-btn').style.display='flex';
+      } else {
+        document.getElementById('step-3-wrap').style.display='block';
+        document.getElementById('step-3-dot').className='step-dot active';
+      }
     } else if(step===3){
       scanData.productPhoto=full;
       document.getElementById('step-3-wrap').style.display='none';
