@@ -1070,6 +1070,12 @@ var CONDITION_CATEGORIES=[
 
 function getAllConditions(){var a=[];CONDITION_CATEGORIES.forEach(function(c){c.conditions.forEach(function(x){a.push(x);});});return a;}
 
+function getConditionName(condId){
+  var all=getAllConditions();
+  var found=all.find(function(c){return c.id===condId;});
+  return found?found.icon+' '+found.name:condId;
+}
+
 // STATE
 var productType='food';
 var activeConditions=new Set();
@@ -1734,8 +1740,20 @@ function extractNutrition(b64, mime){
       if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
       scanData.nutrition=JSON.parse(clean);
     }catch(e){scanData.nutrition=null;}
+    // Pornire automată analiză dacă poza feței există
+    if(scanData.productPhoto){
+      document.getElementById('analyze-btn').style.display='none';
+      setTimeout(function(){doAnalyze();},400);
+    }
   })
-  .catch(function(){hideStepLoading();scanData.nutrition=null;});
+  .catch(function(){
+    hideStepLoading();
+    scanData.nutrition=null;
+    // Chiar dacă nutriționalul eșuează, pornim analiza cu ce avem
+    if(scanData.productPhoto){
+      setTimeout(function(){doAnalyze();},400);
+    }
+  });
 }
 
 var stepLoadingEl=null;
@@ -2119,6 +2137,7 @@ function calcCompatibility(ingredients, activeConditions, members, selectedMembe
     var pen=poz<=3?3:poz<=6?2:1;
     score-=pen;
 
+    var condName=getConditionName(condId);
     var explanation;
     if(person==='Tu'){
       explanation=poz<=3?'Ingredient dominant (poziția '+poz+')':'Prezent în produs (poziția '+poz+')';
@@ -2131,7 +2150,8 @@ function calcCompatibility(ingredients, activeConditions, members, selectedMembe
       person:memberName||person,
       condition:condId,
       ingredient:bestKey,
-      explanation:explanation
+      explanation:explanation,
+      reason:'Motivul: '+condName
     });
   }
 
@@ -2140,12 +2160,14 @@ function calcCompatibility(ingredients, activeConditions, members, selectedMembe
     if(ALLERGY_CONDITIONS.includes(condId)){
       var keys=ALLERGY_KEYS[condId]||[];
       if(containsKey(keys)){
-        // O singură alertă per alergie
         var alreadyAdded=alerts.some(function(a){return a.person==='Tu'&&a.condition===condId;});
         if(!alreadyAdded){
           isIncompatible=true;
           var matched=getBestMatchedKey(keys);
-          alerts.push({severity:'danger',person:'Tu',condition:condId,ingredient:matched,explanation:'Produs nerecomandat — conține '+matched});
+          var condName=getConditionName(condId);
+          alerts.push({severity:'danger',person:'Tu',condition:condId,ingredient:matched,
+            explanation:'Produs nerecomandat — conține <strong>'+matched+'</strong>',
+            reason:'Motivul: '+condName});
         }
       }
     } else if(CHRONIC_CONDITIONS.includes(condId)){
@@ -2167,7 +2189,10 @@ function calcCompatibility(ingredients, activeConditions, members, selectedMembe
           if(!alreadyAdded){
             isIncompatible=true;
             var matched=getBestMatchedKey(keys);
-            alerts.push({severity:'danger',person:m.name||'Membru',condition:condId,ingredient:matched,explanation:'Produs nerecomandat pentru '+(m.name||'acest membru')+' — conține '+matched});
+            var condName=getConditionName(condId);
+            alerts.push({severity:'danger',person:m.name||'Membru',condition:condId,ingredient:matched,
+              explanation:'Produs nerecomandat pentru '+(m.name||'acest membru')+' — conține <strong>'+matched+'</strong>',
+              reason:'Motivul: '+condName});
           }
         }
       } else if(CHRONIC_CONDITIONS.includes(condId)){
@@ -2344,7 +2369,10 @@ function renderResults(compat, nutrit, detail, rawIng){
     return '<div class="alert-card '+a.severity+'">'
       +'<div class="alert-icon">'+(a.severity==='danger'?'🚨':'⚠️')+'</div>'
       +'<div><div class="alert-title">'+(a.person?a.person+' — ':'')+a.ingredient+'</div>'
-      +'<div class="alert-text">'+a.explanation+'</div></div></div>';
+      +'<div class="alert-text">'+a.explanation+'</div>'
+      +(a.reason?'<div style="font-family:\'Jost\',sans-serif;font-size:12px;color:var(--muted);margin-top:4px;font-style:italic">'+a.reason+'</div>':'')
+      +'</div></div>';
+  }).join('');
   }).join('');
 
   // 2 score cards
