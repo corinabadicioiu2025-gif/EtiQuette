@@ -940,7 +940,7 @@ textarea::placeholder{color:var(--muted)}
     if (!window.gdprContributie) return;
     try {
       // Căutăm dacă există deja
-      const q = query(collection(db, 'cautari_nereușite'), where('search_query', '==', searchQuery));
+      const q = query(collection(db, 'cautari_nereussite'), where('search_query', '==', searchQuery));
       const snapshot = await getDocs(q);
 
       if (!snapshot.empty) {
@@ -954,7 +954,7 @@ textarea::placeholder{color:var(--muted)}
         });
       } else {
         // Produs nou nefound — îl înregistrăm
-        await addDoc(collection(db, 'cautari_nereușite'), {
+        await addDoc(collection(db, 'cautari_nereussite'), {
           search_query: searchQuery,
           tip_produs: type,
           de_cate_ori_cautat: 1,
