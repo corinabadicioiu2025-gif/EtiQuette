@@ -33,6 +33,23 @@ exports.handler = async function(event) {
       );
     }
 
+    // ── Validare variantă produs ───────────────────────────
+    // Dacă query-ul conține termeni de variantă (zero, light, diet etc.)
+    // verificăm că produsul găsit conține același termen
+    const variantTerms = ['zero', 'light', 'diet', 'sugar free', 'sans sucre', 
+                          'max', 'plus', 'original', 'classic', 'cherry',
+                          'vanilla', 'lemon', 'orange', 'strawberry'];
+    
+    const queryLower = search.toLowerCase();
+    const queryVariants = variantTerms.filter(t => queryLower.includes(t));
+    
+    // Filtrăm produsele care conțin variantele căutate
+    function hasVariantMatch(product, variants) {
+      if (variants.length === 0) return true; // fără termeni specifici — orice merge
+      const productText = ((product.product_name || '') + ' ' + (product.brands || '')).toLowerCase();
+      return variants.some(v => productText.includes(v));
+    }
+
     // ── Construim variantele de query ──────────────────────
     const words = search.trim().split(/\s+/);
 
@@ -49,21 +66,21 @@ exports.handler = async function(event) {
       ? words.slice(0, 2).join(' ')
       : null;
 
-    // ── Căutare în 3 straturi ──────────────────────────────
+    // ── Căutare în 2 straturi ──────────────────────────────
     let products = [];
 
-    // Stratul 1
+    // Stratul 1 — query complet
     products = await searchOFF(query1);
+    products = products.filter(p => hasVariantMatch(p, queryVariants));
 
-    // Stratul 2 — dacă stratul 1 a eșuat
+    // Stratul 2 — fără ultimul cuvânt
     if (products.length === 0 && query2 && query2 !== query1) {
       products = await searchOFF(query2);
+      products = products.filter(p => hasVariantMatch(p, queryVariants));
     }
 
-    // Stratul 3 — dacă stratul 2 a eșuat
-    if (products.length === 0 && query3 && query3 !== query2) {
-      products = await searchOFF(query3);
-    }
+    // Stratul 3 eliminat — risc prea mare de produs greșit
+    // Dacă nu găsim în 2 straturi → flux manual cu date corecte
 
     // ── Niciun rezultat ────────────────────────────────────
     if (products.length === 0) {
