@@ -1638,13 +1638,13 @@ function searchProductInDB(b64, mime){
 
     // Funcție pentru căutare în OFF cu fallback
     function searchOFF(query, fallbackQuery) {
-      return fetch('https://cool-medovik-03af5e.netlify.app/.netlify/functions/off-proxy?search='+encodeURIComponent(query))
+      return fetch('https://verdant-mochi-b722fd.netlify.app/.netlify/functions/off-proxy?search='+encodeURIComponent(query))
       .then(function(r){return r.json();})
       .then(function(result){
         if(result && result.found) return result;
         // Dacă nu găsim și avem fallback, încercăm cu brandul singur
         if(fallbackQuery && fallbackQuery !== query){
-          return fetch('https://cool-medovik-03af5e.netlify.app/.netlify/functions/off-proxy?search='+encodeURIComponent(fallbackQuery))
+          return fetch('https://verdant-mochi-b722fd.netlify.app/.netlify/functions/off-proxy?search='+encodeURIComponent(fallbackQuery))
           .then(function(r2){return r2.json();});
         }
         return {found: false};
