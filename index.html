@@ -1528,6 +1528,19 @@ function handleStepPhoto(e, step){
       if(scanData.productPhoto){
         document.getElementById('step-3-wrap').style.display='none';
         document.getElementById('analyze-btn').style.display='flex';
+        // Trimitem produsul la Firebase cu cele 3 fotografii
+        if(window.firebaseSaveProduct && (scanData.productName || scanData.productBrand)){
+          var productId=((scanData.productBrand||'')+'-'+(scanData.productName||''))
+            .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+          window.firebaseSaveProduct(
+            productId,
+            scanData.productBrand,
+            scanData.productName,
+            scanData.ingredients,
+            scanData.nutrition,
+            [scanData.photos[1], full, scanData.productPhoto]
+          );
+        }
       } else {
         document.getElementById('step-3-wrap').style.display='block';
         document.getElementById('step-3-dot').className='step-dot active';
