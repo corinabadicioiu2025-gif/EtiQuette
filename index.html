@@ -356,6 +356,10 @@ textarea::placeholder{color:var(--muted)}
 .gdpr-continue-btn.active:hover{background:var(--text)}
 .gdpr-note{font-family:'Jost',sans-serif;font-size:11px;color:var(--muted);text-align:center;margin-top:12px;font-style:italic;line-height:1.6;max-width:340px}
 </style>
+<!-- Firebase CDN compat — încărcat în head pentru disponibilitate globală -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 </head>
 <body>
 
@@ -839,11 +843,6 @@ textarea::placeholder{color:var(--muted)}
   <div class="gdpr-note">Poți modifica preferințele oricând din meniu → Confidențialitate.<br>Datele personale (profil, afecțiuni) rămân exclusiv pe dispozitivul tău.</div>
 </div>
 
-<!-- Firebase SDK -->
-<!-- Firebase CDN compat — funcționează pe GitHub Pages fără module -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script>
   var firebaseConfig = {
     apiKey: "AIzaSyCBxIiy0PohexzyBs-JwwW3JehlFydrwUU",
@@ -2344,7 +2343,6 @@ function renderResults(compat, nutrit, detail, rawIng){
       +'<div class="alert-text">'+a.explanation+'</div>'
       +(a.reason?'<div style="font-family:\'Jost\',sans-serif;font-size:12px;color:var(--muted);margin-top:4px;font-style:italic">'+a.reason+'</div>':'')
       +'</div></div>';
-  }).join('');
   }).join('');
 
   // 2 score cards
