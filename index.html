@@ -840,15 +840,12 @@ textarea::placeholder{color:var(--muted)}
 </div>
 
 <!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getFirestore, collection, addDoc, doc, setDoc, getDoc, query, where, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-  import { getStorage, ref, uploadString, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
-
-  // ── CONFIGURARE FIREBASE ─────────────────────────────────
-  // TODO: Înlocuiește cu valorile tale din Firebase Console
-  // console.firebase.google.com → Proiect → Setări → Aplicații web
-  const firebaseConfig = {
+<!-- Firebase CDN compat — funcționează pe GitHub Pages fără module -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script>
+  var firebaseConfig = {
     apiKey: "AIzaSyCBxIiy0PohexzyBs-JwwW3JehlFydrwUU",
     authDomain: "etiquette-app-7f185.firebaseapp.com",
     projectId: "etiquette-app-7f185",
@@ -857,13 +854,12 @@ textarea::placeholder{color:var(--muted)}
     appId: "1:62374761795:web:236582263b17cb49200bf6"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+  var storage = firebase.storage();
 
-  // ── ID ANONIM utilizator ─────────────────────────────────
   function getAnonymousId() {
-    let uid = localStorage.getItem('eq_uid');
+    var uid = localStorage.getItem('eq_uid');
     if (!uid) {
       uid = 'eq_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
       localStorage.setItem('eq_uid', uid);
@@ -871,114 +867,90 @@ textarea::placeholder{color:var(--muted)}
     return uid;
   }
 
-  // ── TRIMITE SCANARE ANONIMĂ LA FIREBASE ─────────────────
-  // Apelată din autoSave() doar dacă userul a acceptat contribuția
-  window.firebaseSaveScan = async function(compatScore, nutritScore, type, alerts, productName, productBrand) {
-    if (!window.gdprContributie) return; // nu a acceptat contribuția anonimă
-    try {
-      await addDoc(collection(db, 'scanari'), {
-        uid: getAnonymousId(),
-        tip_produs: type,
-        scor_compatibilitate: compatScore,
-        scor_nutritional: nutritScore,
-        nr_alerte: alerts,
-        produs_gasit_automat: productName ? true : false,
-        timestamp: serverTimestamp()
-        // NU trimitem: afecțiuni specifice, nume membre, date naștere
-      });
-    } catch(e) {
-      console.warn('Firebase scanare:', e.message);
-    }
-  };
-
-  // ── TRIMITE PRODUS NECUNOSCUT LA FIREBASE ────────────────
-  // Apelată din fluxul manual 3 poze
-  window.firebaseSaveProduct = async function(productId, brand, name, ingredients, nutrition, photos) {
-    if (!window.gdprContributie) return;
-    try {
-      // Verificăm dacă produsul există deja
-      const docRef = doc(db, 'produse', productId);
-      const existing = await getDoc(docRef);
-      if (existing.exists()) return; // produs deja în baza de date
-
-      // Urcăm fotografiile în Storage
-      const photoUrls = {};
-      const photoLabels = ['fata', 'ingrediente', 'nutritional'];
-      for (let i = 0; i < photoLabels.length; i++) {
-        if (photos[i]) {
-          try {
-            const storageRef = ref(storage, `produse/${productId}/${photoLabels[i]}.jpg`);
-            await uploadString(storageRef, photos[i], 'data_url');
-            photoUrls[photoLabels[i]] = await getDownloadURL(storageRef);
-          } catch(e) {
-            console.warn('Upload poza', photoLabels[i], ':', e.message);
-          }
-        }
-      }
-
-      // Salvăm documentul produsului
-      await setDoc(docRef, {
-        product_id: productId,
-        brand: brand || '',
-        name: name || '',
-        ingredients_original: ingredients || '',
-        limba_originala: detectLimba(ingredients),
-        nutrition: nutrition || null,
-        photos: photoUrls,
-        uid_contributor: getAnonymousId(),
-        status: 'pending_review', // produsul așteaptă verificare
-        timestamp: serverTimestamp()
-      });
-
-    } catch(e) {
-      console.warn('Firebase produs:', e.message);
-    }
-  };
-
-  // ── ÎNREGISTRARE PRODUS NECĂUTAT (jurnal căutări nereușite) ──
-  window.firebaseLogMissedProduct = async function(searchQuery, type) {
-    if (!window.gdprContributie) return;
-    try {
-      // Căutăm dacă există deja
-      const q = query(collection(db, 'cautari_nereussite'), where('search_query', '==', searchQuery));
-      const snapshot = await getDocs(q);
-
-      if (!snapshot.empty) {
-        // Există deja — incrementăm contorul
-        const docRef = snapshot.docs[0].ref;
-        const data = snapshot.docs[0].data();
-        await setDoc(docRef, {
-          ...data,
-          de_cate_ori_cautat: (data.de_cate_ori_cautat || 1) + 1,
-          ultima_cautare: serverTimestamp()
-        });
-      } else {
-        // Produs nou nefound — îl înregistrăm
-        await addDoc(collection(db, 'cautari_nereussite'), {
-          search_query: searchQuery,
-          tip_produs: type,
-          de_cate_ori_cautat: 1,
-          status: 'nerezolvat',
-          prima_cautare: serverTimestamp(),
-          ultima_cautare: serverTimestamp()
-        });
-      }
-    } catch(e) {
-      console.warn('Firebase jurnal:', e.message);
-    }
-  };
-
-  // ── Detectare limbă ingrediente ─────────────────────────
   function detectLimba(text) {
     if (!text) return 'necunoscuta';
-    const t = text.toLowerCase();
+    var t = text.toLowerCase();
     if (t.includes('farine') || t.includes('lait') || t.includes('sucre') || t.includes('beurre')) return 'fr';
     if (t.includes('zucker') || t.includes('milch') || t.includes('mehl') || t.includes('butter')) return 'de';
     if (t.includes('zahar') || t.includes('lapte') || t.includes('apa') || t.includes('sare')) return 'ro';
     return 'en';
   }
 
-  // Facem funcțiile disponibile global
+  window.firebaseSaveScan = function(compatScore, nutritScore, type, alerts, productName, productBrand) {
+    if (!window.gdprContributie) return;
+    db.collection('scanari').add({
+      uid: getAnonymousId(),
+      tip_produs: type,
+      scor_compatibilitate: compatScore,
+      scor_nutritional: nutritScore,
+      nr_alerte: alerts,
+      produs_gasit_automat: productName ? true : false,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).catch(function(e){ console.warn('Firebase scanare:', e.message); });
+  };
+
+  window.firebaseSaveProduct = function(productId, brand, name, ingredients, nutrition, photos) {
+    if (!window.gdprContributie) return;
+    var docRef = db.collection('produse').doc(productId);
+    docRef.get().then(function(existing) {
+      if (existing.exists) return;
+      var photoUrls = {};
+      var photoLabels = ['fata', 'ingrediente', 'nutritional'];
+      var uploads = photos.map(function(photo, i) {
+        if (!photo) return Promise.resolve();
+        var storageRef = storage.ref('produse/' + productId + '/' + photoLabels[i] + '.jpg');
+        return storageRef.putString(photo, 'data_url')
+          .then(function() { return storageRef.getDownloadURL(); })
+          .then(function(url) { photoUrls[photoLabels[i]] = url; })
+          .catch(function(e) { console.warn('Upload poza', photoLabels[i], ':', e.message); });
+      });
+      Promise.all(uploads).then(function() {
+        docRef.set({
+          product_id: productId,
+          brand: brand || '',
+          name: name || '',
+          ingredients_original: ingredients || '',
+          limba_originala: detectLimba(ingredients),
+          nutrition: nutrition || null,
+          photos: photoUrls,
+          uid_contributor: getAnonymousId(),
+          status: 'pending_review',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(function(e){ console.warn('Firebase produs:', e.message); });
+      });
+    }).catch(function(e){ console.warn('Firebase get produs:', e.message); });
+  };
+
+  window.firebaseLogMissedProduct = function(searchQuery, type) {
+    if (!window.gdprContributie) return;
+    db.collection('cautari_nereussite')
+      .where('search_query', '==', searchQuery)
+      .get()
+      .then(function(snapshot) {
+        if (!snapshot.empty) {
+          var docRef = snapshot.docs[0].ref;
+          var data = snapshot.docs[0].data();
+          docRef.set({
+            search_query: searchQuery,
+            tip_produs: type,
+            de_cate_ori_cautat: (data.de_cate_ori_cautat || 1) + 1,
+            status: 'nerezolvat',
+            prima_cautare: data.prima_cautare || firebase.firestore.FieldValue.serverTimestamp(),
+            ultima_cautare: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(function(e){ console.warn('Firebase update jurnal:', e.message); });
+        } else {
+          db.collection('cautari_nereussite').add({
+            search_query: searchQuery,
+            tip_produs: type,
+            de_cate_ori_cautat: 1,
+            status: 'nerezolvat',
+            prima_cautare: firebase.firestore.FieldValue.serverTimestamp(),
+            ultima_cautare: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(function(e){ console.warn('Firebase add jurnal:', e.message); });
+        }
+      }).catch(function(e){ console.warn('Firebase jurnal:', e.message); });
+  };
+
   window._firebaseReady = true;
 </script>
 
