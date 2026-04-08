@@ -356,10 +356,10 @@ textarea::placeholder{color:var(--muted)}
 .gdpr-continue-btn.active:hover{background:var(--text)}
 .gdpr-note{font-family:'Jost',sans-serif;font-size:11px;color:var(--muted);text-align:center;margin-top:12px;font-style:italic;line-height:1.6;max-width:340px}
 </style>
-<!-- Firebase CDN compat — încărcat în head pentru disponibilitate globală -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<!-- Firebase CDN compat — funcționează pe GitHub Pages fără module -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
 <body>
 
@@ -737,6 +737,14 @@ textarea::placeholder{color:var(--muted)}
     <div class="info-sec-title">GDPR</div>
     <div class="info-text">Conform Regulamentului General privind Protecția Datelor, aveți dreptul de a accesa, modifica sau șterge datele personale stocate. Puteți șterge toate datele prin dezinstalarea aplicației.</div>
     <div class="info-divider"></div>
+    <div class="info-sec-title">Consimțământ contribuție anonimă</div>
+    <div id="gdpr-status-text" class="info-text"></div>
+    <div style="margin-top:12px">
+      <button onclick="resetGdprConsent()" style="width:100%;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:13px;font-family:'Jost',sans-serif;font-size:14px;cursor:pointer;letter-spacing:0.06em">
+        Modifică preferințele de consimțământ
+      </button>
+    </div>
+    <div class="info-divider"></div>
     <div class="info-sec-title">Cheia API</div>
     <div class="info-text-italic">Cheia API Anthropic este stocată local pe dispozitiv și folosită exclusiv pentru procesarea ingredientelor. Nu este transmisă către EtiQuette sau terți.</div>
   </div>
@@ -988,6 +996,33 @@ function acceptGdpr() {
   document.getElementById('gdpr-overlay').classList.remove('show');
 }
 
+function resetGdprConsent() {
+  try { localStorage.removeItem('eq_gdpr_v1'); } catch(e) {}
+  window.gdprContributie = false;
+  closeInfoOverlay('privacy-overlay');
+  setTimeout(function(){
+    document.getElementById('gdpr-overlay').classList.add('show');
+  }, 300);
+}
+
+function updateGdprStatus() {
+  var el = document.getElementById('gdpr-status-text');
+  if (!el) return;
+  try {
+    var stored = JSON.parse(localStorage.getItem('eq_gdpr_v1') || 'null');
+    if (stored && stored.accepted) {
+      var contributie = stored.contributie;
+      el.innerHTML = contributie
+        ? '✅ Ai acceptat contribuția anonimă la baza de date EtiQuette.'
+        : '❌ Nu ai acceptat contribuția anonimă. Datele scanărilor nu se trimit la server.';
+    } else {
+      el.innerHTML = '⚠️ Consimțământul nu a fost înregistrat încă.';
+    }
+  } catch(e) {
+    el.innerHTML = '⚠️ Nu s-au putut citi preferințele.';
+  }
+}
+
 function checkGdpr() {
   try {
     var stored = JSON.parse(localStorage.getItem('eq_gdpr_v1') || 'null');
@@ -1201,6 +1236,7 @@ function menuGoTo(page){
   setTimeout(function(){
     if(page==='profile')openProfileOverlay();
     else document.getElementById(page+'-overlay').classList.add('show');
+  if(page==='privacy') updateGdprStatus();
   },50);
 }
 function closeInfoOverlay(id){
