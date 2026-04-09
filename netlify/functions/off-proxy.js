@@ -19,11 +19,15 @@ exports.handler = async function(event) {
       };
     }
 
-    // ── Funcție de căutare în OFF ──────────────────────────
+    // ── Funcție de căutare în OFF cu autentificare ──────────
     async function searchOFF(query) {
+      const credentials = Buffer.from('carolina2025:5wPgVPzGK*!g8_F').toString('base64');
       const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,nutriments,labels`;
       const response = await fetch(url, {
-        headers: { 'User-Agent': 'EtiQuette/1.0 (contact@etiquette.app)' }
+        headers: {
+          'User-Agent': 'EtiQuette/1.0 (contact@etiquette.app)',
+          'Authorization': `Basic ${credentials}`
+        }
       });
       if (!response.ok) throw new Error('OFF status: ' + response.status);
       const data = await response.json();
