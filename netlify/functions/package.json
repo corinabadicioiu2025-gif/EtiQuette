@@ -1,1 +1,10 @@
+[build]
+  functions = "netlify/functions"
 
+[functions]
+  node_bundler = "zisi"
+
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
