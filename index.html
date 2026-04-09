@@ -885,51 +885,56 @@ textarea::placeholder{color:var(--muted)}
 
   window.firebaseSaveScan = function(compatScore, nutritScore, type, alerts, productName, productBrand) {
     if (!window.gdprContributie) return;
+    var tipRo = type === 'food' ? 'alimentar' : 'cosmetic';
     db.collection('scanari').add({
       uid: getAnonymousId(),
-      tip_produs: type,
+      tip_produs: tipRo,
       scor_compatibilitate: compatScore,
       scor_nutritional: nutritScore,
       nr_alerte: alerts,
-      produs_gasit_automat: productName ? true : false,
+      produs_gasit_automat: productName ? 'da' : 'nu',
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).catch(function(e){ console.warn('Firebase scanare:', e.message); });
+    }).then(function(){ console.log('✅ Scanare salvată în Firebase'); })
+      .catch(function(e){ console.warn('❌ Firebase scanare:', e.message); });
   };
 
   window.firebaseSaveProduct = function(productId, brand, name, ingredients, nutrition, photos) {
-    if (!window.gdprContributie) return;
+    if (!window.gdprContributie) { console.warn('⚠️ GDPR contributie false — produs nesalvat'); return; }
+    console.log('📦 Salvez produs în Firebase:', productId, brand, name);
     var docRef = db.collection('produse').doc(productId);
     docRef.get().then(function(existing) {
-      if (existing.exists) return;
+      if (existing.exists) { console.log('ℹ️ Produs deja în baza de date:', productId); return; }
       var photoUrls = {};
-      var photoLabels = ['fata', 'ingrediente', 'nutritional'];
+      var photoLabels = ['ingrediente', 'nutritional', 'fata'];
       var uploads = photos.map(function(photo, i) {
         if (!photo) return Promise.resolve();
         var storageRef = storage.ref('produse/' + productId + '/' + photoLabels[i] + '.jpg');
         return storageRef.putString(photo, 'data_url')
           .then(function() { return storageRef.getDownloadURL(); })
-          .then(function(url) { photoUrls[photoLabels[i]] = url; })
-          .catch(function(e) { console.warn('Upload poza', photoLabels[i], ':', e.message); });
+          .then(function(url) { photoUrls[photoLabels[i]] = url; console.log('📷 Poza uploadată:', photoLabels[i]); })
+          .catch(function(e) { console.warn('❌ Upload poza', photoLabels[i], ':', e.message); });
       });
       Promise.all(uploads).then(function() {
         docRef.set({
           product_id: productId,
           brand: brand || '',
-          name: name || '',
-          ingredients_original: ingredients || '',
+          denumire: name || '',
+          ingrediente_originale: ingredients || '',
           limba_originala: detectLimba(ingredients),
-          nutrition: nutrition || null,
-          photos: photoUrls,
+          nutritie: nutrition || null,
+          fotografii: photoUrls,
           uid_contributor: getAnonymousId(),
-          status: 'pending_review',
+          status: 'in_asteptare',
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(function(e){ console.warn('Firebase produs:', e.message); });
+        }).then(function(){ console.log('✅ Produs salvat în Firebase!'); })
+          .catch(function(e){ console.warn('❌ Firebase produs:', e.message); });
       });
-    }).catch(function(e){ console.warn('Firebase get produs:', e.message); });
+    }).catch(function(e){ console.warn('❌ Firebase get produs:', e.message); });
   };
 
   window.firebaseLogMissedProduct = function(searchQuery, type) {
     if (!window.gdprContributie) return;
+    var tipRo = type === 'food' ? 'alimentar' : 'cosmetic';
     db.collection('cautari_nereussite')
       .where('search_query', '==', searchQuery)
       .get()
@@ -939,7 +944,7 @@ textarea::placeholder{color:var(--muted)}
           var data = snapshot.docs[0].data();
           docRef.set({
             search_query: searchQuery,
-            tip_produs: type,
+            tip_produs: tipRo,
             de_cate_ori_cautat: (data.de_cate_ori_cautat || 1) + 1,
             status: 'nerezolvat',
             prima_cautare: data.prima_cautare || firebase.firestore.FieldValue.serverTimestamp(),
@@ -948,7 +953,7 @@ textarea::placeholder{color:var(--muted)}
         } else {
           db.collection('cautari_nereussite').add({
             search_query: searchQuery,
-            tip_produs: type,
+            tip_produs: tipRo,
             de_cate_ori_cautat: 1,
             status: 'nerezolvat',
             prima_cautare: firebase.firestore.FieldValue.serverTimestamp(),
