@@ -1534,13 +1534,14 @@ function handleStepPhoto(e, step){
         document.getElementById('step-3-wrap').style.display='none';
         document.getElementById('analyze-btn').style.display='flex';
         // Trimitem produsul la Firebase cu cele 3 fotografii
-        if(window.firebaseSaveProduct && (scanData.productName || scanData.productBrand)){
-          var productId=((scanData.productBrand||'')+'-'+(scanData.productName||''))
-            .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+        if(window.firebaseSaveProduct && scanData.ingredients){
+          var brandPart = (scanData.productBrand||'necunoscut').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+          var namePart = (scanData.productName||'produs').toLowerCase().replace(/[^a-z0-9]+/g,'-');
+          var productId = (brandPart+'-'+namePart+'-'+Date.now()).replace(/(^-|-$)/g,'');
           window.firebaseSaveProduct(
             productId,
-            scanData.productBrand,
-            scanData.productName,
+            scanData.productBrand || 'Necunoscut',
+            scanData.productName || 'Produs necunoscut',
             scanData.ingredients,
             scanData.nutrition,
             [scanData.photos[1], full, scanData.productPhoto]
