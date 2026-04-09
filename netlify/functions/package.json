@@ -1,10 +1,7 @@
-[build]
-  functions = "netlify/functions"
-
-[functions]
-  node_bundler = "zisi"
-
-[[headers]]
-  for = "/.netlify/functions/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
+{
+  "name": "etiquette-functions",
+  "version": "1.0.0",
+  "dependencies": {
+    "node-fetch": "2.6.9"
+  }
+}
