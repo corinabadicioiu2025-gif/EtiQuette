@@ -945,7 +945,7 @@ textarea::placeholder{color:var(--muted)}
     }).catch(function(e){ console.warn('❌ Firebase get produs:', e.message); });
   };
 
-  window.firebaseLogMissedProduct = function(searchQuery, type) {
+  window.firebaseLogMissedProduct = function(searchQuery, type, brand, name) {
     if (!window.gdprContributie) return;
     var tipRo = type === 'food' ? 'alimentar' : 'cosmetic';
     db.collection('cautari_nereussite')
@@ -957,6 +957,8 @@ textarea::placeholder{color:var(--muted)}
           var data = snapshot.docs[0].data();
           docRef.set({
             search_query: searchQuery,
+            brand: brand || '',
+            denumire: name || '',
             tip_produs: tipRo,
             de_cate_ori_cautat: (data.de_cate_ori_cautat || 1) + 1,
             status: 'nerezolvat',
@@ -966,6 +968,8 @@ textarea::placeholder{color:var(--muted)}
         } else {
           db.collection('cautari_nereussite').add({
             search_query: searchQuery,
+            brand: brand || '',
+            denumire: name || '',
             tip_produs: tipRo,
             de_cate_ori_cautat: 1,
             status: 'nerezolvat',
@@ -1699,7 +1703,7 @@ function searchProductInDB(b64, mime){
     function handleResult(result) {
       if(!result || !result.found){
         logStep('Produs negăsit în baza de date — fotografiază manual','warn');
-        if(window.firebaseLogMissedProduct) window.firebaseLogMissedProduct(searchQuery, productType);
+        if(window.firebaseLogMissedProduct) window.firebaseLogMissedProduct(searchQuery, productType, product ? product.brand : '', product ? product.name : '');
         showManualFlow(product); return;
       }
 
