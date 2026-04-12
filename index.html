@@ -1601,7 +1601,7 @@ function searchProductInDB(b64, mime){
     headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:[
       {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-      {type:'text',text:'Identifică brandul și numele acestui produs. Returnează DOAR JSON: {"brand":"<DOAR brandul, ex: Coca-Cola>","name":"<DOAR numele produsului fără brand, ex: Zero Sugar>","search":"<brand + nume scurt în engleză, max 4 cuvinte, ex: Coca-Cola Zero Sugar>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null}'}
+      {type:'text',text:'Identifică brandul și numele acestui produs. Returnează DOAR JSON: {"brand":"<DOAR brandul, ex: Coca-Cola>","name":"<DOAR numele produsului fără brand, ex: Zero Zahăr>","search":"<brand + nume EXACT de pe ambalaj, max 4 cuvinte, ex: Coca-Cola Zero Zahăr>","search_en":"<brand + nume în engleză, max 4 cuvinte, ex: Coca-Cola Zero Sugar>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null,"search_en":null}'}
     ]}]})
   })
   .then(function(r){return r.json();})
@@ -1633,7 +1633,8 @@ function searchProductInDB(b64, mime){
     }
 
     // Curățăm query-ul — eliminăm dublurile brand+name
-    var searchQuery = product.search.trim();
+    var searchQuery = product.search ? product.search.trim() : '';
+    var searchQueryEn = product.search_en ? product.search_en.trim() : '';
     // Dacă brandul apare de două ori în search, îl eliminăm
     if(product.brand && searchQuery.toLowerCase().startsWith(product.brand.toLowerCase()+' '+product.brand.toLowerCase())){
       searchQuery = searchQuery.substring(product.brand.length+1).trim();
@@ -1648,7 +1649,6 @@ function searchProductInDB(b64, mime){
       .then(function(r){return r.json();})
       .then(function(result){
         if(result && result.found) return result;
-        // Dacă nu găsim și avem fallback, încercăm cu brandul singur
         if(fallbackQuery && fallbackQuery !== query){
           return fetch('https://verdant-mochi-b722fd.netlify.app/.netlify/functions/off-proxy?search='+encodeURIComponent(fallbackQuery))
           .then(function(r2){return r2.json();});
@@ -1657,8 +1657,10 @@ function searchProductInDB(b64, mime){
       });
     }
 
-    // Căutăm mai întâi cu query complet, apoi doar cu brandul ca fallback
-    var fallback = product.brand || '';
+    // Stratul 1: query original (limba de pe ambalaj)
+    // Stratul 2: query în engleză
+    // Stratul 3: doar brandul
+    var fallback = searchQueryEn || product.brand || '';
     searchOFF(searchQuery, fallback)
     .then(function(result){
       if(!result||!result.found){
