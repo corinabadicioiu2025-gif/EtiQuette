@@ -930,6 +930,7 @@ textarea::placeholder{color:var(--muted)}
           product_id: productId,
           brand: brand || '',
           denumire: name || '',
+          denumire_cautata: scanData.lastSearchQuery || '',
           necesita_denumire: (!brand || brand === 'Necunoscut') ? true : false,
           ingrediente_originale: ingredients || '',
           ingrediente_fingerprint: primele3,
@@ -1613,15 +1614,29 @@ function searchProductInDB(b64, mime){
   logStep('Comprim imaginea...','loading');
   logStep('Trimit la Claude pentru identificare...','loading');
 
-  fetch('https://api.anthropic.com/v1/messages',{
+  // Retry automat pentru erori 529 (overloaded) — max 2 reîncercări cu pauză 3s
+  function fetchWithRetry(url, options, retriesLeft) {
+    return fetch(url, options).then(function(r) {
+      if(r.status === 529 && retriesLeft > 0) {
+        logStep('Server supraîncărcat, reîncerc în 3s... ('+(3-retriesLeft)+'/2)','loading');
+        return new Promise(function(resolve) {
+          setTimeout(function() {
+            resolve(fetchWithRetry(url, options, retriesLeft - 1));
+          }, 3000);
+        });
+      }
+      return r.json();
+    });
+  }
+
+  fetchWithRetry('https://api.anthropic.com/v1/messages', {
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:[
       {type:'image',source:{type:'base64',media_type:mime,data:b64}},
       {type:'text',text:'Identifică brandul și numele acestui produs. Returnează DOAR JSON: {"brand":"<DOAR brandul, ex: Coca-Cola>","name":"<DOAR numele produsului fără brand, ex: Zero Zahăr>","search":"<brand + nume EXACT de pe ambalaj, max 4 cuvinte, ex: Coca-Cola Zero Zahăr>","search_en":"<brand + nume în engleză, max 4 cuvinte, ex: Coca-Cola Zero Sugar>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null,"search_en":null}'}
     ]}]})
-  })
-  .then(function(r){return r.json();})
+  }, 2)
   .then(function(d){
     if(d.error){
       logStep('Eroare API Claude: '+d.error.message,'error');
@@ -1659,6 +1674,7 @@ function searchProductInDB(b64, mime){
 
     logStep('Claude identificat: <strong>'+product.brand+' '+product.name+'</strong>','ok');
     logStep('Caut în baza de date cu: <em>"'+searchQuery+'"</em>','loading');
+    scanData.lastSearchQuery = searchQuery;
 
     // ── Căutare în Firebase EtiQuette ─────────────────────
     function searchEtiQuette(brand, name) {
@@ -1773,17 +1789,28 @@ function showManualFlow(product){
   document.getElementById('photos-preview').style.display='block';
 }
 
+function claudeFetchWithRetry(body, retriesLeft) {
+  if(retriesLeft === undefined) retriesLeft = 2;
+  return fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body: JSON.stringify(body)
+  }).then(function(r) {
+    if(r.status === 529 && retriesLeft > 0) {
+      return new Promise(function(resolve) {
+        setTimeout(function() { resolve(claudeFetchWithRetry(body, retriesLeft - 1)); }, 3000);
+      });
+    }
+    return r.json();
+  });
+}
+
 function extractIngredients(b64, mime){
   showStepLoading('Citesc ingredientele...');
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
-      {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-      {type:'text',text:'Găsește lista de ingrediente de pe ambalaj — apare după: Ingredients, Ingrediente, Inhaltsstoffe, INCI. Returnează DOAR ingredientele separate prin virgule, fără alt text. Dacă nu găsești, returnează: NU_AM_GASIT'}
-    ]}]})
-  })
-  .then(function(r){return r.json();})
+  claudeFetchWithRetry({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
+    {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+    {type:'text',text:'Găsește lista de ingrediente de pe ambalaj — apare după: Ingredients, Ingrediente, Inhaltsstoffe, INCI. Returnează DOAR ingredientele separate prin virgule, fără alt text. Dacă nu găsești, returnează: NU_AM_GASIT'}
+  ]}]})
   .then(function(d){
     hideStepLoading();
     var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
@@ -1803,15 +1830,10 @@ function extractIngredients(b64, mime){
 
 function extractNutrition(b64, mime){
   showStepLoading('Citesc tabelul nutrițional...');
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:[
-      {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-      {type:'text',text:'Extrage valorile nutriționale per 100g din acest tabel. Returnează DOAR JSON: {"energy_kj":null,"fat":null,"saturated_fat":null,"carbohydrates":null,"sugars":null,"fiber":null,"protein":null,"sodium":null,"fruits_percent":null} — toate valorile sunt numere sau null dacă nu găsești. Sodiu în mg, restul în g, energie în kj.'}
-    ]}]})
-  })
-  .then(function(r){return r.json();})
+  claudeFetchWithRetry({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:[
+    {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+    {type:'text',text:'Extrage valorile nutriționale per 100g din acest tabel. Returnează DOAR JSON: {"energy_kj":null,"fat":null,"saturated_fat":null,"carbohydrates":null,"sugars":null,"fiber":null,"protein":null,"sodium":null,"fruits_percent":null} — toate valorile sunt numere sau null dacă nu găsești. Sodiu în mg, restul în g, energie în kj.'}
+  ]}]})
   .then(function(d){
     hideStepLoading();
     var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
@@ -1821,7 +1843,6 @@ function extractNutrition(b64, mime){
       if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
       scanData.nutrition=JSON.parse(clean);
     }catch(e){scanData.nutrition=null;}
-    // Pornire automată analiză dacă poza feței există
     if(scanData.productPhoto){
       document.getElementById('analyze-btn').style.display='none';
       setTimeout(function(){doAnalyze();},400);
@@ -1830,7 +1851,6 @@ function extractNutrition(b64, mime){
   .catch(function(){
     hideStepLoading();
     scanData.nutrition=null;
-    // Chiar dacă nutriționalul eșuează, pornim analiza cu ce avem
     if(scanData.productPhoto){
       setTimeout(function(){doAnalyze();},400);
     }
