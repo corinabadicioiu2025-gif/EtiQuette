@@ -2567,7 +2567,7 @@ function autoSave(compatScore, nutritScore, type, alerts){
     produs_gasit_automat: scanData.productName ? 'da' : 'nu'
   });
   var now=new Date();
-  var photo=scanData.photos[1]||scanData.productPhoto||'';
+  var photo=scanData.productPhoto||scanData.photos[3]||scanData.photos[1]||'';
   var productName=scanData.productName||'';
   var productBrand=scanData.productBrand||'';
   var ing=scanData.ingredients||'';
@@ -2665,7 +2665,7 @@ function toggleFavorite(compatScore,nutritScore,type){
       type:type,
       productName:scanData.productName||'',productBrand:scanData.productBrand||'',
       excerpt:scanData.productName||scanData.ingredients.substring(0,60).replace(/'/g,'').replace(/\n/g,' '),
-      thumb:scanData.photos[1]||scanData.productPhoto||'',
+      thumb:scanData.productPhoto||scanData.photos[3]||scanData.photos[1]||'',
       fullData:currentAnalysisData,
       date:new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
     });
