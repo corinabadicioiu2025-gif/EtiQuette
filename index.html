@@ -2411,21 +2411,26 @@ function doAnalyze(){
   document.getElementById('results').innerHTML='';
   document.getElementById('error-msg').classList.remove('show');
 
-  // Algoritmul ruleaza pe textul ORIGINAL (fr/en/ro/de)
-  // codurile E, glutamate monosodique, maltodextrine etc. detectate corect
+  // Algoritmul rulează pe textul ORIGINAL — instant
   var compatResult=calcCompatibility(ingOriginal, activeConditions, members, selectedMembers, productType);
   var nutritResult=calcNutritional(scanData.nutrition, ingOriginal);
 
-  // Claude primeste textul original si traduce DOAR pentru afisare
+  // Dacă produsul vine din EtiQuette — afișăm scorurile instant, Claude rulează în background
+  if(scanData.sursa === 'etiquette'){
+    document.getElementById('loading').classList.remove('show');
+    if(btn)btn.disabled=false;
+    // Afișăm imediat cu detalii goale
+    renderResults(compatResult, nutritResult, {summary:'',ingredients:[],positives:[],negatives:[],recommendation:''}, ingOriginal);
+    // Adăugăm indicator "Se încarcă detaliile..."
+    var loadingDetail = '<div id="detail-loading" style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;font-family:\'Jost\',sans-serif;font-size:13px;color:var(--muted);text-align:center">⏳ Se încarcă analiza detaliată...</div>';
+    document.getElementById('results').insertAdjacentHTML('beforeend', loadingDetail);
+  }
+
+  // Claude analizează în background (sau în prim plan dacă nu e EtiQuette)
   var typeLabel=productType==='food'?'alimentare':'cosmetice';
   var prompt='Esti expert in ingrediente '+typeLabel+'. Ingredientele pot fi in orice limba (romana, franceza, engleza, germana, spaniola). Toate raspunsurile returneaza-le EXCLUSIV in romana.\n\nReturneaza DOAR JSON valid:\n{"summary":"<2-3 propozitii in romana despre calitatea generala>","ingredients":[{"name":"<nume ingredient tradus in romana>","rating":"<good/medium/bad>","desc":"<explicatie scurta in romana, max 10 cuvinte>","risk":"<null sau risc specific in romana>"}],"positives":["<aspect pozitiv in romana>"],"negatives":["<aspect negativ in romana>"],"recommendation":"<sfat final in romana>"}\n\nIngrediente originale: "'+ingOriginal+'"';
 
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
-  })
-  .then(function(r){return r.json();})
+  claudeFetchWithRetry({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
   .then(function(d){
     var text=(d.content||[]).map(function(i){return i.text||'';}).join('');
     var detail;
@@ -2435,13 +2440,50 @@ function doAnalyze(){
       if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
       detail=JSON.parse(clean);
     }catch(e){detail={summary:'',ingredients:[],positives:[],negatives:[],recommendation:''};}
-    renderResults(compatResult, nutritResult, detail, ingOriginal);
+
+    if(scanData.sursa === 'etiquette'){
+      // Actualizăm doar secțiunile de detalii fără să refacem tot
+      var loadingEl = document.getElementById('detail-loading');
+      if(loadingEl) loadingEl.remove();
+      // Adăugăm detaliile în rezultatele existente
+      var ingHTML=(detail.ingredients||[]).slice(0,14).map(function(i){
+        var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';
+        var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';
+        return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div>'
+          +'<div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div>'
+          +(i.risk&&i.risk!=='null'?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')
+          +'</div></div>';
+      }).join('');
+      var posHTML=(detail.positives||[]).map(function(p){return '<div class="point-row"><span>✅</span><span>'+p+'</span></div>';}).join('');
+      var negHTML=(detail.negatives||[]).map(function(n){return '<div class="point-row"><span>⚠️</span><span>'+n+'</span></div>';}).join('');
+      var detailHTML='';
+      if(detail.summary) detailHTML+='<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;font-family:\'Jost\',sans-serif;font-size:14px;color:var(--text2);line-height:1.6">'+detail.summary+'</div>';
+      if(ingHTML) detailHTML+='<div class="section-card"><div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:4px" onclick="toggleIngAnaliza(this)"><div class="section-label" style="margin:0">Analiza ingredientelor</div><span style="font-family:\'Jost\',sans-serif;font-size:12px;color:var(--gold)">▼ Vezi</span></div><div class="ing-analiza-body" style="display:none;margin-top:12px">'+ingHTML+'</div></div>';
+      if(posHTML) detailHTML+='<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte forte</div>'+posHTML+'</div>';
+      if(negHTML) detailHTML+='<div class="section-card"><div class="section-label" style="margin-bottom:10px">Puncte slabe</div>'+negHTML+'</div>';
+      if(detail.recommendation) detailHTML+='<div class="reco-box">'+detail.recommendation+'</div>';
+      // Inserăm detaliile înainte de butoanele finale
+      var disclaimerEl = document.querySelector('.disclaimer');
+      if(disclaimerEl) disclaimerEl.insertAdjacentHTML('beforebegin', detailHTML);
+      currentAnalysisData.detail = detail;
+    } else {
+      renderResults(compatResult, nutritResult, detail, ingOriginal);
+    }
   })
-  .catch(function(err){trackEvent('eroare_analiza',{mesaj:err&&err.message?err.message:'unknown'});showError(err.message||'Eroare. Verifica cheia API.');})
+  .catch(function(err){
+    var loadingEl = document.getElementById('detail-loading');
+    if(loadingEl) loadingEl.remove();
+    if(scanData.sursa !== 'etiquette'){
+      trackEvent('eroare_analiza',{mesaj:err&&err.message?err.message:'unknown'});
+      showError(err.message||'Eroare. Verifica cheia API.');
+    }
+  })
   .finally(function(){
     var btn=document.getElementById('analyze-btn');
     if(btn)btn.disabled=false;
-    document.getElementById('loading').classList.remove('show');
+    if(scanData.sursa !== 'etiquette'){
+      document.getElementById('loading').classList.remove('show');
+    }
   });
 }
 
