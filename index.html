@@ -1502,7 +1502,7 @@ function logAbandon(){
 }
 
 function resetScan(){
-  scanData={step:1,ingredients:'',nutrition:null,productPhoto:null,productName:'',productBrand:'',photos:{1:null,2:null,3:null}};
+  scanData={step:1,ingredients:'',nutrition:null,productPhoto:null,productName:'',productBrand:'',photos:{1:null,2:null,3:null},sursa:null,lastSearchQuery:''};
   document.getElementById('step-0-wrap').style.display='block';
   document.getElementById('product-search-wrap').style.display='none';
   document.getElementById('product-searching').style.display='none';
@@ -1518,12 +1518,18 @@ function resetScan(){
   document.getElementById('error-msg').classList.remove('show');
   document.getElementById('results').classList.remove('show');
   document.getElementById('results').innerHTML='';
+  // Reset file inputs — important pe iOS ca să permită reselecția aceluiași fișier
+  [0,1,2,3].forEach(function(i){
+    var inp = document.getElementById('file-input-'+i);
+    if(inp) inp.value = '';
+  });
   [1,2,3].forEach(function(i){
     document.getElementById('step-'+i+'-dot').className='step-dot'+(i===1?' active':'');
     document.getElementById('preview-'+i).style.display='none';
     document.getElementById('preview-'+i+'-empty').style.display='flex';
     document.getElementById('check-'+i).style.display='none';
   });
+  window._lastScanId = null;
 }
 
 function openCameraStep(step){
