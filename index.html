@@ -887,12 +887,15 @@ textarea::placeholder{color:var(--muted)}
     return 'en';
   }
 
-  window.firebaseSaveScan = function(compatScore, nutritScore, type, alerts, productName, productBrand) {
+  window.firebaseSaveScan = function(compatScore, nutritScore, type, alerts, productName, productBrand, sursa) {
     if (!window.gdprContributie) return;
     var tipRo = type === 'food' ? 'alimentar' : 'cosmetic';
     db.collection('scanari').add({
       uid: getAnonymousId(),
       tip_produs: tipRo,
+      brand: productBrand || '',
+      denumire: productName || '',
+      sursa_date: sursa || 'manual',
       scor_compatibilitate: compatScore,
       scor_nutritional: nutritScore,
       nr_alerte: alerts,
@@ -1681,6 +1684,7 @@ function searchProductInDB(b64, mime){
 
       logStep('Ingrediente găsite în Open Food Facts ✓','ok');
       scanData.ingredients=result.ingredients||'';
+      scanData.sursa='off';
       trackEvent('produs_gasit_automat', {tip_produs: productType, brand: product.brand||''});
 
       if(result.nutrition&&Object.values(result.nutrition).some(function(v){return v!==null;})){
@@ -2448,8 +2452,17 @@ function renderResults(compat, nutrit, detail, rawIng){
   var negHTML=(detail.negatives||[]).map(function(n){return '<div class="point-row"><span>⚠️</span><span>'+n+'</span></div>';}).join('');
   var ac=compat.alerts.filter(function(a){return a.severity==='danger';}).length;
 
+  var sursaBadge = '';
+  if(scanData.sursa === 'off'){
+    sursaBadge = '<div style="display:inline-flex;align-items:center;gap:4px;background:#e8f4fd;color:#1a73e8;font-family:\'Jost\',sans-serif;font-size:10px;padding:3px 8px;border-radius:10px;margin-bottom:10px">🔵 Open Food Facts</div>';
+  } else if(scanData.sursa === 'etiquette'){
+    sursaBadge = '<div style="display:inline-flex;align-items:center;gap:4px;background:#e8f5e9;color:#2e7d32;font-family:\'Jost\',sans-serif;font-size:10px;padding:3px 8px;border-radius:10px;margin-bottom:10px">🟢 Baza EtiQuette</div>';
+  } else {
+    sursaBadge = '<div style="display:inline-flex;align-items:center;gap:4px;background:#fff8e1;color:#f57f17;font-family:\'Jost\',sans-serif;font-size:10px;padding:3px 8px;border-radius:10px;margin-bottom:10px">🟡 Scanat manual</div>';
+  }
+
   document.getElementById('results').innerHTML=
-    alertsHTML+scoresHTML+nutritBreakHTML
+    sursaBadge+alertsHTML+scoresHTML+nutritBreakHTML
     +(detail.summary?'<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;font-family:\'Jost\',sans-serif;font-size:14px;color:var(--text2);line-height:1.6">'+detail.summary+'</div>':'')
     +(ingHTML?'<div class="section-card">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:4px" onclick="toggleIngAnaliza(this)">'
@@ -2484,7 +2497,7 @@ function renderResults(compat, nutrit, detail, rawIng){
 function autoSave(compatScore, nutritScore, type, alerts){
   // Trimite scanare anonimă la Firebase (dacă userul a acceptat)
   if (window.firebaseSaveScan) {
-    window.firebaseSaveScan(compatScore, nutritScore, type, alerts, scanData.productName, scanData.productBrand);
+    window.firebaseSaveScan(compatScore, nutritScore, type, alerts, scanData.productName, scanData.productBrand, scanData.sursa || 'manual');
   }
   // Track analiză completă
   trackEvent('analiza_finalizata', {
