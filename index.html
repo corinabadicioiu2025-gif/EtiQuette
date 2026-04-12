@@ -493,7 +493,7 @@ textarea::placeholder{color:var(--muted)}
     <div id="product-not-found" style="display:none;background:var(--warn-pale);border:0.5px solid var(--warn);border-radius:var(--radius);padding:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <div style="font-family:'Jost',sans-serif;font-size:14px;font-weight:500;color:var(--warn)">Produs negăsit în baza de date</div>
-        <button onclick="resetScan()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);padding:2px 6px;line-height:1" title="Revino la scanare">×</button>
+        <button onclick="logAbandon();resetScan()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted);padding:2px 6px;line-height:1" title="Revino la scanare">×</button>
       </div>
       <div id="log-list-fail" style="margin-bottom:8px"></div>
       <div style="font-family:'Jost',sans-serif;font-size:13px;color:var(--text2);line-height:1.5">Fotografiază manual cele 3 imagini de mai jos pentru a continua analiza.</div>
@@ -890,6 +890,10 @@ textarea::placeholder{color:var(--muted)}
   window.firebaseSaveScan = function(compatScore, nutritScore, type, alerts, productName, productBrand, sursa) {
     if (!window.gdprContributie) return;
     var tipRo = type === 'food' ? 'alimentar' : 'cosmetic';
+    // Afecțiuni active — anonimizate, fără date personale
+    var afectiuni = Array.from(activeConditions || []);
+    // Membri în profil — doar numărul, fără nume
+    var nrMembri = (members || []).length;
     db.collection('scanari').add({
       uid: getAnonymousId(),
       tip_produs: tipRo,
@@ -899,10 +903,16 @@ textarea::placeholder{color:var(--muted)}
       scor_compatibilitate: compatScore,
       scor_nutritional: nutritScore,
       nr_alerte: alerts,
+      afectiuni_active: afectiuni,
+      nr_membri_profil: nrMembri,
+      a_citit_rezultat_complet: false,
       produs_gasit_automat: productName ? 'da' : 'nu',
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(function(){ console.log('✅ Scanare salvată în Firebase'); })
-      .catch(function(e){ console.warn('❌ Firebase scanare:', e.message); });
+    }).then(function(doc){
+      console.log('✅ Scanare salvată în Firebase');
+      // Salvăm ID-ul scanării pentru scroll tracking
+      window._lastScanId = doc.id;
+    }).catch(function(e){ console.warn('❌ Firebase scanare:', e.message); });
   };
 
   window.firebaseSaveProduct = function(productId, brand, name, ingredients, nutrition, photos) {
@@ -1448,6 +1458,48 @@ var scanData = {
   productBrand: '',
   photos: {1: null, 2: null, 3: null}
 };
+
+function logAbandon(){
+  if(!window.gdprContributie) return;
+  if(!window.firebaseLogMissedProduct) return;
+  // Câte poze a făcut utilizatorul
+  var nrPoze = 0;
+  if(scanData.photos && scanData.photos[1]) nrPoze++;
+  if(scanData.photos && scanData.photos[2]) nrPoze++;
+  if(scanData.productPhoto) nrPoze++;
+  var searchQuery = scanData.lastSearchQuery || (scanData.productBrand||'') + ' ' + (scanData.productName||'');
+  if(!searchQuery.trim()) return;
+  // Salvăm în cautari_nereussite cu stadiul abandonului
+  var tipRo = productType === 'food' ? 'alimentar' : 'cosmetic';
+  db.collection('cautari_nereussite')
+    .where('search_query', '==', searchQuery.trim())
+    .get()
+    .then(function(snapshot){
+      var abandonPas = nrPoze === 0 ? 'fara_poze' : nrPoze === 1 ? 'dupa_ingrediente' : 'dupa_nutritional';
+      if(!snapshot.empty){
+        var docRef = snapshot.docs[0].ref;
+        var data = snapshot.docs[0].data();
+        docRef.update({
+          de_cate_ori_cautat: (data.de_cate_ori_cautat||1) + 1,
+          abandon_la_pasul: abandonPas,
+          status: 'abandonat',
+          ultima_cautare: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(function(){});
+      } else {
+        db.collection('cautari_nereussite').add({
+          search_query: searchQuery.trim(),
+          brand: scanData.productBrand || '',
+          denumire: scanData.productName || '',
+          tip_produs: tipRo,
+          de_cate_ori_cautat: 1,
+          abandon_la_pasul: abandonPas,
+          status: 'abandonat',
+          prima_cautare: firebase.firestore.FieldValue.serverTimestamp(),
+          ultima_cautare: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(function(){});
+      }
+    }).catch(function(){});
+}
 
 function resetScan(){
   scanData={step:1,ingredients:'',nutrition:null,productPhoto:null,productName:'',productBrand:'',photos:{1:null,2:null,3:null}};
@@ -2466,6 +2518,10 @@ function doAnalyze(){
       var disclaimerEl = document.querySelector('.disclaimer');
       if(disclaimerEl) disclaimerEl.insertAdjacentHTML('beforebegin', detailHTML);
       currentAnalysisData.detail = detail;
+      // Salvare automată după ce Claude termină
+      var ac = compatResult.alerts.filter(function(a){return a.severity==='danger';}).length;
+      autoSave(compatResult.score, nutritResult.score, productType, ac);
+      updateDashboard();
     } else {
       renderResults(compatResult, nutritResult, detail, ingOriginal);
     }
@@ -2591,9 +2647,26 @@ function renderResults(compat, nutrit, detail, rawIng){
     +'</div>';
 
   document.getElementById('results').classList.add('show');
-  // Salvare automată
-  autoSave(compat.score, nutrit.score, productType, ac);
+  // Salvare automată — doar dacă nu e EtiQuette (pentru EtiQuette se face după Claude)
+  if(scanData.sursa !== 'etiquette'){
+    autoSave(compat.score, nutrit.score, productType, ac);
+  }
   updateDashboard();
+  // Scroll tracking — detectăm dacă utilizatorul a citit rezultatul complet
+  setTimeout(function(){
+    var disclaimer = document.querySelector('.disclaimer');
+    if(disclaimer && window.IntersectionObserver){
+      var observer = new IntersectionObserver(function(entries){
+        if(entries[0].isIntersecting && window._lastScanId){
+          db.collection('scanari').doc(window._lastScanId).update({
+            a_citit_rezultat_complet: true
+          }).catch(function(){});
+          observer.disconnect();
+        }
+      }, {threshold: 0.5});
+      observer.observe(disclaimer);
+    }
+  }, 500);
 }
 function autoSave(compatScore, nutritScore, type, alerts){
   // Trimite scanare anonimă la Firebase (dacă userul a acceptat)
