@@ -1634,7 +1634,7 @@ function searchProductInDB(b64, mime){
     headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:[
       {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-      {type:'text',text:'Identifică brandul și numele acestui produs. Returnează DOAR JSON: {"brand":"<DOAR brandul, ex: Coca-Cola>","name":"<DOAR numele produsului fără brand, ex: Zero Zahăr>","search":"<brand + nume EXACT de pe ambalaj, max 4 cuvinte, ex: Coca-Cola Zero Zahăr>","search_en":"<brand + nume în engleză, max 4 cuvinte, ex: Coca-Cola Zero Sugar>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null,"search_en":null}'}
+      {type:'text',text:'Identifică brandul și numele acestui produs. Returnează DOAR JSON: {"brand":"<DOAR brandul, ex: Coca-Cola>","name":"<DOAR numele produsului fără brand, ex: Zero Zahăr>","search":"<brand + nume EXACT și COMPLET de pe ambalaj, ex: Coca-Cola Zero Zahăr>","search_en":"<brand + nume complet în engleză, ex: Coca-Cola Zero Sugar>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null,"search_en":null}'}
     ]}]})
   }, 2)
   .then(function(d){
