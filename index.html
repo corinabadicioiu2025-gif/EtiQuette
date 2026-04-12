@@ -1656,7 +1656,32 @@ function searchProductInDB(b64, mime){
     logStep('Claude identificat: <strong>'+product.brand+' '+product.name+'</strong>','ok');
     logStep('Caut în baza de date cu: <em>"'+searchQuery+'"</em>','loading');
 
-    // Funcție pentru căutare în OFF cu fallback
+    // ── Căutare în Firebase EtiQuette ─────────────────────
+    function searchEtiQuette(brand, name) {
+      if(!brand || brand === 'Necunoscut') return Promise.resolve(null);
+      return db.collection('produse')
+        .where('brand', '==', brand)
+        .where('denumire', '==', name)
+        .where('necesita_denumire', '==', false)
+        .limit(1)
+        .get()
+        .then(function(snapshot) {
+          if(snapshot.empty) return null;
+          var doc = snapshot.docs[0].data();
+          if(!doc.ingrediente_originale) return null;
+          return {
+            found: true,
+            product_name: doc.denumire || '',
+            brand: doc.brand || '',
+            ingredients: doc.ingrediente_originale || '',
+            nutrition: doc.nutritie || null,
+            sursa: 'etiquette'
+          };
+        })
+        .catch(function(e){ console.warn('Firebase search:', e.message); return null; });
+    }
+
+    // ── Funcție pentru căutare în OFF cu fallback ──────────
     function searchOFF(query, fallbackQuery) {
       return fetch('https://verdant-mochi-b722fd.netlify.app/.netlify/functions/off-proxy?search='+encodeURIComponent(query))
       .then(function(r){return r.json();})
@@ -1670,41 +1695,51 @@ function searchProductInDB(b64, mime){
       });
     }
 
-    // Stratul 1: query original (limba de pe ambalaj)
-    // Stratul 2: query în engleză
-    // Stratul 3: doar brandul
-    var fallback = searchQueryEn || product.brand || '';
-    searchOFF(searchQuery, fallback)
-    .then(function(result){
-      if(!result||!result.found){
-        logStep('Produs negăsit în Open Food Facts — fotografiază manual','warn');
+    // ── Flux căutare: EtiQuette → OFF → manual ─────────────
+    function handleResult(result) {
+      if(!result || !result.found){
+        logStep('Produs negăsit în baza de date — fotografiază manual','warn');
         if(window.firebaseLogMissedProduct) window.firebaseLogMissedProduct(searchQuery, productType);
-        showManualFlow(product);return;
+        showManualFlow(product); return;
       }
 
-      logStep('Ingrediente găsite în Open Food Facts ✓','ok');
-      scanData.ingredients=result.ingredients||'';
-      scanData.sursa='off';
-      trackEvent('produs_gasit_automat', {tip_produs: productType, brand: product.brand||''});
+      var sursa = result.sursa || 'off';
+      logStep('Ingrediente găsite ✓','ok');
+      scanData.ingredients = result.ingredients || '';
+      scanData.sursa = sursa;
+      trackEvent('produs_gasit_automat', {tip_produs: productType, brand: product.brand||'', sursa: sursa});
 
-      if(result.nutrition&&Object.values(result.nutrition).some(function(v){return v!==null;})){
-        scanData.nutrition=result.nutrition;
-        scanData.nutrition.isOrganic=result.is_organic||false;
+      if(result.nutrition && Object.values(result.nutrition).some(function(v){return v!==null;})){
+        scanData.nutrition = result.nutrition;
+        scanData.nutrition.isOrganic = result.is_organic || false;
         logStep('Valori nutriționale găsite','ok');
       } else {
-        logStep('Fără valori nutriționale în OFF','warn');
+        logStep('Fără valori nutriționale','warn');
       }
 
       document.getElementById('product-searching').style.display='none';
       document.getElementById('product-found').style.display='block';
-      document.getElementById('product-name-found').textContent=result.product_name||product.name||'';
-      document.getElementById('product-brand-found').textContent=result.brand||product.brand||'';
-      scanData.productName=result.product_name||product.name||'';
-      scanData.productBrand=result.brand||product.brand||'';
-      setTimeout(function(){doAnalyze();},600);
+      document.getElementById('product-name-found').textContent = result.product_name || product.name || '';
+      document.getElementById('product-brand-found').textContent = result.brand || product.brand || '';
+      scanData.productName = result.product_name || product.name || '';
+      scanData.productBrand = result.brand || product.brand || '';
+      setTimeout(function(){doAnalyze();}, 800);
+    }
+
+    // Stratul 1 — Firebase EtiQuette
+    searchEtiQuette(product.brand, product.name)
+    .then(function(etqResult) {
+      if(etqResult) {
+        logStep('Găsit în baza EtiQuette ✓','ok');
+        handleResult(etqResult);
+        return;
+      }
+      // Stratul 2 — OFF
+      var fallback = searchQueryEn || product.brand || '';
+      return searchOFF(searchQuery, fallback).then(handleResult);
     })
     .catch(function(e){
-      logStep('Eroare OFF proxy: '+(e&&e.message?e.message:'necunoscută'),'error');
+      logStep('Eroare căutare: '+(e&&e.message?e.message:'necunoscută'),'error');
       showManualFlow(product);
     });
   })
