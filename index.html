@@ -990,8 +990,10 @@ textarea::placeholder{color:var(--muted)}
         var primele3 = (ingredients || '').split(',').slice(0, 3)
           .map(function(i){ return i.trim().toLowerCase().replace(/[^a-z0-9]/g,''); })
           .join('-');
-        // FIX: folosim scanData.lastSearchQuery direct, cu fallback sigur
-        var lastQuery = (scanData && scanData.lastSearchQuery) ? scanData.lastSearchQuery : '';
+        // FIX: folosim lastSearchQuery dacă există, altfel derivăm din brand+denumire
+        var lastQuery = (scanData && scanData.lastSearchQuery && scanData.lastSearchQuery.trim())
+          ? scanData.lastSearchQuery.trim()
+          : ((brand && brand !== 'Necunoscut' ? brand + ' ' : '') + (name || '')).trim();
         var docData = sanitizeForFirestore({
           product_id: productId,
           brand: brand || '',
