@@ -1788,25 +1788,97 @@ function searchProductInDB(b64, mime){
     logStep('Caut în baza de date cu: <em>"'+searchQuery+'"</em>','loading');
     scanData.lastSearchQuery = searchQuery;
 
+    // ── Normalizare text pentru matching fuzzy ──────────────────────────────
+    function normalizeText(text) {
+      if(!text) return '';
+      return text.toLowerCase()
+        .replace(/[ăâ]/g, 'a').replace(/[îí]/g, 'i').replace(/[șş]/g, 's')
+        .replace(/[țţ]/g, 't').replace(/[é]/g, 'e')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+    }
+
+    function tokenize(text) {
+      var stopwords = ['in', 'cu', 'de', 'la', 'si', 'sau', 'the', 'with', 'and', 'for'];
+      return normalizeText(text).split(' ')
+        .filter(function(w){ return w.length > 2 && stopwords.indexOf(w) === -1; });
+    }
+
+    function calcScorSimilaritate(tokensQuery, tokensProdus) {
+      if(!tokensQuery.length || !tokensProdus.length) return 0;
+      var comuni = tokensQuery.filter(function(t){
+        return tokensProdus.indexOf(t) !== -1;
+      }).length;
+      var baza = Math.min(tokensQuery.length, tokensProdus.length);
+      return Math.round((comuni / baza) * 100);
+    }
+
+    function logMatch(queryText, brandQuery, nrCandidati, bestDoc, bestScor, gasit) {
+      if(!db) return;
+      try {
+        db.collection('match_log').add(sanitizeForFirestore({
+          uid: getAnonymousId(),
+          query_text: queryText,
+          brand_query: brandQuery,
+          tokens_query: tokenize(brandQuery + ' ' + queryText),
+          nr_candidati: nrCandidati,
+          produs_id: bestDoc ? (bestDoc.product_id || '') : '',
+          produs_denumire: bestDoc ? (bestDoc.brand + ' ' + bestDoc.denumire) : '',
+          tokens_produs: bestDoc ? tokenize(bestDoc.brand + ' ' + bestDoc.denumire) : [],
+          scor_similaritate: bestScor,
+          prag_folosit: 70,
+          rezultat: gasit ? 'match' : (nrCandidati > 0 ? 'sub_prag' : 'fara_candidati'),
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }));
+      } catch(e) { console.warn('match_log:', e.message); }
+    }
+
     function searchEtiQuette(brand, name) {
       if(!brand || brand === 'Necunoscut') return Promise.resolve(null);
+      var tokensQuery = tokenize(brand + ' ' + name);
+      var PRAG_MINIM = 70;
+
       return db.collection('produse')
         .where('brand', '==', brand)
-        .where('denumire', '==', name)
         .where('necesita_denumire', '==', false)
-        .limit(1)
+        .limit(10)
         .get()
         .then(function(snapshot) {
-          if(snapshot.empty) return null;
-          var doc = snapshot.docs[0].data();
-          if(!doc.ingrediente_originale) return null;
+          if(snapshot.empty) {
+            logMatch(name, brand, 0, null, 0, false);
+            return null;
+          }
+          var candidati = snapshot.docs.map(function(doc) {
+            var data = doc.data();
+            var tokensProdus = tokenize(data.brand + ' ' + data.denumire);
+            var scor = calcScorSimilaritate(tokensQuery, tokensProdus);
+            return { data: data, scor: scor, tokens: tokensProdus };
+          });
+          candidati.sort(function(a, b){ return b.scor - a.scor; });
+          var best = candidati[0];
+
+          console.log('🔍 EtiQuette fuzzy search:', brand, name);
+          console.log('   Tokens query:', tokensQuery);
+          candidati.forEach(function(c){
+            console.log('   Candidat:', c.data.denumire, '→', c.scor + '%', c.tokens);
+          });
+
+          logMatch(name, brand, candidati.length, best.data, best.scor, best.scor >= PRAG_MINIM);
+
+          if(best.scor < PRAG_MINIM) {
+            console.log('   ❌ Best score', best.scor + '% < prag', PRAG_MINIM + '% — negăsit');
+            return null;
+          }
+          console.log('   ✅ Match la', best.scor + '%:', best.data.denumire);
+          if(!best.data.ingrediente_originale) return null;
           return {
             found: true,
-            product_name: doc.denumire || '',
-            brand: doc.brand || '',
-            ingredients: doc.ingrediente_originale || '',
-            nutrition: doc.nutritie || null,
-            sursa: 'etiquette'
+            product_name: best.data.denumire || '',
+            brand: best.data.brand || '',
+            ingredients: best.data.ingrediente_originale || '',
+            nutrition: best.data.nutritie || null,
+            sursa: 'etiquette',
+            scor_match: best.scor
           };
         })
         .catch(function(e){ console.warn('Firebase search:', e.message); return null; });
@@ -1858,7 +1930,7 @@ function searchProductInDB(b64, mime){
     searchEtiQuette(product.brand, product.name)
     .then(function(etqResult) {
       if(etqResult) {
-        logStep('Găsit în baza EtiQuette ✓','ok');
+        logStep('Găsit în baza EtiQuette ✓ (similaritate: '+etqResult.scor_match+'%)','ok');
         handleResult(etqResult);
         return;
       }
