@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 exports.handler = async function(event) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -25,7 +23,11 @@ exports.handler = async function(event) {
     // FIX: înlocuit Buffer.from().toString('base64') cu btoa()
     // Buffer nu e disponibil în toate mediile Netlify și cauza eroarea 500
     async function searchOFF(query) {
-      const credentials = btoa('carolina2025:5wPgVPzGK*!g8_F');
+      // FIX: compatibil cu toate versiunile Node.js
+      const credStr = 'carolina2025:5wPgVPzGK*!g8_F';
+      const credentials = (typeof Buffer !== 'undefined')
+        ? Buffer.from(credStr).toString('base64')
+        : btoa(credStr);
       const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,nutriments,labels`;
       
       const response = await fetch(url, {
