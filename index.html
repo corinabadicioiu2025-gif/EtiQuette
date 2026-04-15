@@ -477,6 +477,7 @@ textarea::placeholder{color:var(--muted)}
       Fotografiază fața produsului
     </button>
     <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--muted);font-style:italic;text-align:center;margin-top:4px">Căutăm automat ingredientele în baza de date</div>
+    <div style="font-family:'Jost',sans-serif;font-size:11px;color:var(--muted2);font-style:italic;text-align:center;margin-top:2px">Asigură-te că ambalajul este drept și textul vizibil</div>
   </div>
 
   <!-- STATUS căutare produs -->
@@ -1748,7 +1749,7 @@ function searchProductInDB(b64, mime){
     headers:{'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,messages:[{role:'user',content:[
       {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-      {type:'text',text:'Identifică brandul și numele acestui produs. Reguli STRICTE: (1) brand = EXACT numele mărcii/companiei de pe ambalaj, cu majuscule exacte (ex: "AGRICOLA", "Danone", "NutLine") — NU interpreta, NU traduce, NU adăuga informații extra; (2) name = EXACT numele produsului fără brand, cum apare pe ambalaj (ex: "Mozzarella Sticks", "Actimel Original") — NU traduce; (3) Copiază textul EXACT de pe ambalaj. Returnează DOAR JSON: {"brand":"<marca exacta de pe ambalaj>","name":"<numele exact al produsului fara brand>","search":"<brand + name exact>","search_en":"<brand + name in engleza>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null,"search_en":null}'}
+      {type:'text',text:'Identifică brandul și numele acestui produs. Reguli STRICTE: (1) Citește textul EXACT de pe ambalaj, chiar dacă imaginea e rotită sau răsturnată — nu interpreta, nu ghici; (2) brand = EXACT numele mărcii/companiei cel mai proeminent de pe ambalaj, cu majuscule exacte (ex: "AGRICOLA", "Danone", "Bucătarul Tău") — dacă nu e vizibil pune null; (3) name = EXACT numele produsului fără brand, cel mai mare text de pe ambalaj (ex: "Nuggets Puișor", "Mozzarella Sticks") — NU traduce, NU înlocui cu variante similare; (4) Dacă textul e răsturnat, rotește-l mental și citește-l corect. Returnează DOAR JSON: {"brand":"<marca exacta de pe ambalaj>","name":"<numele exact al produsului fara brand>","search":"<brand + name exact>","search_en":"<brand + name in engleza>"} — fără alt text. Dacă nu poți identifica, returnează: {"brand":null,"name":null,"search":null,"search_en":null}'}
     ]}]})
   }, 2)
   .then(function(d){
@@ -2392,7 +2393,7 @@ function doAnalyze(){
   }
 
   var typeLabel=productType==='food'?'alimentare':'cosmetice';
-  var prompt='Esti expert in ingrediente '+typeLabel+'. Ingredientele pot fi in orice limba (romana, franceza, engleza, germana, spaniola). Toate raspunsurile returneaza-le EXCLUSIV in romana.\n\nReturneaza DOAR JSON valid:\n{"summary":"<2-3 propozitii in romana despre calitatea generala>","ingredients":[{"name":"<nume ingredient tradus in romana>","rating":"<good/medium/bad>","desc":"<explicatie scurta in romana, max 10 cuvinte>","risk":"<null sau risc specific in romana>"}],"positives":["<aspect pozitiv in romana>"],"negatives":["<aspect negativ in romana>"],"recommendation":"<sfat final in romana>"}\n\nIngrediente originale: "'+ingOriginal+'"';
+  var prompt='Esti expert in ingrediente '+typeLabel+'. Ingredientele pot fi in orice limba (romana, franceza, engleza, germana, spaniola). Toate raspunsurile returneaza-le EXCLUSIV in romana.\n\nPentru campul "risk": formuleaza ca avertisment general, nu ca diagnostic personal. Exemple corecte: "atenție dacă ești celiac", "poate fi problematic pentru diabetici", "alergen pentru cei sensibili la lactoză". NU scrie: "probleme pentru diabetici", "cauzeaza intoleranta".\n\nReturneaza DOAR JSON valid:\n{"summary":"<2-3 propozitii in romana despre calitatea generala>","ingredients":[{"name":"<nume ingredient tradus in romana>","rating":"<good/medium/bad>","desc":"<explicatie scurta in romana, max 10 cuvinte>","risk":"<null sau risc specific formulat ca avertisment general>"}],"positives":["<aspect pozitiv in romana>"],"negatives":["<aspect negativ in romana>"],"recommendation":"<sfat final in romana>"}\n\nIngrediente originale: "'+ingOriginal+'"';
 
   claudeFetchWithRetry({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
   .then(function(d){
