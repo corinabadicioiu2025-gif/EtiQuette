@@ -524,6 +524,7 @@ textarea::placeholder{color:var(--muted)}
         Fotografiază lista de ingrediente
       </button>
       <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--muted);font-style:italic;text-align:center">Spatele ambalajului — lista completă de ingrediente</div>
+      <div style="font-family:'Jost',sans-serif;font-size:11px;color:var(--muted2);font-style:italic;text-align:center;margin-top:2px">Încearcă să fotografiezi drept — dacă nu e posibil, și în format orizontal merge</div>
     </div>
 
     <div id="step-2-wrap" style="display:none">
@@ -1987,7 +1988,7 @@ function extractIngredients(b64, mime){
   showStepLoading('Citesc ingredientele...');
   claudeFetchWithRetry({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
     {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-    {type:'text',text:'Găsește lista de ingrediente de pe ambalaj — apare după: Ingredients, Ingrediente, Inhaltsstoffe, INCI. Returnează DOAR ingredientele separate prin virgule, fără alt text. Dacă nu găsești, returnează: NU_AM_GASIT'}
+    {type:'text',text:'Găsește lista de ingrediente de pe ambalaj. Reguli STRICTE: (1) Caută textul care apare după cuvintele: Ingredients, Ingrediente, Inhaltsstoffe, INCI, Składniki, Sastav; (2) Copiază EXACT ce vezi — NU inventa, NU completa, NU presupune ingrediente; (3) Dacă poza e rotită sau înclinată, rotește-o mental și citește-o corect; (4) Dacă textul e mic, citește-l cu atenție litera cu litera; (5) Dacă nu ești sigur de un cuvânt, omite-l mai bine decât să îl inventezi; (6) Dacă lista nu e vizibilă sau nu o poți citi cu certitudine, returnează: NU_AM_GASIT. Returnează DOAR ingredientele separate prin virgule, fără alt text.'}
   ]}]})
   .then(function(d){
     hideStepLoading();
