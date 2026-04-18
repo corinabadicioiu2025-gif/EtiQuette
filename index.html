@@ -331,6 +331,28 @@ textarea::placeholder{color:var(--muted)}
 .svg-food{display:block}
 .svg-cosm{display:block}
 
+/* PREVIEW CONFIRMARE POZĂ */
+.photo-confirm-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(28,25,23,0.7);align-items:flex-end;justify-content:center}
+.photo-confirm-overlay.show{display:flex}
+.photo-confirm-box{background:var(--bg);border-radius:20px 20px 0 0;padding:20px 20px 40px;width:100%;max-width:430px;animation:slideUp 0.3s ease}
+.photo-confirm-img{width:100%;max-height:220px;object-fit:cover;border-radius:var(--radius);border:1.5px solid var(--gold);margin-bottom:14px}
+.photo-confirm-question{font-family:'Jost',sans-serif;font-size:15px;font-weight:500;color:var(--text);text-align:center;margin-bottom:6px}
+.photo-confirm-sub{font-family:'Jost',sans-serif;font-size:13px;color:var(--muted);text-align:center;margin-bottom:18px;font-style:italic}
+.photo-confirm-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.photo-confirm-yes{background:var(--gold);color:var(--bg);border:none;border-radius:6px;padding:14px;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;letter-spacing:0.1em;cursor:pointer}
+.photo-confirm-redo{background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:6px;padding:14px;font-family:'Jost',sans-serif;font-size:14px;cursor:pointer}
+
+/* MULTI-CADRU ingrediente */
+.multi-frame-wrap{margin-top:10px;display:none}
+.multi-frame-btn{width:100%;background:transparent;color:var(--text2);border:1px dashed var(--border);border-radius:var(--radius);padding:10px;font-family:'Jost',sans-serif;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s}
+.multi-frame-btn:hover{border-color:var(--gold);color:var(--gold)}
+.multi-frame-preview{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.multi-frame-thumb{width:60px;height:60px;object-fit:cover;border-radius:6px;border:1.5px solid var(--good)}
+
+/* SĂGEATĂ PALPÂITOARE */
+@keyframes pulseArrow{0%,100%{opacity:0.4;transform:translateX(0)}50%{opacity:1;transform:translateX(4px)}}
+.arrow-pulse{display:inline-block;animation:pulseArrow 1s ease-in-out infinite;color:var(--gold);font-size:18px}
+
 /* GDPR ONBOARDING */
 .gdpr-overlay{display:none;position:fixed;inset:0;z-index:500;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;animation:fadeIn 0.5s ease}
 .gdpr-overlay.show{display:flex}
@@ -524,7 +546,22 @@ textarea::placeholder{color:var(--muted)}
         Fotografiază lista de ingrediente
       </button>
       <div style="font-family:'Jost',sans-serif;font-size:12px;color:var(--muted);font-style:italic;text-align:center">Spatele ambalajului — lista completă de ingrediente</div>
-      <div style="font-family:'Jost',sans-serif;font-size:11px;color:var(--muted2);font-style:italic;text-align:center;margin-top:2px">Încearcă să fotografiezi drept — dacă nu e posibil, și în format orizontal merge</div>
+      <div style="font-family:'Jost',sans-serif;font-size:11px;color:var(--muted2);font-style:italic;text-align:center;margin-top:2px">Încearcă să fotografiezi drept — pentru text mic, apropie-te sau folosește zoom-ul</div>
+      <div style="font-family:'Jost',sans-serif;font-size:11px;color:var(--muted2);font-style:italic;text-align:center;margin-top:2px">Dacă nu e posibil, și în format orizontal merge</div>
+      <!-- Multi-cadru — pentru liste lungi -->
+      <div class="multi-frame-wrap" id="multi-frame-wrap">
+        <div style="font-family:'Jost',sans-serif;font-size:11px;color:var(--muted);text-align:center;margin-bottom:6px">Lista continuă? <span class="arrow-pulse">→</span> Fotografiază continuarea</div>
+        <button class="multi-frame-btn" onclick="addMultiCadru()">
+          <span style="font-size:16px">+</span> Adaugă cadru următor
+        </button>
+        <div class="multi-frame-preview" id="multi-frame-preview"></div>
+      </div>
+      <!-- Ambalaj mic -->
+      <div style="margin-top:10px;text-align:center">
+        <button onclick="openCameraStep('combined')" style="background:transparent;border:none;font-family:'Jost',sans-serif;font-size:12px;color:var(--gold);cursor:pointer;text-decoration:underline;padding:4px">
+          Ambalaj mic? Fotografiază ingredientele și nutriționalul dintr-o singură poză
+        </button>
+      </div>
     </div>
 
     <div id="step-2-wrap" style="display:none">
@@ -588,6 +625,7 @@ textarea::placeholder{color:var(--muted)}
   <input type="file" id="file-input-2" accept="image/*" capture="environment" style="display:none" onchange="handleStepPhoto(event,2)">
   <input type="file" id="file-input-3" accept="image/*" capture="environment" style="display:none" onchange="handleStepPhoto(event,3)">
   <input type="file" id="file-input-product" accept="image/*" capture="environment" style="display:none" onchange="handleProductPhoto(event)">
+  <input type="file" id="file-input-multicadru" accept="image/*" capture="environment" style="display:none" onchange="handleMultiCadru(event)">
 
   <!-- Ingredient text collapse -->
   <div class="ing-collapse-wrap" id="ing-collapse-wrap" style="display:none">
@@ -819,6 +857,20 @@ textarea::placeholder{color:var(--muted)}
       <div class="bday-msg" id="bday-msg"></div>
       <div class="bday-update" id="bday-update"></div>
       <button class="btn-primary" onclick="closeBirthday()">Mulțumesc!</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY CONFIRMARE POZĂ -->
+<div class="photo-confirm-overlay" id="photo-confirm-overlay">
+  <div class="photo-confirm-box">
+    <div class="modal-handle"></div>
+    <img id="photo-confirm-img" src="" class="photo-confirm-img" alt="Preview poză">
+    <div class="photo-confirm-question">Textul este lizibil în poză?</div>
+    <div class="photo-confirm-sub">Verifică dacă lista de ingrediente se vede clar</div>
+    <div class="photo-confirm-btns">
+      <button class="photo-confirm-redo" onclick="redoPhoto()">🔄 Refă poza</button>
+      <button class="photo-confirm-yes" onclick="confirmPhoto()">Da, continuă ›</button>
     </div>
   </div>
 </div>
@@ -1596,10 +1648,37 @@ function resetScan(){
     document.getElementById('check-'+i).style.display='none';
   });
   window._lastScanId = null;
+  _multiCadruFrames = [];
+  var mfw=document.getElementById('multi-frame-wrap'); if(mfw)mfw.style.display='none';
+  var mfp=document.getElementById('multi-frame-preview'); if(mfp)mfp.innerHTML='';
 }
 
 function openCameraStep(step){
   if(!getKey()){showApiModal();return;}
+  if(step === 'combined') {
+    // Adăugăm input pentru combined dacă nu există
+    var inp = document.getElementById('file-input-combined');
+    if(!inp) {
+      inp = document.createElement('input');
+      inp.type='file'; inp.id='file-input-combined';
+      inp.accept='image/*'; inp.capture='environment';
+      inp.style.display='none';
+      inp.onchange = function(e) {
+        var file=e.target.files[0]; if(!file) return;
+        var reader=new FileReader();
+        reader.onload=function(ev){
+          var full=ev.target.result;
+          var b64=full.split(',')[1];
+          var mime=file.type||'image/jpeg';
+          showPhotoConfirm('combined', full, b64, mime);
+        };
+        reader.readAsDataURL(file);
+      };
+      document.body.appendChild(inp);
+    }
+    inp.click();
+    return;
+  }
   document.getElementById('file-input-'+step).click();
 }
 
@@ -1625,14 +1704,76 @@ function compressImage(base64, mime, maxSizeBytes, callback){
   img.src='data:'+mime+';base64,'+base64;
 }
 
-function handleStepPhoto(e, step){
-  var file=e.target.files[0]; if(!file) return;
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var full=ev.target.result;
-    var b64=full.split(',')[1];
-    var mime=file.type||'image/jpeg';
+// ── Variabile pentru confirm + multi-cadru ───────────────────
+var _pendingPhotoStep = null;
+var _pendingPhotoFull = null;
+var _pendingPhotoB64 = null;
+var _pendingPhotoMime = null;
+var _multiCadruFrames = []; // array de {b64, mime, full}
 
+function showPhotoConfirm(step, full, b64, mime) {
+  // Pasul 0 (față produs) și pasul 2 (nutrițional) nu au nevoie de confirmare
+  // Confirmarea e doar pentru pasul 1 (ingrediente) unde erorile costă cel mai mult
+  if(step !== 1 && step !== 'combined') {
+    processPhoto(step, full, b64, mime);
+    return;
+  }
+  _pendingPhotoStep = step;
+  _pendingPhotoFull = full;
+  _pendingPhotoB64 = b64;
+  _pendingPhotoMime = mime;
+  document.getElementById('photo-confirm-img').src = full;
+  document.getElementById('photo-confirm-overlay').classList.add('show');
+}
+
+function confirmPhoto() {
+  document.getElementById('photo-confirm-overlay').classList.remove('show');
+  if(_pendingPhotoStep !== null) {
+    processPhoto(_pendingPhotoStep, _pendingPhotoFull, _pendingPhotoB64, _pendingPhotoMime);
+  }
+  _pendingPhotoStep = null;
+  _pendingPhotoFull = null;
+}
+
+function redoPhoto() {
+  document.getElementById('photo-confirm-overlay').classList.remove('show');
+  // Redeschide camera pentru același pas
+  if(_pendingPhotoStep !== null) {
+    var inputId = _pendingPhotoStep === 'combined' ? 'file-input-combined' : 'file-input-' + _pendingPhotoStep;
+    // Reset input ca să permită reselecția aceleiași poze
+    var inp = document.getElementById(inputId) || document.getElementById('file-input-1');
+    if(inp) { inp.value = ''; inp.click(); }
+  }
+  _pendingPhotoStep = null;
+}
+
+function addMultiCadru() {
+  document.getElementById('file-input-multicadru').click();
+}
+
+function handleMultiCadru(e) {
+  var file = e.target.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var full = ev.target.result;
+    var b64 = full.split(',')[1];
+    var mime = file.type || 'image/jpeg';
+    compressImage(b64, mime, 4*1024*1024, function(compB64, compMime) {
+      _multiCadruFrames.push({b64: compB64, mime: compMime, full: full});
+      // Adaugă thumbnail în preview
+      var preview = document.getElementById('multi-frame-preview');
+      var img = document.createElement('img');
+      img.src = full;
+      img.className = 'multi-frame-thumb';
+      preview.appendChild(img);
+      // Reset input
+      document.getElementById('file-input-multicadru').value = '';
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function processPhoto(step, full, b64, mime) {
     if(step===0){
       scanData.productPhoto=full;
       scanData.photos[3]=full;
@@ -1646,6 +1787,65 @@ function handleStepPhoto(e, step){
       return;
     }
 
+    if(step==='combined'){
+      // O singură poză pentru ingrediente + nutrițional
+      scanData.photos[1]=full;
+      document.getElementById('step-1-wrap').style.display='none';
+      document.getElementById('step-2-wrap').style.display='none';
+      document.getElementById('step-2-dot').className='step-dot done';
+      document.getElementById('step-3-dot').className='step-dot done';
+      document.getElementById('photos-preview').style.display='block';
+      document.getElementById('preview-1').src=full;
+      document.getElementById('preview-1').style.display='block';
+      document.getElementById('preview-1-empty').style.display='none';
+      document.getElementById('check-1').style.display='flex';
+      document.getElementById('check-2').style.display='flex';
+      document.getElementById('step-1-dot').className='step-dot done';
+      showStepLoading('Citesc ingredientele și nutriționalul...');
+      compressImage(b64, mime, 4*1024*1024, function(compB64, compMime){
+        extractCombined(compB64, compMime);
+      });
+      return;
+    }
+
+    if(step===1){
+      // Procesăm ingredientele — cu suport multi-cadru
+      scanData.photos[1]=full;
+      document.getElementById('photos-preview').style.display='block';
+      document.getElementById('preview-1').src=full;
+      document.getElementById('preview-1').style.display='block';
+      document.getElementById('preview-1-empty').style.display='none';
+      document.getElementById('check-1').style.display='flex';
+      document.getElementById('step-1-dot').className='step-dot done';
+      document.getElementById('step-1-wrap').style.display='none';
+      document.getElementById('step-2-wrap').style.display='block';
+      document.getElementById('step-2-dot').className='step-dot active';
+      // Activăm multi-cadru
+      document.getElementById('multi-frame-wrap').style.display='block';
+      compressImage(b64, mime, 4*1024*1024, function(compB64, compMime){
+        // Dacă avem cadre extra, le adăugăm la extragere
+        if(_multiCadruFrames.length > 0) {
+          extractIngredientsMulti(compB64, compMime, _multiCadruFrames);
+        } else {
+          extractIngredients(compB64, compMime);
+        }
+      });
+      return;
+    }
+
+function handleStepPhoto(e, step){
+  var file=e.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var full=ev.target.result;
+    var b64=full.split(',')[1];
+    var mime=file.type||'image/jpeg';
+
+    if(step===0){
+      showPhotoConfirm(step, full, b64, mime);
+      return;
+    }
+
     scanData.photos[step]=full;
     document.getElementById('photos-preview').style.display='block';
     document.getElementById('preview-'+step).src=full;
@@ -1655,12 +1855,8 @@ function handleStepPhoto(e, step){
     document.getElementById('step-'+step+'-dot').className='step-dot done';
 
     if(step===1){
-      document.getElementById('step-1-wrap').style.display='none';
-      document.getElementById('step-2-wrap').style.display='block';
-      document.getElementById('step-2-dot').className='step-dot active';
-      compressImage(b64, mime, 4*1024*1024, function(compB64, compMime){
-        extractIngredients(compB64, compMime);
-      });
+      showPhotoConfirm(1, full, b64, mime);
+      return;
     } else if(step===2){
       document.getElementById('step-2-wrap').style.display='none';
       document.getElementById('step-2-dot').className='step-dot done';
@@ -2007,6 +2203,78 @@ function extractIngredients(b64, mime){
   .catch(function(){hideStepLoading();showError('Eroare la citirea ingredientelor. Încearcă din nou.');});
 }
 
+// ── Extrage ingrediente din multiple cadre ───────────────────
+function extractIngredientsMulti(b64Main, mimeMain, extraFrames) {
+  showStepLoading('Citesc ingredientele din ' + (extraFrames.length + 1) + ' cadre...');
+  // Construim array de imagini pentru Claude
+  var images = [{type:'image',source:{type:'base64',media_type:mimeMain,data:b64Main}}];
+  extraFrames.forEach(function(f) {
+    images.push({type:'image',source:{type:'base64',media_type:f.mime,data:f.b64}});
+  });
+  images.push({type:'text',text:'Aceste ' + (extraFrames.length + 1) + ' imagini sunt cadre consecutive ale aceleiași liste de ingrediente de pe un ambalaj. Reguli STRICTE: (1) Citește și combină ingredientele din TOATE cadrele în ordinea corectă; (2) Elimină duplicatele dacă cadrele se suprapun; (3) Copiază EXACT ce vezi — NU inventa; (4) Returnează DOAR ingredientele combinate separate prin virgule, fără alt text; (5) Dacă nu poți citi cu certitudine, returnează: NU_AM_GASIT'});
+  claudeFetchWithRetry({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:images}]})
+  .then(function(d){
+    hideStepLoading();
+    var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
+    if(!text||text==='NU_AM_GASIT'||text.length<5){
+      showError('Nu am putut citi ingredientele. Încearcă din nou.');
+      document.getElementById('step-1-wrap').style.display='block';
+      document.getElementById('step-2-wrap').style.display='none';
+    } else {
+      scanData.ingredients=text;
+      document.getElementById('ing-textarea').value=text;
+      document.getElementById('ing-collapse-wrap').style.display='block';
+      document.getElementById('ing-collapse-label').textContent=text.split(',').length+' ingrediente găsite din '+( extraFrames.length+1)+' cadre';
+      _multiCadruFrames=[];
+    }
+  })
+  .catch(function(){hideStepLoading();showError('Eroare la citirea ingredientelor.');});
+}
+
+// ── Extrage ingrediente + nutrițional dintr-o singură poză ───
+function extractCombined(b64, mime) {
+  // Extrage ingredientele
+  claudeFetchWithRetry({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
+    {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+    {type:'text',text:'Găsește lista de ingrediente de pe ambalaj. Reguli STRICTE: (1) Caută textul după: Ingredients, Ingrediente, Inhaltsstoffe, INCI; (2) Copiază EXACT ce vezi — NU inventa; (3) Dacă poza e rotită, citește corect; (4) Dacă nu ești sigur, returnează: NU_AM_GASIT. Returnează DOAR ingredientele separate prin virgule, fără alt text.'}
+  ]}]})
+  .then(function(d){
+    var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
+    if(text && text !== 'NU_AM_GASIT' && text.length > 5) {
+      scanData.ingredients = text;
+      document.getElementById('ing-textarea').value = text;
+      document.getElementById('ing-collapse-wrap').style.display='block';
+      document.getElementById('ing-collapse-label').textContent = text.split(',').length + ' ingrediente găsite';
+    }
+    // Extrage și nutriționalul din aceeași poză
+    return claudeFetchWithRetry({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+      {type:'text',text:'Extrage valorile nutriționale per 100g din acest tabel. Returnează DOAR JSON: {"energy_kj":null,"fat":null,"saturated_fat":null,"carbohydrates":null,"sugars":null,"fiber":null,"protein":null,"sodium":null,"fruits_percent":null} — toate valorile sunt numere sau null. Sodiu în mg, restul în g.'}
+    ]}]});
+  })
+  .then(function(d){
+    hideStepLoading();
+    var text=(d.content||[]).map(function(i){return i.text||'';}).join('').trim();
+    try{
+      var clean=text.replace(/```json/g,'').replace(/```/g,'').trim();
+      var s=clean.indexOf('{'),en=clean.lastIndexOf('}');
+      if(s!==-1&&en!==-1)clean=clean.substring(s,en+1);
+      scanData.nutrition=JSON.parse(clean);
+    }catch(e){scanData.nutrition=null;}
+    if(scanData.productPhoto){
+      setTimeout(function(){doAnalyze();},400);
+    } else {
+      document.getElementById('step-3-wrap').style.display='block';
+      document.getElementById('step-3-dot').className='step-dot active';
+    }
+  })
+  .catch(function(){
+    hideStepLoading();
+    scanData.nutrition=null;
+    if(scanData.productPhoto) setTimeout(function(){doAnalyze();},400);
+  });
+}
+
 function extractNutrition(b64, mime){
   showStepLoading('Citesc tabelul nutrițional...');
   claudeFetchWithRetry({model:'claude-sonnet-4-20250514',max_tokens:500,messages:[{role:'user',content:[
@@ -2324,9 +2592,79 @@ function calcCompatibility(ingredients, activeConditions, members, selectedMembe
   return {score:score, isIncompatible:isIncompatible, alerts:alerts};
 }
 
+function detectCategorieProdus(ingredients) {
+  var ing = (ingredients || '').toLowerCase();
+  // Ceaiuri din plante — ingrediente tipice
+  var ceaiKeywords = ['camomile','chamomile','mușețel','musetel','hibiscus','lemongrass',
+    'ginger','ghimbir','peppermint','spearmint','mentă','menta','rooibos','echinacea',
+    'lavender','lavandă','lavanda','rosehip','măceșe','macese','ashwagandha','turmeric',
+    'green tea','black tea','ceai verde','ceai negru','ceai alb','white tea',
+    'yerba mate','moringa','elderflower','soc','nettle','urzică','urzica',
+    'linden','tei','valerian','valeriana','sage','salvie'];
+  var isCeai = ceaiKeywords.some(function(k){ return ing.includes(k); }) &&
+    !ing.includes('sugar') && !ing.includes('zahar') && !ing.includes('zahăr') &&
+    !ing.includes('glucose') && !ing.includes('fructose');
+
+  // Ape — foarte simplu
+  var isApa = ing.trim().length < 30 ||
+    (ing.includes('aqua') && ing.split(',').length <= 3) ||
+    ing === 'apă' || ing === 'apa' || ing === 'water';
+
+  // Cola/sucuri carbogazoase cu zahăr/îndulcitori
+  var colaKeywords = ['caramel color','caramel colour','colorant caramel',
+    'phosphoric acid','acid fosforic','carbon dioxide','dioxid de carbon',
+    'carbonated water','apă carbogazoasă','apa carbogazoasa'];
+  var isCola = colaKeywords.some(function(k){ return ing.includes(k); }) &&
+    (ing.includes('sugar') || ing.includes('zahar') || ing.includes('zahăr') ||
+     ing.includes('aspartame') || ing.includes('acesulfame') || ing.includes('sucralose'));
+
+  if(isApa) return 'apa';
+  if(isCeai) return 'ceai';
+  if(isCola) return 'cola';
+  return 'normal';
+}
+
 function calcNutritional(nutrition, ingredients){
   var ingLower=(ingredients||'').toLowerCase();
   var total=0;
+
+  // ── Detectare categorie specială ─────────────────────────
+  var categorie = detectCategorieProdus(ingredients);
+
+  if(categorie === 'apa') {
+    // Apă — scor maxim automat
+    var scoreAditivi=30;
+    ADITIVI_RISC_RIDICAT.forEach(function(a){if(ingLower.includes(a)){scoreAditivi-=8;}});
+    ADITIVI_RISC_LIMITAT.forEach(function(a){if(ingLower.includes(a)){scoreAditivi-=3;}});
+    scoreAditivi=Math.max(0,scoreAditivi);
+    return{score:Math.min(100,95+scoreAditivi/30*5),label:'Excelent',color:'good',
+      scoreNutritie:60,scoreAditivi:scoreAditivi,isOrganic:false,hasNutrition:true,
+      categorie:'apa'};
+  }
+
+  if(categorie === 'ceai') {
+    // Ceai din plante fără zahăr — scor nutrițional maxim
+    var scoreAditivi=30;
+    ADITIVI_RISC_RIDICAT.forEach(function(a){if(ingLower.includes(a)){scoreAditivi-=8;}});
+    ADITIVI_RISC_LIMITAT.forEach(function(a){if(ingLower.includes(a)){scoreAditivi-=3;}});
+    scoreAditivi=Math.max(0,scoreAditivi);
+    var isOrganic=ingLower.includes('bio')||ingLower.includes('organic')||ingLower.includes('ecologic');
+    return{score:Math.min(100,60+scoreAditivi+(isOrganic?5:0)),label:'Excelent',color:'good',
+      scoreNutritie:60,scoreAditivi:scoreAditivi,isOrganic:isOrganic,hasNutrition:true,
+      categorie:'ceai'};
+  }
+
+  if(categorie === 'cola') {
+    // Cola/sucuri carbogazoase — penalizare automată
+    var scoreAditivi=30;
+    ADITIVI_RISC_RIDICAT.forEach(function(a){if(ingLower.includes(a)){scoreAditivi-=8;}});
+    ADITIVI_RISC_LIMITAT.forEach(function(a){if(ingLower.includes(a)){scoreAditivi-=3;}});
+    scoreAditivi=Math.max(0,scoreAditivi);
+    // Scor nutrițional slab pentru cola
+    return{score:Math.min(100,Math.max(0,scoreAditivi)),label:'Slab',color:'bad',
+      scoreNutritie:0,scoreAditivi:scoreAditivi,isOrganic:false,hasNutrition:true,
+      categorie:'cola'};
+  }
 
   var scoreNutritie=30;
   if(nutrition){
@@ -2433,7 +2771,7 @@ function doAnalyze(){
         var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';
         return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div>'
           +'<div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div>'
-          +(i.risk&&i.risk!=='null'?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')
+          +(shouldShowRisk(i.risk)?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')
           +'</div></div>';
       }).join('');
       var posHTML=(detail.positives||[]).map(function(p){return '<div class="point-row"><span>✅</span><span>'+p+'</span></div>';}).join('');
@@ -2551,12 +2889,47 @@ function renderResults(compat, nutrit, detail, rawIng){
     +(!nutrit.hasNutrition?'<div style="font-family:\'Jost\',sans-serif;font-size:11px;color:var(--muted);font-style:italic;margin-top:8px;padding-top:8px;border-top:0.5px solid var(--border)">* Fotografiați tabelul nutrițional pentru scor complet</div>':'')
   +'</div>';
 
+  // ── Filtrare alerte medicale ─────────────────────────────
+  // Alertele specifice unei boli apar doar dacă userul a declarat afecțiunea
+  // Alertele generale (alergeni, aditivi) apar întotdeauna
+  var RISCURI_MEDICALE = [
+    {keywords:['diabet','glicemi','insulină','insulina','zahăr','zahar','glucoză','glucoza'], conditie:'diabet'},
+    {keywords:['hipertensiune','tensiune arterială','tensiune arteriala','tensiune','sodiu','sare'], conditie:'hipertensiune'},
+    {keywords:['colesterol','grăsimi saturate','grasimi saturate','ateroscleroză','ateroscleroza'], conditie:'colesterol'},
+    {keywords:['ibs','colon iritabil','intestin iritabil','sindrom de colon'], conditie:'ibs'},
+    {keywords:['reflux','gerd','acid','arsuri','esofag'], conditie:'reflux'},
+    {keywords:['gută','guta','acid uric'], conditie:'guta'},
+    {keywords:['tiroidă','tiroida','tiroid','autoimun'], conditie:null}, // orice boala declarata
+    {keywords:['anticoagulant','coagulare','sânge','sange','tromboz'], conditie:null},
+    {keywords:['sedativ','sedare','somnifere'], conditie:null},
+    {keywords:['medicament','medicamente','interacțiune','interactiune','interacționa','interactioneaza'], conditie:null}
+  ];
+
+  function shouldShowRisk(riskText) {
+    if(!riskText || riskText === 'null') return false;
+    var riskLower = riskText.toLowerCase();
+    // Verificăm dacă riscul e medical specific
+    for(var r=0; r<RISCURI_MEDICALE.length; r++) {
+      var rm = RISCURI_MEDICALE[r];
+      var isMedical = rm.keywords.some(function(k){ return riskLower.includes(k); });
+      if(isMedical) {
+        // Dacă e medical și userul nu are nicio afecțiune → ascundem
+        if(activeConditions.size === 0) return false;
+        // Dacă are condiție specifică, verificăm
+        if(rm.conditie && !activeConditions.has(rm.conditie)) return false;
+        return true;
+      }
+    }
+    // Nu e medical specific → arătăm întotdeauna
+    return true;
+  }
+
   var ingHTML=(detail.ingredients||[]).slice(0,14).map(function(i){
     var dc=i.rating==='good'?'d-good':i.rating==='bad'?'d-bad':'d-medium';
     var sym=i.rating==='good'?'✓':i.rating==='bad'?'✗':'~';
     return '<div class="ing-row"><div class="ing-dot '+dc+'">'+sym+'</div>'
       +'<div><div class="ing-name">'+i.name+'</div><div class="ing-desc">'+i.desc+'</div>'
-      +(i.risk&&i.risk!=='null'?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')
+      +(shouldShowRisk(i.risk)?'<div class="ing-risk">⚠️ '+i.risk+'</div>':'')
       +'</div></div>';
   }).join('');
 
@@ -2571,6 +2944,13 @@ function renderResults(compat, nutrit, detail, rawIng){
     sursaBadge = '<div style="display:inline-flex;align-items:center;gap:4px;background:#e8f5e9;color:#2e7d32;font-family:\'Jost\',sans-serif;font-size:10px;padding:3px 8px;border-radius:10px;margin-bottom:10px">🟢 Baza EtiQuette</div>';
   } else {
     sursaBadge = '<div style="display:inline-flex;align-items:center;gap:4px;background:#fff8e1;color:#f57f17;font-family:\'Jost\',sans-serif;font-size:10px;padding:3px 8px;border-radius:10px;margin-bottom:10px">🟡 Scanat manual</div>';
+  }
+  if(nutrit.categorie === 'ceai'){
+    sursaBadge += '<div style="display:inline-flex;align-items:center;gap:4px;background:#e8f5e9;color:#2e7d32;font-family:\'Jost\',sans-serif;font-size:10px;padding:3px 8px;border-radius:10px;margin-bottom:10px;margin-left:4px">🍵 Ceai din plante</div>';
+  } else if(nutrit.categorie === 'apa'){
+    sursaBadge += '<div style="display:inline-flex;align-items:center;gap:4px;background:#e3f2fd;color:#1565c0;font-family:\'Jost\',sans-serif;font-size:10px;padding:3px 8px;border-radius:10px;margin-bottom:10px;margin-left:4px">💧 Apă</div>';
+  } else if(nutrit.categorie === 'cola'){
+    sursaBadge += '<div style="display:inline-flex;align-items:center;gap:4px;background:#fce4ec;color:#c62828;font-family:\'Jost\',sans-serif;font-size:10px;padding:3px 8px;border-radius:10px;margin-bottom:10px;margin-left:4px">🥤 Băutură carbogazoasă</div>';
   }
 
   document.getElementById('results').innerHTML=
