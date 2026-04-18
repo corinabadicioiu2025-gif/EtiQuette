@@ -19,28 +19,47 @@ exports.handler = async function(event) {
       };
     }
 
-    // ── Funcție de căutare în OFF ────────────────────────────
-    // FIX: înlocuit Buffer.from().toString('base64') cu btoa()
-    // Buffer nu e disponibil în toate mediile Netlify și cauza eroarea 500
+    // ── Algoritm fuzzy matching — același ca în searchEtiQuette ──
+    function normalizeText(text) {
+      if (!text) return '';
+      return text.toLowerCase()
+        .replace(/[ăâ]/g, 'a').replace(/[îí]/g, 'i').replace(/[șş]/g, 's')
+        .replace(/[țţ]/g, 't').replace(/[é]/g, 'e')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+    }
+
+    function tokenize(text) {
+      const stopwords = ['in', 'cu', 'de', 'la', 'si', 'sau', 'the', 'with', 'and', 'for'];
+      return normalizeText(text).split(' ')
+        .filter(w => w.length > 2 && !stopwords.includes(w));
+    }
+
+    function calcScor(tokensQuery, tokensProdus) {
+      if (!tokensQuery.length || !tokensProdus.length) return 0;
+      const comuni = tokensQuery.filter(t => tokensProdus.includes(t)).length;
+      const baza = Math.min(tokensQuery.length, tokensProdus.length);
+      return Math.round((comuni / baza) * 100);
+    }
+
+    // ── Funcție de căutare în OFF ────────────────────────────────
     async function searchOFF(query) {
-      // FIX: compatibil cu toate versiunile Node.js
       const credStr = 'carolina2025:5wPgVPzGK*!g8_F';
       const credentials = (typeof Buffer !== 'undefined')
         ? Buffer.from(credStr).toString('base64')
         : btoa(credStr);
-      const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=5&fields=product_name,brands,ingredients_text,nutriments,labels`;
-      
+
+      const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=8&fields=product_name,brands,ingredients_text,nutriments,labels`;
+
       const response = await fetch(url, {
         headers: {
           'User-Agent': 'EtiQuette/1.0 (contact@etiquette.app)',
           'Authorization': `Basic ${credentials}`
         },
-        // FIX: timeout explicit — fără timeout OFF poate bloca funcția indefinit
         timeout: 8000
       });
 
       if (!response.ok) {
-        // FIX: log status pentru debugging, returnăm array gol în loc de throw
         console.log('OFF status:', response.status, 'pentru query:', query);
         return [];
       }
@@ -49,51 +68,55 @@ exports.handler = async function(event) {
       try {
         data = await response.json();
       } catch(jsonErr) {
-        // FIX: OFF returnează uneori HTML în loc de JSON (când e down)
         console.log('OFF JSON parse error pentru query:', query);
         return [];
       }
 
-      // Returnăm doar produsele cu ingrediente complete
       return (data.products || []).filter(p =>
         p.ingredients_text && p.ingredients_text.length > 10
       );
     }
 
-    // ── Validare variantă produs ───────────────────────────
-    const variantTerms = ['zero', 'light', 'diet', 'sugar free', 'sans sucre',
-                          'max', 'plus', 'original', 'classic', 'cherry',
-                          'vanilla', 'lemon', 'orange', 'strawberry'];
-
-    const queryLower = search.toLowerCase();
-    const queryVariants = variantTerms.filter(t => queryLower.includes(t));
-
-    function hasVariantMatch(product, variants) {
-      if (variants.length === 0) return true;
-      const productText = ((product.product_name || '') + ' ' + (product.brands || '')).toLowerCase();
-      return variants.some(v => productText.includes(v));
-    }
-
-    // ── Construim variantele de query ──────────────────────
+    // ── Construim variantele de query ────────────────────────────
     const words = search.trim().split(/\s+/);
-
     const query1 = search.trim();
     const query2 = words.length > 2 ? words.slice(0, -1).join(' ') : null;
 
-    // ── Căutare în 2 straturi ──────────────────────────────
-    let products = [];
+    const tokensQuery = tokenize(search);
+    const PRAG_MINIM = 70;
 
-    // Stratul 1 — query complet
-    products = await searchOFF(query1);
-    products = products.filter(p => hasVariantMatch(p, queryVariants));
+    console.log('OFF search query:', search);
+    console.log('Tokens query:', tokensQuery);
 
-    // Stratul 2 — fără ultimul cuvânt
-    if (products.length === 0 && query2 && query2 !== query1) {
-      products = await searchOFF(query2);
-      products = products.filter(p => hasVariantMatch(p, queryVariants));
+    let bestProduct = null;
+    let bestScor = 0;
+
+    async function searchAndScore(query) {
+      const products = await searchOFF(query);
+      products.forEach(p => {
+        const productText = (p.product_name || '') + ' ' + (p.brands || '');
+        const tokensProdus = tokenize(productText);
+        const scor = calcScor(tokensQuery, tokensProdus);
+        console.log(`  Candidat: "${productText}" -> scor ${scor}%`);
+        if (scor > bestScor) {
+          bestScor = scor;
+          bestProduct = p;
+        }
+      });
     }
 
-    if (products.length === 0) {
+    // Stratul 1 — query complet
+    await searchAndScore(query1);
+
+    // Stratul 2 — fără ultimul cuvânt dacă nu am găsit
+    if (bestScor < PRAG_MINIM && query2 && query2 !== query1) {
+      await searchAndScore(query2);
+    }
+
+    console.log('Best match: ' + (bestProduct ? bestProduct.product_name : 'none') + ' -> scor ' + bestScor + '%');
+
+    if (!bestProduct || bestScor < PRAG_MINIM) {
+      console.log('Scor ' + bestScor + '% < prag ' + PRAG_MINIM + '% -> found: false');
       return {
         statusCode: 200,
         headers,
@@ -101,10 +124,8 @@ exports.handler = async function(event) {
       };
     }
 
-    // ── Procesăm primul rezultat bun ───────────────────────
-    const p = products[0];
+    const p = bestProduct;
     const n = p.nutriments || {};
-
     const sodiumG = n['sodium_100g'] || null;
     const sodiumMg = sodiumG !== null ? Math.round(sodiumG * 1000) : null;
 
@@ -116,6 +137,7 @@ exports.handler = async function(event) {
         product_name: p.product_name || '',
         brand: p.brands || '',
         ingredients: p.ingredients_text || '',
+        scor_match: bestScor,
         nutrition: {
           energy_kj:     n['energy-kj_100g']    || null,
           fat:           n['fat_100g']           || null,
@@ -133,7 +155,6 @@ exports.handler = async function(event) {
     };
 
   } catch(e) {
-    // FIX: log eroarea completă pentru debugging în Netlify Functions log
     console.error('off-proxy eroare:', e.message, e.stack);
     return {
       statusCode: 500,
